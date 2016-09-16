@@ -1,0 +1,4 @@
+// FTC Apps
+include (':FtcRobotController')
+include ':openCV'
+include ':openCV'

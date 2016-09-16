@@ -1,0 +1,54 @@
+apply plugin: 'com.android.application'
+
+android {
+    signingConfigs {
+        debug {
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+            storeFile file('libs/ftc.debug.keystore')
+            storePassword 'android'
+        }
+    }
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 19
+    }
+    compileSdkVersion 19
+    buildToolsVersion '21.1.2'
+}
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:1.2.3'
+    }
+}
+
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        flatDir {
+            dirs 'out'
+        }
+    }
+}
+
+dependencies {
+    compile files('libs/android-support-v4.jar')
+    compile(name: 'RobotCore-release', ext: 'aar')
+    compile(name: 'Hardware-release', ext: 'aar')
+    compile(name: 'FtcCommon-release', ext: 'aar')
+    compile(name: 'ModernRobotics-release', ext: 'aar')
+    compile(name: 'Analytics-release', ext: 'aar')
+    compile(name: 'WirelessP2p-release', ext: 'aar')
+    compile files('libs/Vuforia.jar')
+    compile project(':openCV')
+}

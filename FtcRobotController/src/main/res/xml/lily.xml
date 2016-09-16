@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Robot>
+
+    <Motor name="turnTable" target="fix" />
+    <Motor name="elbow" target="fix" />
+    <Motor name="tapeMeasure" target="none" />
+
+    <ContServo name="brush" zero="0.5" />
+    <ContServo name="hook" zero="0.5" />
+    <ContServo name="people" zero="0.53" />
+
+    <Servo name="doorL" default="closed">
+        <Pos name="closed" val="0.65" />
+        <Pos name="open" val="0" />
+    </Servo>
+
+    <Servo name="doorR" default="closed">
+        <Pos name="closed" val="0.35" />
+        <Pos name="open" val="0.7" />
+    </Servo>
+
+    <Servo name="frontguard" default="down">
+        <Pos name="down" val="0.2" />
+        <Pos name="up" val="0.8" />
+    </Servo>
+
+    <Servo name="backguard" default="down">
+        <Pos name="down" val="0.2" />
+        <Pos name="up" val="0.9" />
+    </Servo>
+
+    <Servo name="redzip" default="close">
+        <Pos name="close" val="0" />
+        <Pos name="open" val="0.2" />
+    </Servo>
+
+    <Servo name="bluezip" default="close">
+        <Pos name="close" val="0.2" />
+        <Pos name="open" val="0" />
+    </Servo>
+
+    <LinearServo name="tapeAdjust" default="0" />
+
+    <Servo name="wrist" default="0.5" />
+
+</Robot>

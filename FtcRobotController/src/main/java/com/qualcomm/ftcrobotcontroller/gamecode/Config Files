@@ -1,0 +1,62 @@
+*Note: All controllers are named with Upper-Case Camel Notation (e.g. "DriveSystem")
+       Motors, servos, sensors, etc. are named with Lower-Case Camel Notation (e.g. "tapeMeasure")
+
+Larry Configuration File Set-Up:
+
+    Port 1: Legacy Module
+        Port 3: Servo Controller ("servos")
+            Port 1: "autoball"
+            Port 2: "latch"
+            Port 3: "flag"
+            Port 5: "gate"
+        Port 4: Motor Controller ("mechcontrol")
+            Port 1: "scissor"
+            Port 2: "stomper"
+        Port 5: Motor Controller ("drivesystem")
+            Port 1: "driveL"
+            Port 2: "driveR"
+            
+-----------------------------------------------------
+
+Billy Configuration File Set-Up:
+
+    Port 2: Device Interface Module ("Sensor")
+        Port 0: I2cDevice ("adafruit")
+    Port 3: Motor Controller ("Arm")
+        Port 1: "base"
+        Port 2: "turnTable"
+    Port 4: Motor Controller ("Tape")
+        Port 1: "tapeMeasure"
+    Port 5: Motor Controller ("DriveSystem")
+        Port 1: "driveR"
+        Port 2: "driveL"
+    Port 6: ServoController ("Servo")
+        Port 1: "elbow"
+        Port 2: "wrist"
+        Port 3: "door"
+        Port 4: "brush"
+        Port 5: "hook"
+        port 6: "tapeAdjust"
+
+----------------------------------------------------
+
+*Module-to-PowerDistribution Port Numbers Unknown*
+
+Lily Configuration File Set-Up:
+
+    Port 1: ServoController ("Servo Controller 1")
+        Port 1: Servo ("wrist")
+        Port 2: Servo ("brush")
+        Port 3: Servo ("hook")
+        Port 4: Servo ("doorL")
+        Port 5: Servo ("doorR")
+    Port 2: ServoController ("Servo Controller 2")
+        Port 2: LinearServo ("tapeAdjust")
+        Port 3: Servo ("frontguard")
+        Port 4: Servo ("redzip")
+        Port 5: Servo ("backguard")
+        Port 6: Servo ("bluezip")
+    Port 3: MotorController ("Motor Controller 1")
+        Port 1: Motor ("driveL")
+        Port 2: Motor ("driveR")
+    Port 4
