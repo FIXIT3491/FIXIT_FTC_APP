@@ -35,8 +35,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
     <!--
         Base application theme for API 14+. This theme completely replaces
+<<<<<<< HEAD
         AppBaseTheme from BOTH res/storedValues/styles.xml and
         res/storedValues-v11/styles.xml on API 14+ devices.
+=======
+        AppBaseTheme from BOTH res/values/styles.xml and
+        res/values-v11/styles.xml on API 14+ devices.
+>>>>>>> upstream/master
     -->
     <style name="AppBaseTheme" parent="android:Theme.Holo.Light.DarkActionBar">
         <!-- API 14 theme customizations can go here. -->

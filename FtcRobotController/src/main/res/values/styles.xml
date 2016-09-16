@@ -35,12 +35,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
     <!--
         Base application theme, dependent on API level. This theme is replaced
+<<<<<<< HEAD
         by AppBaseTheme from res/storedValues-vXX/styles.xml on newer devices.
+=======
+        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
+>>>>>>> upstream/master
     -->
     <style name="AppBaseTheme" parent="android:Theme.Light">
         <!--
             Theme customizations available in newer API levels can go in
+<<<<<<< HEAD
             res/storedValues-vXX/styles.xml, while customizations related to
+=======
+            res/values-vXX/styles.xml, while customizations related to
+>>>>>>> upstream/master
             backward-compatibility can go here.
         -->
     </style>
