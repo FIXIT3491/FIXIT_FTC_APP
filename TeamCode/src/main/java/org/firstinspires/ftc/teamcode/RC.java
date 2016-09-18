@@ -4,8 +4,9 @@ import android.app.Application;
 import android.content.Context;
 import android.view.View;
 
-import org.firstinspires.ftc.teamcode.roboticslibrary.FXTCamera;
+import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 import org.firstinspires.ftc.teamcode.roboticslibrary.FXTTelemetry;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -22,7 +23,6 @@ public class RC extends Application {
     public static FXTTelemetry t;
     public static HardwareMap h;
     public static FtcRobotControllerActivity a;
-    public static FXTCamera cam;
     public static HashMap<String, Object> adjust;
 
     public static void setOpMode(OpMode op) {
@@ -31,10 +31,6 @@ public class RC extends Application {
         t = new FXTTelemetry();
         t.setTelemetry(op.telemetry);
     }//setOpMode
-
-    public static void setCam(FXTCamera camera) {
-        cam = camera;
-    }//setCam
 
     public static boolean isOpModeActive() {
         if (o != null && o instanceof LinearOpMode) {
@@ -51,15 +47,6 @@ public class RC extends Application {
 
     public void stop() {
         t.close();
-        cam.destroy();
-
-        a.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                a.camView.setVisibility(View.INVISIBLE);
-                a.display.setVisibility(View.INVISIBLE);
-            }//run
-        });
     }//stop
 
     public static void addAdjustingValue(String name, Object toAdjust) {

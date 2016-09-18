@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.teamcode.newhardware;
 
-import org.firstinspires.ftc.teamcode.RC;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-
 /**
  * Created by User on 11/8/2015.
  */
@@ -13,12 +10,8 @@ public class LinearServo extends FXTServo {
     public double max = 1;
     private double length = 2.54;
 
-    public LinearServo(HardwareMap hardware, String address) {
-        super(hardware, address);
-    }
-
     public LinearServo(String address) {
-        super(RC.h, address);
+        super(address);
     }
 
     public void out(double speed) {

@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.newhardware.FXTSensors;
 
 import org.firstinspires.ftc.teamcode.RC;
 import com.qualcomm.robotcore.hardware.GyroSensor;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
 /**
  * Created by FIXIT on 15-08-23.
@@ -27,8 +26,8 @@ public class FXTGyroSensor extends FXTSensor {
         return "Gyro";
     }
 
-    public double returnValue() {
-        return gyro.getRotation();
+    public double[] returnValues() {
+        return new double[]{ gyro.getHeading(), gyro.getRotationFraction()};
 
     }
 

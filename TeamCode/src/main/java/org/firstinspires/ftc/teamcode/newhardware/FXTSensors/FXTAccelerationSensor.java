@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.newhardware.FXTSensors;
 
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.teamcode.RC;
 import com.qualcomm.robotcore.hardware.AccelerationSensor;
 
@@ -25,11 +26,11 @@ public class FXTAccelerationSensor extends FXTSensor {
     }
 
     public double[] returnValues() {
-        AccelerationSensor.Acceleration accelValues = accel.getAcceleration();
+        Acceleration accelValues = accel.getAcceleration();
 
-        double[] values = {accelValues.x,
-                            accelValues.y,
-                            accelValues.z};
+        double[] values = {accelValues.xAccel,
+                            accelValues.yAccel,
+                            accelValues.zAccel};
 
         for (int i = 0; i < values.length; i++) {
             values[i] = (float) SensorUtils.lowPassFilter(0.25, values[i], super.storedValues[i]);

@@ -1,11 +1,6 @@
 package org.firstinspires.ftc.teamcode.newhardware;
 
-import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.gamecode.ServoDebug;
-
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.ServoController;
 
 import java.util.HashMap;
 
@@ -36,41 +31,11 @@ public class ContinuousServo extends FXTServo implements Timeable {
     /**Constructors*/
 
     /**
-     * If you have the controller and the port you can use this constructor
-     * @param s The servo controller
-     * @param portNumber the port on that servo controller
-     */
-    public ContinuousServo(ServoController s, int portNumber){
-        super(s, portNumber);
-        stop();
-    }//ContinuousServo
-
-
-    /**
-     * Makes a continuous servo from a pre-existing servo
-     * @param s The pre existing servo
-     */
-    public ContinuousServo (Servo s) {
-        super(s.getController(), s.getPortNumber());
-        stop();
-    }//ContinuousServo
-
-    /**
-     * Simplest constructor accepts the Tele-Op mode hardwaremap and the name in the config file
-     * @param hardware The hardwareMap in OpMode
-     * @param address The name of the servo in the config file
-     */
-    public ContinuousServo (HardwareMap hardware, String address) {
-        super(hardware.servo.get(address).getController(), hardware.servo.get(address).getPortNumber());
-        stop();
-    }//ContinuousServo
-
-    /**
      * Simplest constructor accepts the Tele-Op mode hardwaremap and the name in the config file
      * @param address The name of the servo in the config file
      */
     public ContinuousServo (String address) {
-        this(RC.h, address);
+        super(address);
     }//ContinuousServo
 
     /**

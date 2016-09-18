@@ -13,7 +13,7 @@ public class LinearTester extends TeleOpMode {
 
     @Override
     public void initialize() {
-        l = new LinearServo(RC.h, "line");
+        l = new LinearServo("line");
         RC.t.addData(TAG, l.getPosition());
     }
 

@@ -6,7 +6,6 @@ import org.firstinspires.ftc.teamcode.newhardware.FXTDevice;
 import org.firstinspires.ftc.teamcode.newhardware.FXTServo;
 import org.firstinspires.ftc.teamcode.newhardware.LinearServo;
 import org.firstinspires.ftc.teamcode.newhardware.Motor;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.xmlpull.v1.XmlPullParser;
 

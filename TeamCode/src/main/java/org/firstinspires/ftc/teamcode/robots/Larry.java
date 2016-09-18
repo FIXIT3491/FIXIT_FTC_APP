@@ -41,16 +41,16 @@ public class Larry extends Robot {
 
         fxt = new OnBoardSensorManager();
 
-        scissor = new Motor(RC.h, "scissor");
-        stomper = new Motor(RC.h, "stomper");
+        scissor = new Motor("scissor");
+        stomper = new Motor("stomper");
         stomper.setReverse(true);
 
-        flag = new ContinuousServo(RC.h, "flag");
+        flag = new ContinuousServo("flag");
         flag.setZeroPosition(0.52);
 
-        latch = new FXTServo(RC.h, "latch");
-        autoball = new FXTServo(RC.h, "autoball");
-        gate = new FXTServo(RC.h, "gate");
+        latch = new FXTServo("latch");
+        autoball = new FXTServo("autoball");
+        gate = new FXTServo("gate");
 
         initializeSensors();
 
@@ -60,15 +60,15 @@ public class Larry extends Robot {
     public Larry(Motor driveL, Motor driveR) {
         super(driveL, driveR);
 
-        scissor = new Motor(RC.h, "scissor");
-        stomper = new Motor(RC.h, "stomper");
+        scissor = new Motor("scissor");
+        stomper = new Motor("stomper");
         stomper.setReverse(true);
 
-        flag = new ContinuousServo(RC.h, "flag");
+        flag = new ContinuousServo("flag");
         flag.setZeroPosition(0.52);
-        latch = new FXTServo(RC.h, "latch");
-        autoball = new FXTServo(RC.h, "autoball");
-        gate = new FXTServo(RC.h, "gate");
+        latch = new FXTServo("latch");
+        autoball = new FXTServo("autoball");
+        gate = new FXTServo("gate");
 
         initializeSensors();
 

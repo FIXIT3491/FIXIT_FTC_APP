@@ -126,6 +126,7 @@ public abstract class HidBridge {
      */
     public void startReadingThread() {
         if (_readingThread == null) {
+
             RC.a.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {

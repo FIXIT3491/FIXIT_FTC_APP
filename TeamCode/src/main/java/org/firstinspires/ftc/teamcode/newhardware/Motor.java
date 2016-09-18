@@ -3,20 +3,21 @@ package org.firstinspires.ftc.teamcode.newhardware;
 
 import org.firstinspires.ftc.teamcode.RC;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorController;
-import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 /**
  * Created by FIXIT on 15-08-18.
  * This class take the basic functionality of DcMotor but adds some methods to it
  */
-public class Motor extends DcMotor implements FXTDevice, Timeable {
+public class Motor implements FXTDevice, Timeable {
 
     public static final double CHEC_TAR_PROP_CONST = 4000.0;
     public static final double CHEC_TAR_FIX_PROP_CONST = 500.0;
     public static final double TAR_ACC_CONST = 5.0;
 
     public double commandedSpeed = 0;
+
+    private DcMotor m;
 
     public boolean targetCheck = false;
     public boolean reachedTarget = true;
@@ -41,36 +42,9 @@ public class Motor extends DcMotor implements FXTDevice, Timeable {
      */
 
     public Motor (DcMotor motor) {
-        super(motor.getController(), motor.getPortNumber());
-        this.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        this.m = motor;
+        m.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
         beginningPosition = getCurrentPosition();
-    }//Motor
-
-    /**
-     * Initializes a new Motor based on the motor controller and port
-     *
-     * @param dcMotorController a pre-existing DcMotorController
-     * @param portNumber the port the motor is in either 1 or 2
-     * @see DcMotor
-     */
-
-    public Motor (DcMotorController dcMotorController, int portNumber) {
-        super(dcMotorController, portNumber);
-        this.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        beginningPosition = getCurrentPosition();
-    }//Motor
-
-    /**
-     * Initializes a new Motor from the OpMode HardwareMap and uses the key determined by the
-     * XML config file. Then it uses this DcMotor to call the first constructor
-     *
-     * @param hardware The OpMode HardwareMap.
-     * @param address the port the motor is in either 1 or 2
-     * @see com.qualcomm.robotcore.hardware.DcMotor
-     */
-
-    public Motor (HardwareMap hardware, String address) {
-        this(hardware.dcMotor.get(address));
     }//Motor
 
     public Motor(String address) {
@@ -87,9 +61,9 @@ public class Motor extends DcMotor implements FXTDevice, Timeable {
      */
     public void setReverse (boolean reverse) {
         if (reverse) {
-            setDirection(Direction.REVERSE);
+            m.setDirection(DcMotorSimple.Direction.REVERSE);
         } else {
-            setDirection(Direction.FORWARD);
+            m.setDirection(DcMotorSimple.Direction.FORWARD);
         }//else
     }//setReverse
 
@@ -194,7 +168,18 @@ public class Motor extends DcMotor implements FXTDevice, Timeable {
 
     //SET MOTOR POWER
 
-    @Override
+    public int getCurrentPosition() {
+        return m.getCurrentPosition();
+    }
+
+    public double getPower() {
+        return m.getPower();
+    }
+
+    public void setMode(DcMotor.RunMode mode) {
+        m.setMode(mode);
+    }
+
     public void setPower(double power) {
         setPowerSuper(power);
         this.commandedSpeed = power;
@@ -213,7 +198,7 @@ public class Motor extends DcMotor implements FXTDevice, Timeable {
             power = minSpeed;
         }//elseif
 
-        super.setPower(power);
+        m.setPower(power);
     }//setPowerSuper
 
 

@@ -157,12 +157,6 @@ public class NavSystem {
 
         Utils.matToBitmap(createDistMap(smooth(heights), img.size()), bit);
 
-        try {
-            RC.a.display.setImageBitmap(bit);
-        } catch (Exception e) {
-
-        }//catch
-
         double angle = combineHeightsToAngle(heights, img.size());
 
         return angle;

@@ -1,35 +1,26 @@
 package org.firstinspires.ftc.teamcode.newhardware;
 
 import org.firstinspires.ftc.teamcode.RC;
-import com.qualcomm.robotcore.hardware.HardwareMap;
+
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.ServoController;
 
 import java.util.HashMap;
 
 /**
  * Created by Nirzvi on 15-08-21.
  */
-public class FXTServo extends Servo implements FXTDevice {
+public class FXTServo implements FXTDevice {
 
+    private Servo s;
     public double currentPos = 0.0;
 
     protected HashMap<String, Double> pos = new HashMap<String, Double>();
 
     public FXTServo(Servo s) {
-        super(s.getController(), s.getPortNumber());
+        this.s = s;
     }
-
-    public FXTServo(ServoController sControl, int portNumber) {
-        super(sControl, portNumber);
-    }
-
-    public FXTServo(HardwareMap hardware, String address) {
-        this(hardware.servo.get(address));
-    }
-
     public FXTServo(String address) {
-        this(RC.h, address);
+        this((Servo) RC.h.get(address));
     }
 
     public void addPos (String name, double position) {
@@ -45,7 +36,7 @@ public class FXTServo extends Servo implements FXTDevice {
     }
 
     public void goTo(int position) {
-        super.setPosition(position);
+        s.setPosition(position);
     }
 
     private double translate (int angle) {
@@ -56,13 +47,17 @@ public class FXTServo extends Servo implements FXTDevice {
         setPosition(currentPos);
     }
 
+    public double getPosition() {
+        return s.getPosition();
+    }
+
     public void setPosition(double pos) {
 
         if(pos > 1) pos = 1;
         if(pos < 0) pos = 0;
 
         currentPos = pos;
-        super.setPosition(pos);
+        s.setPosition(pos);
     }//setPosition
 
     public void add(double increment) {

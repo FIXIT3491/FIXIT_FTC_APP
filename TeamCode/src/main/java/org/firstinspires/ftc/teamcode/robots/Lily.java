@@ -10,7 +10,8 @@ import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.AdafruitIMU;
 import org.firstinspires.ftc.teamcode.newhardware.FXTServo;
 import org.firstinspires.ftc.teamcode.newhardware.LinearServo;
 import org.firstinspires.ftc.teamcode.newhardware.Motor;
-import com.qualcomm.robotcore.hardware.DcMotorController;
+
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 
 import java.util.HashMap;
@@ -83,12 +84,12 @@ public class Lily extends Robot {
         super();
 
         if (!teleOp) {
-            motorL.setMode(DcMotorController.RunMode.RUN_WITHOUT_ENCODERS);
-            motorR.setMode(DcMotorController.RunMode.RUN_WITHOUT_ENCODERS);
+            motorL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            motorR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             adafruit = new AdafruitIMU("adafruit", (byte) AdafruitIMU.OPERATION_MODE_IMU);
         }//if
 
-        tapeAdjust = new LinearServo(RC.h, "tapeAdjust");
+        tapeAdjust = new LinearServo("tapeAdjust");
         tapeAdjust.max = 0.5;
 
         motorL.setReverse(true);
@@ -97,53 +98,53 @@ public class Lily extends Robot {
         tapeMeasure = new Motor("tapeMeasure");
         tapeMeasure.stop();
 
-        hook = new ContinuousServo(RC.h, "hook");
+        hook = new ContinuousServo("hook");
         hook.setZeroPosition(0.5);
 
-        frontguard = new FXTServo(RC.h, "frontguard");
+        frontguard = new FXTServo("frontguard");
         frontguard.addPos("down", 0.2);
         frontguard.addPos("up", 0.8);
         frontguard.goToPos("down");
 
-        backguard = new FXTServo(RC.h, "backguard");
+        backguard = new FXTServo("backguard");
         backguard.addPos("down", 0.2);
         backguard.addPos("up", 0.9);
         backguard.goToPos("down");
 
-        wrist = new FXTServo(RC.h, "wrist");
+        wrist = new FXTServo("wrist");
         wrist.setPosition(0.5);
 
-        doorL = new FXTServo(RC.h, "doorL");
+        doorL = new FXTServo("doorL");
         doorL.addPos("closed", 0.65);
         doorL.addPos("open", 0);
         doorL.goToPos("closed");
 
-        doorR = new FXTServo(RC.h, "doorR");
+        doorR = new FXTServo("doorR");
         doorR.addPos("closed", 0.35);
         doorR.addPos("open", 0.7);
         doorR.goToPos("closed");
 
-        brush = new ContinuousServo(RC.h, "brush");
+        brush = new ContinuousServo("brush");
         brush.setZeroPosition(0.5);
 
-        redZipliner = new ContinuousServo(RC.h, "redzip");
+        redZipliner = new ContinuousServo("redzip");
         redZipliner.addPos("open", 0.2);
         redZipliner.addPos("close", 0);
         redZipliner.goToPos("close");
 
-        blueZipliner = new ContinuousServo(RC.h, "bluezip");
+        blueZipliner = new ContinuousServo("bluezip");
         blueZipliner.addPos("open", 0);
         blueZipliner.addPos("close", 0.2);
         blueZipliner.goToPos("close");
 
-        people = new ContinuousServo(RC.h, "people");
+        people = new ContinuousServo("people");
         people.setZeroPosition(0.53);
 
-        turnTable = new Motor(RC.h, "turnTable");
+        turnTable = new Motor("turnTable");
         turnTable.toggleTargetFixing(true);
         turnTable.accuracy = 11;
 
-        elbow = new Motor(RC.h, "elbow");
+        elbow = new Motor("elbow");
         elbow.toggleTargetFixing(true);
 
         EOPD = RC.h.opticalDistanceSensor.get("eopd");

@@ -13,8 +13,8 @@ public class MarsRover extends Robot {
 
     public MarsRover(HardwareMap hardware) {
         super();
-        drill = new Motor(hardware, "drill");
-        arm = new Motor(hardware, "arm");
+        drill = new Motor("drill");
+        arm = new Motor("arm");
     }
 
     public void armUp() {

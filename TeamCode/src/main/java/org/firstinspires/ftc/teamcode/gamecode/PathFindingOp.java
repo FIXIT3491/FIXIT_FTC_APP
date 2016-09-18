@@ -8,7 +8,8 @@ import org.firstinspires.ftc.teamcode.opmodesupport.NavSystem;
 import org.firstinspires.ftc.teamcode.opmodesupport.TeleOpMode;
 import org.firstinspires.ftc.teamcode.roboticslibrary.OCVUtils;
 import org.firstinspires.ftc.teamcode.robots.Robot;
-import com.qualcomm.robotcore.hardware.DcMotorController;
+
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.opencv.android.Utils;
 import org.opencv.core.CvType;
@@ -31,7 +32,6 @@ public class PathFindingOp extends TeleOpMode {
     public void initialize() {
         RC.t.setDataLogFile("weights", true);
 
-        RC.cam.start();
         robot = new Robot();
 //        adafruit = new AdafruitIMU("adafruit", AdafruitIMU.OPERATION_MODE_IMU);
 
@@ -56,7 +56,7 @@ public class PathFindingOp extends TeleOpMode {
         }
 
         if (stage > 0) {
-            Bitmap newImg = Bitmap.createScaledBitmap(RC.cam.image, 300, 400, false);
+            Bitmap newImg = null;
 
             Mat current = new Mat(newImg.getHeight(), newImg.getWidth(), CvType.CV_8UC3);
             Utils.bitmapToMat(newImg, current);

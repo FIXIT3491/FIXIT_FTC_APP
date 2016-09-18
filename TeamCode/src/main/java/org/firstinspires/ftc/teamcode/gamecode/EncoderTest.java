@@ -5,7 +5,8 @@ import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.FXTVoltageSensor;
 import org.firstinspires.ftc.teamcode.newhardware.Motor;
 import org.firstinspires.ftc.teamcode.opmodesupport.TeleOpMode;
 import org.firstinspires.ftc.teamcode.robots.Lily;
-import com.qualcomm.robotcore.hardware.DcMotorController;
+
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 /**
  * Created by FIXIT on 8/19/2015.
@@ -25,7 +26,7 @@ public class EncoderTest extends TeleOpMode {
         testing = new Motor("tester");
         volts = new FXTVoltageSensor("Motor Controller 1");
         setDataLogFile("motor.txt", true);
-        testing.setMode(DcMotorController.RunMode.RUN_WITHOUT_ENCODERS);
+        testing.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODERS);
     }
 
     @Override

@@ -32,35 +32,35 @@ public class Billy extends Robot {
     public Billy(boolean teleOp) {
         super();
 
-        brush = new ContinuousServo(RC.h, "brush");
+        brush = new ContinuousServo("brush");
         brush.setZeroPosition(0.53);
 
-        baseJoint = new Motor(RC.h, "base");
+        baseJoint = new Motor("base");
         baseJoint.toggleTargetChecking(true);
 
-        turnTable = new Motor(RC.h, "turnTable");
+        turnTable = new Motor("turnTable");
         turnTable.toggleTargetChecking(true);
 
-        elbow = new LinearServo(RC.h, "elbow");
-        wrist = new LinearServo(RC.h, "wrist");
-        hook = new ContinuousServo(RC.h, "hook");
+        elbow = new LinearServo("elbow");
+        wrist = new LinearServo("wrist");
+        hook = new ContinuousServo("hook");
         hook.setZeroPosition(0.53);
 
-        door = new FXTServo(RC.h, "door");
+        door = new FXTServo("door");
         door.addPos("open", 1);
         door.addPos("close", 0);
 
 
-        tapeMeasure = new Motor(RC.h, "tapeMeasure");
+        tapeMeasure = new Motor("tapeMeasure");
         tapeMeasure.stop();
 
         if (!teleOp) {
             adafruit = new AdafruitIMU("adafruit", (byte) AdafruitIMU.OPERATION_MODE_IMU);
         }
 
-        tapeAdjust = new LinearServo(RC.h, "tapeAdjust");
+        tapeAdjust = new LinearServo("tapeAdjust");
         tapeAdjust.setPosition(0);
-        ziplines = new Motor(RC.h, "lights");
+        ziplines = new Motor("lights");
         ziplines.setPower(0.1);
     }//constructor
 

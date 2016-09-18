@@ -51,6 +51,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -99,6 +100,8 @@ public class FtcRobotControllerActivity extends Activity {
 
   public static final String TAG = "RCActivity";
 
+  public static FtcRobotControllerActivity instance = null;
+
   private static final int REQUEST_CONFIG_WIFI_CHANNEL = 1;
   private static final boolean USE_DEVICE_EMULATION = false;
   private static final int NUM_GAMEPADS = 2;
@@ -133,6 +136,8 @@ public class FtcRobotControllerActivity extends Activity {
 
   protected FtcEventLoop eventLoop;
   protected Queue<UsbDevice> receivedUsbAttachmentNotifications;
+
+  public ImageView img;
 
   protected class RobotRestarter implements Restarter {
 
@@ -200,6 +205,10 @@ public class FtcRobotControllerActivity extends Activity {
     eventLoop = null;
 
     setContentView(R.layout.activity_ftc_controller);
+
+    img = (ImageView) findViewById(R.id.display);
+
+    instance = this;
 
     context = this;
     utility = new Utility(this);
@@ -282,6 +291,7 @@ public class FtcRobotControllerActivity extends Activity {
     updateUIAndRequestRobotSetup();
 
     cfgFileMgr.getActiveConfigAndUpdateUI();
+    cfgFileMgr.changeBackground(0xFF539E2E, R.id.idActiveConfigHeader);
 
     entireScreenLayout.setOnTouchListener(new View.OnTouchListener() {
       @Override
@@ -464,6 +474,7 @@ public class FtcRobotControllerActivity extends Activity {
     if (request == LaunchActivityConstantsList.FTC_CONFIGURE_REQUEST_CODE_ROBOT_CONTROLLER) {
       // We always do a refresh, whether it was a cancel or an OK, for robustness
       cfgFileMgr.getActiveConfigAndUpdateUI();
+      cfgFileMgr.changeBackground(0xFF539E2E, R.id.idActiveConfigHeader);
     }
   }
 
@@ -488,6 +499,8 @@ public class FtcRobotControllerActivity extends Activity {
 
     HardwareFactory factory;
     RobotConfigFile file = cfgFileMgr.getActiveConfigAndUpdateUI();
+    cfgFileMgr.changeBackground(0xFF539E2E, R.id.idActiveConfigHeader);
+    
     HardwareFactory hardwareFactory = new HardwareFactory(context);
     hardwareFactory.setXmlPullParser(file.getXml());
     factory = hardwareFactory;

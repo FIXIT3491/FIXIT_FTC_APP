@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.newhardware.FXTSensors;
 
 import org.firstinspires.ftc.teamcode.RC;
-import com.qualcomm.robotcore.hardware.HardwareMap;
+
 import com.qualcomm.robotcore.hardware.LightSensor;
 
 /**
@@ -29,7 +29,7 @@ public class FXTLightSensor extends FXTSensor {
     }
 
     protected double[] returnValues() {
-        return new double[] {light.getLightDetected(), light.getLightDetectedRaw()};
+        return new double[] {light.getLightDetected(), light.getRawLightDetected()};
     }
 
     public void enableLed (boolean b) {

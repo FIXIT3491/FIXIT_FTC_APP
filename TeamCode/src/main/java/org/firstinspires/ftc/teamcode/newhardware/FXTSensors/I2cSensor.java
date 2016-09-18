@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.newhardware.FXTSensors;
 import android.util.Log;
 
 import org.firstinspires.ftc.teamcode.RC;
+
+import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.I2cController;
 import com.qualcomm.robotcore.hardware.I2cDevice;
 
@@ -12,8 +14,8 @@ import com.qualcomm.robotcore.hardware.I2cDevice;
 public class I2cSensor extends FXTSensor implements I2cController.I2cPortReadyCallback {
 
     public I2cDevice device;
-    public int i2cReadAddr;
-    public int i2cWriteAddr;
+    public I2cAddr i2cReadAddr;
+    public I2cAddr i2cWriteAddr;
     public int currentReadAddress;
     public int MAX_BYTE_COUNT = 26;
 
@@ -37,8 +39,8 @@ public class I2cSensor extends FXTSensor implements I2cController.I2cPortReadyCa
     public I2cSensor (String name, byte i2cReadAddr, byte i2cWriteAddr) {
 
         device = RC.h.i2cDevice.get(name);
-        this.i2cReadAddr = (int) i2cReadAddr & 0xFF;
-        this.i2cWriteAddr = i2cWriteAddr;
+        this.i2cReadAddr = new I2cAddr(i2cReadAddr);
+        this.i2cWriteAddr = new I2cAddr(i2cWriteAddr);
 
     } //I2cSensor
 

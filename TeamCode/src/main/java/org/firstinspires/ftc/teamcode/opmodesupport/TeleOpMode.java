@@ -96,7 +96,6 @@ public abstract class TeleOpMode extends OpMode {
      */
     @Override
     public void stop() {
-        RC.cam.stop();
         RC.t.close();
     }
 

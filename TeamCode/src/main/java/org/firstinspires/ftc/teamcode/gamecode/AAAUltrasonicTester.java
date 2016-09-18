@@ -2,8 +2,8 @@ package org.firstinspires.ftc.teamcode.gamecode;
 
 import android.util.Log;
 
-        import org.firstinspires.ftc.teamcode.RC;
-        import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.DigitalUltrasonicSensor;
+import org.firstinspires.ftc.teamcode.RC;
+import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.DigitalUltrasonicSensor;
 import org.firstinspires.ftc.teamcode.opmodesupport.LoopThread;
 import org.firstinspires.ftc.teamcode.opmodesupport.TeleOpMode;
 

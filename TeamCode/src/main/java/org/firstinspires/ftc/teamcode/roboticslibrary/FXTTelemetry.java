@@ -2,8 +2,8 @@ package org.firstinspires.ftc.teamcode.roboticslibrary;
 
 import android.util.Log;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.FXTSensor;
-import com.qualcomm.robotcore.robocol.Telemetry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,6 +82,10 @@ public class FXTTelemetry {
 
     public void addData(String key, byte data) {
         telemetry.addData(key, data);
+    }
+
+    public void addData(String key, Object data) {
+        telemetry.addData(key, data.toString());
     }
 
 

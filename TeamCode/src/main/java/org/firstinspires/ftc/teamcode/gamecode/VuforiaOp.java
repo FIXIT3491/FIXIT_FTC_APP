@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.gamecode;
 
 import android.util.Log;
 
-import com.qualcomm.ftcrobotcontroller.FtcRobotControllerActivity;
 import org.firstinspires.ftc.teamcode.roboticslibrary.FTCVuforia;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
@@ -20,9 +19,6 @@ public class VuforiaOp extends OpMode {
 
     @Override
     public void init() {
-        vuf = FtcRobotControllerActivity.getVuforia();
-        vuf.addTrackables("Ftc_OT.xml");
-        vuf.initVuforia();
     }
 
     @Override
