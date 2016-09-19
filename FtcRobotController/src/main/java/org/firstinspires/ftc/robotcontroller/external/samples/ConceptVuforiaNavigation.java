@@ -252,6 +252,7 @@ public class ConceptVuforiaNavigation extends LinearOpMode {
          * axis towards the origin. A positive rotation about Z (ie: a rotation parallel to the the X-Y
          * plane) is then CCW, as one would normally expect from the usual classic 2D geometry.
          */
+        new OpenGLMatrix().inverted();
         OpenGLMatrix phoneLocationOnRobot = OpenGLMatrix
                 .translation(mmBotWidth/2,0,0)
                 .multiplied(Orientation.getRotationMatrix(
