@@ -414,19 +414,19 @@ public abstract class TeleOpMode extends OpMode {
         }
 
         public float x1(){
-            return (Math.abs(gamepads[padIndex].left_stick_x) > 0.09) ? -gamepads[padIndex].left_stick_x : 0;
+            return (Math.abs(gamepads[padIndex].left_stick_x) > 0.09) ? gamepads[padIndex].left_stick_x : 0;
         }
 
         public float x2(){
-            return (Math.abs(gamepads[padIndex].right_stick_x) > 0.09)? -gamepads[padIndex].right_stick_x : 0;
+            return (Math.abs(gamepads[padIndex].right_stick_x) > 0.09)? gamepads[padIndex].right_stick_x : 0;
         }
 
         public float y1(){
-            return (Math.abs(gamepads[padIndex].left_stick_y) > 0.09)? -gamepads[padIndex].left_stick_y : 0;
+            return (Math.abs(gamepads[padIndex].left_stick_y) > 0.09)? gamepads[padIndex].left_stick_y : 0;
         }
 
         public float y2(){
-            return (Math.abs(gamepads[padIndex].right_stick_y) > 0.09)? -gamepads[padIndex].right_stick_y : 0;
+            return (Math.abs(gamepads[padIndex].right_stick_y) > 0.09)? gamepads[padIndex].right_stick_y : 0;
         }
 
 

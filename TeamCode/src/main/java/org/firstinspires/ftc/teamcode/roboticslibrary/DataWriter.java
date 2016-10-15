@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.roboticslibrary;
 
+import org.firstinspires.ftc.robotcore.internal.AppUtil;
 import org.firstinspires.ftc.teamcode.RC;
 
 import java.io.File;
@@ -14,7 +15,7 @@ public class DataWriter extends FileOutputStream {
 
     public DataWriter(String fileName, boolean overWrite) throws FileNotFoundException {
 
-        super(new File(RC.c.getExternalFilesDir(null).getAbsolutePath() + "/" + fileName.replace(".txt", "") + ".txt"), !overWrite);
+        super(new File(AppUtil.getInstance().getActivity().getExternalFilesDir(null).getAbsolutePath() + "/" + fileName.replace(".txt", "") + ".txt"), !overWrite);
 
     }
 

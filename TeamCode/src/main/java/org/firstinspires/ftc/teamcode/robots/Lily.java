@@ -141,11 +141,13 @@ public class Lily extends Robot {
         people.setZeroPosition(0.53);
 
         turnTable = new Motor("turnTable");
-        turnTable.toggleTargetFixing(true);
-        turnTable.accuracy = 11;
+        turnTable.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        turnTable.toggleTargetFixing(true);
+//        turnTable.accuracy = 11;
 
         elbow = new Motor("elbow");
-        elbow.toggleTargetFixing(true);
+        elbow.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        elbow.toggleTargetFixing(true);
 
         EOPD = RC.h.opticalDistanceSensor.get("eopd");
         wheelDiameter = 5;
@@ -166,15 +168,15 @@ public class Lily extends Robot {
     }
 
     public boolean armReady() {
-        return elbow.reachedTarget && turnTable.reachedTarget;
+        return !elbow.isBusy() && !turnTable.isBusy();
     }
 
     public void checkAllSystems() {
 
         super.checkAllSystems();
 
-        elbow.check();
-        turnTable.check();
+//        elbow.check();
+//        turnTable.check();
 
         if (adafruit != null) {
             angleCheck();
@@ -221,24 +223,32 @@ public class Lily extends Robot {
 
         if (elbowFirst) {
             if (motionStage == 0) {
-                elbow.setTarget(elbow.beginningPosition + newElbowPosition - elbow.getCurrentPosition(), 0.4);
+                elbow.setTargetPosition(elbow.beginningPosition + newElbowPosition - elbow.getCurrentPosition());
+                elbow.setPower(0.3);
                 motionStage++;
             } else if (motionStage == 1 && armReady()) {
-                turnTable.setTarget(turnTable.beginningPosition + newTurnTablePosition - turnTable.getCurrentPosition(), 0.15);
+                elbow.stop();
+                turnTable.setTargetPosition(turnTable.beginningPosition + newTurnTablePosition - turnTable.getCurrentPosition());
+                turnTable.setPower(0.3);
                 motionStage++;
             } else if (motionStage == 2 && armReady()) {
+                turnTable.stop();
                 wrist.setPosition(newWristPosition);
                 motionStage = 0;
                 return true;
             }//elseif
         } else {
             if (motionStage == 0) {
-                turnTable.setTarget(turnTable.beginningPosition + newTurnTablePosition - turnTable.getCurrentPosition(), 0.15);
+                turnTable.setTargetPosition(turnTable.beginningPosition + newTurnTablePosition - turnTable.getCurrentPosition());
+                turnTable.setPower(0.3);
                 motionStage++;
             } else if (motionStage == 1 && armReady()) {
-                elbow.setTarget(elbow.beginningPosition + newElbowPosition - elbow.getCurrentPosition(), 0.4);
+                turnTable.stop();
+                elbow.setTargetPosition(elbow.beginningPosition + newElbowPosition - elbow.getCurrentPosition());
+                elbow.setPower(0.3);
                 motionStage++;
             } else if (motionStage == 2 && armReady()) {
+                elbow.stop();
                 wrist.setPosition(newWristPosition);
                 motionStage = 0;
                 return true;

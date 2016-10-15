@@ -45,14 +45,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -104,7 +102,6 @@ public class FtcRobotControllerActivity extends Activity {
 
   public static final String TAG = "RCActivity";
 
-  public static FtcRobotControllerActivity instance = null;
 
   private static final int REQUEST_CONFIG_WIFI_CHANNEL = 1;
   private static final boolean USE_DEVICE_EMULATION = false;
@@ -141,8 +138,6 @@ public class FtcRobotControllerActivity extends Activity {
   protected FtcEventLoop eventLoop;
   protected Queue<UsbDevice> receivedUsbAttachmentNotifications;
 
-  public ImageView img;
-
   protected class RobotRestarter implements Restarter {
 
     public void requestRestart() {
@@ -157,7 +152,7 @@ public class FtcRobotControllerActivity extends Activity {
       switch (status) {
         case LoaderCallbackInterface.SUCCESS:
         {
-          Log.i(TAG, "OpenCV loaded successfully");
+          RobotLog.i(TAG, "OpenCV loaded successfully");
           // Create and set View
 
         } break;
@@ -221,16 +216,13 @@ public class FtcRobotControllerActivity extends Activity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    RobotLog.writeLogcatToDisk();
     RobotLog.vv(TAG, "onCreate()");
 
     receivedUsbAttachmentNotifications = new ConcurrentLinkedQueue<UsbDevice>();
     eventLoop = null;
 
     setContentView(R.layout.activity_ftc_controller);
-
-    img = (ImageView) findViewById(R.id.display);
-
-    instance = this;
 
     context = this;
     utility = new Utility(this);
@@ -283,20 +275,17 @@ public class FtcRobotControllerActivity extends Activity {
 
     if (USE_DEVICE_EMULATION) { HardwareFactory.enableDeviceEmulation(); }
 
-    // save 4MB of logcat to the SD card
-    RobotLog.writeLogcatToDisk(this, 4 * 1024);
-    wifiLock.acquire();
-    callback.networkConnectionUpdate(WifiDirectAssistant.Event.DISCONNECTED);
-    bindToService();
-
     if (!OpenCVLoader.initDebug()) {
-      Log.d("OpenCV", "Internal OpenCV library not found. Using OpenCV Manager for initialization");
+      RobotLog.d("OpenCV", "Internal OpenCV library not found. Using OpenCV Manager for initialization");
       OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_0_0, this, mOpenCVCallBack);
     } else {
-      Log.d("OpenCV", "OpenCV library found inside package. Using it!");
+      RobotLog.d("OpenCV", "OpenCV library found inside package. Using it!");
       mOpenCVCallBack.onManagerConnected(LoaderCallbackInterface.SUCCESS);
     }
 
+    wifiLock.acquire();
+    callback.networkConnectionUpdate(WifiDirectAssistant.Event.DISCONNECTED);
+    bindToService();
   }
 
   protected UpdateUI createUpdateUI() {
@@ -367,7 +356,7 @@ public class FtcRobotControllerActivity extends Activity {
 
     unbindFromService();
     wifiLock.release();
-    RobotLog.cancelWriteLogcatToDisk(this);
+    RobotLog.cancelWriteLogcatToDisk();
   }
 
   protected void bindToService() {

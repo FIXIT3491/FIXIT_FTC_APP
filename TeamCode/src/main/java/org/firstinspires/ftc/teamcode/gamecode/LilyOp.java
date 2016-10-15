@@ -1,13 +1,21 @@
 package org.firstinspires.ftc.teamcode.gamecode;
 
+import android.util.Log;
+
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.opmodesupport.TeleOpMode;
+import org.firstinspires.ftc.teamcode.roboticslibrary.DataWriter;
 import org.firstinspires.ftc.teamcode.robots.Lily;
 import org.firstinspires.ftc.teamcode.robots.Robot;
+
+import java.io.FileNotFoundException;
 
 /**
  * Created by FIXIT on 8/29/2015
  */
+@TeleOp
 public class LilyOp extends TeleOpMode {
 
     Lily lily;
@@ -26,12 +34,19 @@ public class LilyOp extends TeleOpMode {
     boolean zipout = false;
     boolean hookMoving = false;
 
+    DataWriter writer;
+
     @Override
     public void initialize() {
         lily = new Lily(true);
         clearTimer(2);
         clearTimer(3);
-        setDataLogFile("volts.txt", true);
+        try {
+            writer = new DataWriter("teleopdatalog.txt", true);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+//        RC.t.setDataLogFile("volts.txt", true);
     }//initialize
 
     @Override
@@ -58,8 +73,8 @@ public class LilyOp extends TeleOpMode {
             right /= 5;
         }
 
-        lily.driveL(left);
-        lily.driveR(right);
+        lily.driveL(right);
+        lily.driveR(left);
 
 
         if (joy1.buttonX() && getMilliSeconds() > 500) {
@@ -163,32 +178,30 @@ public class LilyOp extends TeleOpMode {
         RC.t.dataLogData(hardwareMap.voltageSensor.get("Motor Controller 1").getVoltage() + "\n");
         if (!currentlySwitching) {
             if (joy2.buttonA() && armStage == COLLECT) {
-                lily.elbow.minSpeed = 0.2;
-                lily.elbow.setTarget(12, 0.9);
-                lily.elbow.accuracy = 11;
+                lily.elbow.setTargetPosition(12);
+                lily.elbow.setPower(0.4);
                 armStage = MANUAL;
             } else if (joy2.buttonY() && armStage == COLLECT) {
-                lily.elbow.setTarget(-12, 0.9);
-                lily.elbow.minSpeed = 0.1;
-                lily.elbow.accuracy = 11;
+                lily.elbow.setTargetPosition(-12);
+                lily.elbow.setPower(0.4);
                 armStage = MANUAL;
             } else if (joy2.buttonA()) {
-                lily.elbow.minSpeed = 0.3;
-                lily.elbow.setTarget(25, 0.9);
-                lily.elbow.accuracy = 24;
+                lily.elbow.setTargetPosition(-25);
+                lily.elbow.setPower(0.6);
                 armStage = MANUAL;
             } else if (joy2.buttonY()) {
-                lily.elbow.setTarget(-25, 0.9);
-                lily.elbow.minSpeed = 0.3;
-                lily.elbow.accuracy = 24;
+                lily.elbow.setTargetPosition(25);
+                lily.elbow.setPower(0.6);
                 armStage = MANUAL;
             } else
 
             if (joy2.buttonB()) {
-                lily.turnTable.setTarget(25, 1.8);
+                lily.turnTable.setTargetPosition(25);
+                lily.turnTable.setPower(0.6);
                 armStage = MANUAL;
             } else if (joy2.buttonX()) {
-                lily.turnTable.setTarget(-25, 1.8);
+                lily.turnTable.setTargetPosition(-25);
+                lily.turnTable.setPower(0.6);
                 armStage = MANUAL;
             }//elseif
 
@@ -259,14 +272,49 @@ public class LilyOp extends TeleOpMode {
         RC.t.addData("Elbow Position", lily.elbow.getCurrentPosition());
         RC.t.addData("Wrist Position", lily.wrist.getPosition());
 
+
+//        Log.i("Elbow", lily.elbow.getCurrentPosition() + "----" + lily.elbow.getM().getTargetPosition() + "");
+//        Log.i("TurnTable", lily.turnTable.getCurrentPosition() + "----" + lily.turnTable.getM().getTargetPosition() + "");
+
         lily.checkAllSystems(); //check all motor positions
         if (getMilliSeconds(4) > 119000) {
             lily.brush.stop();
         }
+
         if (joy2.buttonStart()) {
             lily.turnTable.stop();
             lily.elbow.stop();
-        }
+        }//if
+
+//        if (lily.elbow.reachedTarget()) {
+//            lily.elbow.stop();
+//        }//if
+//
+//        if (lily.turnTable.reachedTarget()) {
+//            lily.elbow.stop();
+//        }//if
+
+        writer.write("driveL: " + lily.motorL.returnCurrentState() + "\n");
+        writer.write("driveR: " + lily.motorR.returnCurrentState() + "\n");
+        writer.write("elbow: " + lily.elbow.returnCurrentState() + "\n");
+        writer.write("turnTable: " + lily.turnTable.returnCurrentState() + "\n");
+        writer.write("TurnTable/TapeMeasure MC: " + RC.h.voltageSensor.get("Motor Controller 3").getVoltage() + "\n");
+        writer.write("Drive MC: " + RC.h.voltageSensor.get("Motor Controller 2").getVoltage() + "\n");
+        writer.write("Elbow MC: " + RC.h.voltageSensor.get("Motor Controller 1").getVoltage() + "\n");
+
+//        RC.t.dataLogData("driveL", lily.motorL.returnCurrentState() + "\n");
+//        RC.t.dataLogData("driveR", lily.motorR.returnCurrentState() + "\n");
+//        RC.t.dataLogData("MotorC1", RC.h.voltageSensor.get("Motor Controller 1").getVoltage() + "\n");
+//        RC.t.dataLogData("MotorC2", RC.h.voltageSensor.get("Motor Controller 2").getVoltage() + "\n");
+//        RC.t.dataLogData("MotorC3", RC.h.voltageSensor.get("Motor Controller 3").getVoltage() + "\n");
+
     }//loopOpMode
+
+
+    public void stop() {
+        super.stop();
+
+        writer.closeWriter();
+    }
 
 }//class

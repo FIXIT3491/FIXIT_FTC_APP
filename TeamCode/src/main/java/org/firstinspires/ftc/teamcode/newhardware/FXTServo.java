@@ -35,9 +35,9 @@ public class FXTServo implements FXTDevice {
         setPosition(pos.get(name));
     }
 
-    public void goTo(int position) {
-        s.setPosition(position);
-    }
+    public void goTo(double position) {
+        setPosition(position);
+    }//goTo
 
     private double translate (int angle) {
         return angle / 180.0;
@@ -48,7 +48,9 @@ public class FXTServo implements FXTDevice {
     }
 
     public double getPosition() {
-        return s.getPosition();
+        synchronized (s) {
+            return s.getPosition();
+        }//synchronized
     }
 
     public void setPosition(double pos) {
@@ -57,7 +59,10 @@ public class FXTServo implements FXTDevice {
         if(pos < 0) pos = 0;
 
         currentPos = pos;
-        s.setPosition(pos);
+        synchronized (s) {
+            s.setPosition(pos);
+        }//synchronized
+
     }//setPosition
 
     public void add(double increment) {

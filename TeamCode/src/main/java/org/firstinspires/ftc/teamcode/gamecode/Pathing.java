@@ -6,7 +6,6 @@ import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.RC;
-import org.firstinspires.ftc.teamcode.opmodesupport.PathFinder;
 import org.firstinspires.ftc.teamcode.robots.Robot;
 
 /**
@@ -26,8 +25,6 @@ public class Pathing extends LinearOpMode {
         Robot robot = new Robot();
 
         waitForStart();
-
-        PathFinder.navigateTo(beacons.get(0), robot, PathFinder.PathType.DIRECT, true);
 
 
         /*

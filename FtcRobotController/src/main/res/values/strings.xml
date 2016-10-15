@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-<<<<<<< HEAD
-=======
 
 strings.xml in FtcRobotController
 
->>>>>>> upstream/master
 Copyright (c) 2014, 2015 Qualcomm Technologies Inc
 
 All rights reserved.
@@ -61,5 +58,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <string name="toastWifiConfigurationComplete">Configuration Complete</string>
   <string name="toastRestartingRobot">Restarting Robot</string>
   <string name="toastConfigureRobotBeforeProgrammingMode">You must Configure Robot before starting Programming Mode.</string>
+
   <string name="activeConfigCaption">Active Configuration</string>
 </resources>

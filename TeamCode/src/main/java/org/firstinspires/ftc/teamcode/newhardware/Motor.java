@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.newhardware;
 
 
+import android.util.Log;
+
 import org.firstinspires.ftc.teamcode.RC;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -23,13 +25,13 @@ public class Motor implements FXTDevice, Timeable {
     public boolean reachedTarget = true;
     public boolean isFixing = false;
 
-    public int target = getCurrentPosition();
+    public int target = 0;
     public int beginningPosition = 0;
     private long targetTime = -1;
 
     public double minSpeed = 0.09;
 
-    public int accuracy = 0;
+    public int accuracy = 20;
 
     /**
      * Constructors
@@ -43,7 +45,7 @@ public class Motor implements FXTDevice, Timeable {
 
     public Motor (DcMotor motor) {
         this.m = motor;
-        m.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+        m.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         beginningPosition = getCurrentPosition();
     }//Motor
 
@@ -60,11 +62,13 @@ public class Motor implements FXTDevice, Timeable {
      * @param reverse If true the motor is reversed
      */
     public void setReverse (boolean reverse) {
-        if (reverse) {
-            m.setDirection(DcMotorSimple.Direction.REVERSE);
-        } else {
-            m.setDirection(DcMotorSimple.Direction.FORWARD);
-        }//else
+        synchronized (m) {
+            if (reverse) {
+                m.setDirection(DcMotorSimple.Direction.REVERSE);
+            } else {
+                m.setDirection(DcMotorSimple.Direction.FORWARD);
+            }//else
+        }//synchronized
     }//setReverse
 
     /**
@@ -105,11 +109,11 @@ public class Motor implements FXTDevice, Timeable {
     }//finished
 
     public void setTarget(int target) {
-        this.target = target + getCurrentPosition();
-        this.reachedTarget = false;
-        accuracy = (int) (TAR_ACC_CONST * commandedSpeed);
 
         toggleTargetChecking(true);
+        this.target += target;
+        this.reachedTarget = false;
+        accuracy = (int) (TAR_ACC_CONST * commandedSpeed);
     }//setTarget
 
 
@@ -168,17 +172,45 @@ public class Motor implements FXTDevice, Timeable {
 
     //SET MOTOR POWER
 
-    public int getCurrentPosition() {
-        return m.getCurrentPosition();
+    public boolean isBusy() {
+        synchronized (m) {
+            return m.isBusy();
+        }//synchronized
+    }//isBusy
+
+    public boolean reachedTarget() {
+        return Math.abs(getCurrentPosition() - getM().getTargetPosition()) < 15;
+    }//reachedTarget
+
+    public DcMotor getM() {
+        synchronized (m) {
+            return m;
+        }//synchronized
+    }//getM
+
+    public void setTargetPosition(int tik) {
+        synchronized (m) {
+            m.setTargetPosition(tik + m.getCurrentPosition());
+        }
     }
+
+    public int getCurrentPosition() {
+        synchronized (m) {
+            return m.getCurrentPosition();
+        }//synchronized
+    }//getCurrentPosition
 
     public double getPower() {
-        return m.getPower();
-    }
+        synchronized (m) {
+            return m.getPower();
+        }//synchronized
+    }//getPower
 
     public void setMode(DcMotor.RunMode mode) {
-        m.setMode(mode);
-    }
+        synchronized (m) {
+            m.setMode(mode);
+        }//synchronized
+    }//setMode
 
     public void setPower(double power) {
         setPowerSuper(power);
@@ -198,7 +230,9 @@ public class Motor implements FXTDevice, Timeable {
             power = minSpeed;
         }//elseif
 
-        m.setPower(power);
+        synchronized (m) {
+            m.setPower(power);
+        }//synchronized
     }//setPowerSuper
 
 
@@ -206,10 +240,9 @@ public class Motor implements FXTDevice, Timeable {
 
     public String returnCurrentState() {
         return "Current Pos: " + getCurrentPosition() +
-                ", Speed: " + getPower() +
                 ", Commanded Speed: " + commandedSpeed +
                 ", Power: " + getPower() +
-                ", Target: " + target;
+                ", Target: " + getM().getTargetPosition();
     }//returnCurrentState
 
 

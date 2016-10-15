@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.gamecode;
 
 import android.util.Log;
 
-import org.firstinspires.ftc.teamcode.roboticslibrary.FTCVuforia;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import java.util.HashMap;
@@ -12,7 +11,7 @@ import java.util.HashMap;
  */
 public class VuforiaOp extends OpMode {
 
-    FTCVuforia vuf;
+    Object vuf;
     int stage = 1;
 
     HashMap<String, double[]> vuforiaData = new HashMap<String, double[]>();
@@ -23,7 +22,7 @@ public class VuforiaOp extends OpMode {
 
     @Override
     public void loop() {
-        vuforiaData = vuf.getVuforiaData();
+        vuforiaData = null; //vuf.getVuforiaData();
 
         if (vuforiaData.size() > 0) {
             if (vuforiaData.containsKey("block")) {
@@ -35,7 +34,7 @@ public class VuforiaOp extends OpMode {
     public void stop() {
         super.stop();
         try {
-            vuf.destroy();
+            vuf = null; //vuf.destroy();
         } catch (Exception e) {
             Log.i("Vuforia", e.getMessage());
         }

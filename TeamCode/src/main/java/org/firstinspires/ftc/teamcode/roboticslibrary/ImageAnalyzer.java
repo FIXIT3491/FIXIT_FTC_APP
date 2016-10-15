@@ -26,7 +26,6 @@ public class ImageAnalyzer {
 
     public double blobAccuracy = 4;
 
-
     public void updateImage(Bitmap bit){
         if(!analyzing) {
             startTime = System.currentTimeMillis();

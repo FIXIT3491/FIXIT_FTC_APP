@@ -98,7 +98,7 @@ public class ConceptVuforiaNavigation extends LinearOpMode {
      */
     VuforiaLocalizer vuforia;
 
-    @Override public void runOpMode() throws InterruptedException {
+    @Override public void runOpMode() {
         /**
          * Start up Vuforia, telling it the id of the view that we wish to use as the parent for
          * the camera monitor feedback; if no camera monitor feedback is desired, use the parameterless
@@ -252,7 +252,6 @@ public class ConceptVuforiaNavigation extends LinearOpMode {
          * axis towards the origin. A positive rotation about Z (ie: a rotation parallel to the the X-Y
          * plane) is then CCW, as one would normally expect from the usual classic 2D geometry.
          */
-        new OpenGLMatrix().inverted();
         OpenGLMatrix phoneLocationOnRobot = OpenGLMatrix
                 .translation(mmBotWidth/2,0,0)
                 .multiplied(Orientation.getRotationMatrix(
@@ -320,7 +319,6 @@ public class ConceptVuforiaNavigation extends LinearOpMode {
                 telemetry.addData("Pos", "Unknown");
             }
             telemetry.update();
-            idle();
         }
     }
 
