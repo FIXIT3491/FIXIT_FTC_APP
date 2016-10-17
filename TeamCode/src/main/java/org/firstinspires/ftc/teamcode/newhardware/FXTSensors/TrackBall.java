@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.newhardware.FXTSensors;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.teamcode.RC;
 import org.opencv.core.Point;
 
 /**
@@ -9,12 +10,16 @@ import org.opencv.core.Point;
  */
 public class TrackBall {
 
-    Point offset = null;
     DcMotor xEnc;
     DcMotor yEnc;
 
-    public void init() {
+    public TrackBall(String xAddr, String yAddr) {
+        xEnc = RC.h.dcMotor.get(xAddr);
+        yEnc = RC.h.dcMotor.get(yAddr);
+    }//TrackBall
 
-    }
+    public Point getXY() {
+        return new Point(xEnc.getCurrentPosition(), yEnc.getCurrentPosition());
+    }//Point
 
 }

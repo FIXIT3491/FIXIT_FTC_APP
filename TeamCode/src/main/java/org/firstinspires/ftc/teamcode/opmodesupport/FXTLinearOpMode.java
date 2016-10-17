@@ -39,7 +39,7 @@ public abstract class FXTLinearOpMode extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         RC.setOpMode(this);
-        clearTimer();
+        addTimer();
 
         runOp();
 

@@ -45,7 +45,6 @@ public class NoPIDRun extends LinearOpMode{
         idle();
 
 
-
         left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER) ;
         right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 

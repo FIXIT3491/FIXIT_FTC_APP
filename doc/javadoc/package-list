@@ -3,18 +3,7 @@ com.qualcomm.robotcore.eventloop
 com.qualcomm.robotcore.eventloop.opmode
 com.qualcomm.robotcore.exception
 com.qualcomm.robotcore.hardware
-<<<<<<< HEAD
-com.qualcomm.robotcore.robocol
-com.qualcomm.robotcore.util
-<<<<<<< HEAD
-=======
 com.qualcomm.robotcore.util
 org.firstinspires.ftc.robotcore.external
 org.firstinspires.ftc.robotcore.external.matrices
 org.firstinspires.ftc.robotcore.external.navigation
->>>>>>> upstream/master
-=======
-org.firstinspires.ftc.robotcore.external
-org.firstinspires.ftc.robotcore.external.matrices
-org.firstinspires.ftc.robotcore.external.navigation
->>>>>>> upstream/master

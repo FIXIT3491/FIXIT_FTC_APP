@@ -51,6 +51,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -137,6 +138,8 @@ public class FtcRobotControllerActivity extends Activity {
 
   protected FtcEventLoop eventLoop;
   protected Queue<UsbDevice> receivedUsbAttachmentNotifications;
+
+  public ImageView display;
 
   protected class RobotRestarter implements Restarter {
 
@@ -282,6 +285,8 @@ public class FtcRobotControllerActivity extends Activity {
       RobotLog.d("OpenCV", "OpenCV library found inside package. Using it!");
       mOpenCVCallBack.onManagerConnected(LoaderCallbackInterface.SUCCESS);
     }
+
+    display = (ImageView) findViewById(R.id.tempdisplay);
 
     wifiLock.acquire();
     callback.networkConnectionUpdate(WifiDirectAssistant.Event.DISCONNECTED);
