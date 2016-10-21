@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.gamecode;
 
+import android.support.annotation.Nullable;
+
+import com.vuforia.Image;
 import com.vuforia.PIXEL_FORMAT;
 import com.vuforia.Vuforia;
 
@@ -8,20 +11,18 @@ import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
-import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.opmodesupport.FXTLinearOpMode;
-import org.firstinspires.ftc.teamcode.opmodesupport.TaskHandler;
-import org.firstinspires.ftc.teamcode.robots.NewRobot;
+import org.firstinspires.ftc.teamcode.robots.Fermion;
 
 /**
- * Created by FIXIT on 16-10-18.
+ * Created by FIXIT on 16-10-21.
  */
-public class NewRobotRed extends FXTLinearOpMode {
+public class FermionPositionBlue extends FXTLinearOpMode {
 
     @Override
     public void runOp() throws InterruptedException {
-        final NewRobot rbt = new NewRobot(true);
+        final Fermion lepton = new Fermion(true);
 
         VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters();
         params.vuforiaLicenseKey = RC.VUFORIA_LICENSE_KEY;
@@ -40,29 +41,39 @@ public class NewRobotRed extends FXTLinearOpMode {
         mainTasks.addRunnable(new Runnable() {
             @Override
             public void run() {
-                rbt.veerCheck();
+                lepton.veerCheck();
             }
         });
 
-        rbt.trackForward(609.6, 0.5);
-        rbt.imuTurnL(45, 0.5);
-        rbt.forward(0.5);
+        lepton.trackForward(609.6, 0.5);
+        lepton.imuTurnL(45, 0.5);
+        lepton.forward(0.5);
 
         while(!gears.isVisible()) {
             idle();
         }//while
 
-        VectorF trans = movePointOffWall(gears.getPose().getTranslation(), rbt.imu.getAngularOrientation().firstAngle, 100);
+        lepton.strafeToBeacon(gears, 100);
 
-        while (trans.magnitude() < 100) {
-            trans = movePointOffWall(gears.getPose().getTranslation(), rbt.imu.getAngularOrientation().firstAngle, 100);
+        lepton.absoluteIMUTurn(-90, 0.5);
 
-            double targetAngle = Math.atan2(trans.get(3), trans.get(2));
+        lepton.strafeToBeacon(gears, 40);
 
-            rbt.absoluteIMUTurn(targetAngle, 0.25);
-        }//while
+        int beaconConfig = Fermion.waitForBeaconConfig(
+                getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
+                gears, locale.getCameraCalibration());
 
-    }
+        //push button using beaconConfig!
+
+        lepton.trackRight(1219.2, 0.5);
+
+        beaconConfig = Fermion.waitForBeaconConfig(
+                getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
+                gears, locale.getCameraCalibration());
+
+        //push button using beaconConfig!
+
+    }//runOp
 
     //this assumes the horizontal axis is the y-axis since the phone is vertical
     //robot angle is relative to "parallel with the beacon wall"
@@ -83,4 +94,16 @@ public class NewRobotRed extends FXTLinearOpMode {
         return new VectorF(trans.get(1), (float) xDist, (float) zDist);
     }
 
+    @Nullable
+    public static Image getImageFromFrame(VuforiaLocalizer.CloseableFrame frame, int format) {
+
+        long numImgs = frame.getNumImages();
+        for (int i = 0; i < numImgs; i++) {
+            if (frame.getImage(i).getFormat() == format) {
+                return frame.getImage(i);
+            }//if
+        }//for
+
+        return null;
+    }
 }

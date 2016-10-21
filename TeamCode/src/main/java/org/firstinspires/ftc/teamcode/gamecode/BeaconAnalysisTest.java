@@ -15,7 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.opmodesupport.FXTLinearOpMode;
-import org.firstinspires.ftc.teamcode.robots.NewRobot;
+import org.firstinspires.ftc.teamcode.robots.Fermion;
 
 /**
  * Created by FIXIT on 16-10-07.
@@ -46,14 +46,14 @@ public class BeaconAnalysisTest extends FXTLinearOpMode {
         }//while
 
         while (opModeIsActive()) {
-            int beaconConfig = NewRobot.BEACON_NOT_VISIBLE;
-            while (beaconConfig == NewRobot.BEACON_NOT_VISIBLE) {
-                beaconConfig = NewRobot.getBeaconConfig(getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565), beacons.get(3), locale.getCameraCalibration());
+            int beaconConfig = Fermion.BEACON_NOT_VISIBLE;
+            while (beaconConfig == Fermion.BEACON_NOT_VISIBLE) {
+                beaconConfig = Fermion.getBeaconConfig(getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565), gears, locale.getCameraCalibration());
             }//while
 
-            if (beaconConfig == NewRobot.BEACON_RED_BLUE) {
+            if (beaconConfig == Fermion.BEACON_RED_BLUE) {
                 Log.i("RED", "BLUE");
-            } else if (beaconConfig != NewRobot.BEACON_NOT_VISIBLE) {
+            } else if (beaconConfig != Fermion.BEACON_NOT_VISIBLE) {
                 Log.i("BLUE", "RED");
             } else {
                 Log.i("BEAC", "== -1");

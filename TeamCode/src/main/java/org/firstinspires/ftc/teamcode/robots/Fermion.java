@@ -14,6 +14,7 @@ import com.vuforia.Vec3F;
 
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.internal.AppUtil;
@@ -34,7 +35,7 @@ import java.util.Arrays;
 /**
  * Created by FIXIT on 16-10-07.
  */
-public class NewRobot {
+public class Fermion {
 
     public AdafruitBNO055IMU imu;
     public TrackBall mouse;
@@ -44,17 +45,22 @@ public class NewRobot {
     public Motor leftBack;
     public Motor rightBack;
 
+    private double leftForeRightBackStrafeSpeed = 0;
+    private double rightForeLeftBackStrafeSpeed = 0;
+
     public double targetAngle = 0;
 
     //hsv blue beacon range colours
     public static Scalar blueLow = new Scalar(108, 0, 220);
     public static Scalar blueHigh = new Scalar(178, 255, 255);
 
-    public final static int BEACON_BLUE_RED = 0;
-    public final static int BEACON_RED_BLUE = 1;
-    public final static int BEACON_NOT_VISIBLE = 2;
+    public final static int BEACON_NOT_VISIBLE = 0;
+    public final static int BEACON_BLUE_RED = 1;
+    public final static int BEACON_RED_BLUE = 2;
 
-    public NewRobot(boolean auto) {
+    public final static double TURNING_ACCURACY_DEG = 10;
+
+    public Fermion(boolean auto) {
         leftFore = new Motor("leftFore");
         rightFore = new Motor("rightFore");
         leftBack = new Motor("leftBack");
@@ -65,6 +71,9 @@ public class NewRobot {
 
         if (auto) {
             BNO055IMU.Parameters params = new BNO055IMU.Parameters();
+            params.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+            params.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+
             imu = (AdafruitBNO055IMU) RC.h.get(BNO055IMU.class, "adafruit");
             imu.initialize(params);
 
@@ -129,6 +138,9 @@ public class NewRobot {
         double multi = speed / Math.max(leftForeRightBack, rightForeLeftBack);
         leftForeRightBack *= multi;
         rightForeLeftBack *= multi;
+
+        leftForeRightBackStrafeSpeed = leftForeRightBack;
+        rightForeLeftBackStrafeSpeed = rightForeLeftBack;
 
         leftFore.setPower(leftForeRightBack);
         leftBack.setPower(rightForeLeftBack);
@@ -226,6 +238,12 @@ public class NewRobot {
         turnL(speed);
         double beginAngle = imu.getAngularOrientation().firstAngle;
 
+        if (beginAngle > 180) {
+            beginAngle -= 360;
+        }//if
+
+        double targetAngle = beginAngle - degrees;
+
         while (true) {
 
             double currentAngle = imu.getAngularOrientation().firstAngle;
@@ -234,19 +252,35 @@ public class NewRobot {
                 currentAngle -= 360;
             }//if
 
-            double angleToTurn = degrees - (currentAngle - beginAngle);
+            double angleToTurn = currentAngle - targetAngle;
 
-            if (Math.abs(angleToTurn) < 10) {
+            turnL(angleToTurn * (speed / degrees));
+
+            if (Math.abs(angleToTurn) < TURNING_ACCURACY_DEG) {
                 break;
             }//if
         }//while
+
+        stop();
+
+        targetAngle = imu.getAngularOrientation().firstAngle;
+
+        if (targetAngle > 180) {
+            targetAngle -= 360;
+        }//if
 
     }
 
     public void imuTurnR(double degrees, double speed) {
 
-        turnL(speed);
+        turnR(speed);
         double beginAngle = imu.getAngularOrientation().firstAngle;
+
+        if (beginAngle > 180) {
+            beginAngle -= 360;
+        }//if
+
+        double targetAngle = beginAngle + degrees;
 
         while (true) {
 
@@ -256,12 +290,22 @@ public class NewRobot {
                 currentAngle -= 360;
             }//if
 
-            double angleToTurn = degrees - (currentAngle - beginAngle);
+            double angleToTurn = targetAngle - currentAngle;
 
-            if (Math.abs(angleToTurn) < 10) {
+            turnR(angleToTurn * (speed / degrees));
+
+            if (Math.abs(angleToTurn) < TURNING_ACCURACY_DEG) {
                 break;
             }//if
         }//while
+
+        stop();
+
+        targetAngle = imu.getAngularOrientation().firstAngle;
+
+        if (targetAngle > 180) {
+            targetAngle -= 360;
+        }//if
 
     }//imuTurnR
 
@@ -289,69 +333,45 @@ public class NewRobot {
 
     //to be used via TaskHandler
     //therefore, it's not a loop
+    //no idea if this works...
+    //simultaneously turning and strafing with mecanum wheels seems extremely complicated
     public void veerCheck() {
 
-        final double TURNING_CONSTANT = 0.1 / 90.0;
+        final double TURNING_CONSTANT = 0.1 / 90.0; //random guess
 
-        double angleError = targetAngle - imu.getAngularOrientation().firstAngle;
+        double currentAngle = imu.getAngularOrientation().firstAngle;
 
-        double leftForePower = leftFore.getPower();
-        double leftBackPower = leftBack.getPower();
-        double rightForePower = rightFore.getPower();
-        double rightBackPower = rightBack.getPower();
+        if (currentAngle > 180) {
+            currentAngle -= 360;
+        }//if
 
-        if (angleError < 0) {
-            leftForePower -= TURNING_CONSTANT * Math.abs(angleError);
-            rightBackPower += TURNING_CONSTANT * Math.abs(angleError);
+        double angleError = targetAngle - currentAngle;
 
-            if (leftForePower < -1) {
-                rightBackPower += -1 - leftForePower;
-                leftForePower = -1;
-            }//if
+        double leftForePower = leftForeRightBackStrafeSpeed;
+        double leftBackPower = rightForeLeftBackStrafeSpeed;
+        double rightForePower = rightForeLeftBackStrafeSpeed;
+        double rightBackPower = leftForeRightBackStrafeSpeed;
 
-            if (rightBackPower > 1) {
-                leftForePower += 1 - rightBackPower;
-                rightBackPower = 1;
-            }//if
+        leftForePower += TURNING_CONSTANT * angleError;
+        rightBackPower -= TURNING_CONSTANT * angleError;
 
-            leftBackPower -= TURNING_CONSTANT * Math.abs(angleError);
-            rightForePower += TURNING_CONSTANT * Math.abs(angleError);
+        if (Math.abs(leftForePower) > 1) {
+            rightBackPower -= leftForePower - Math.signum(leftForePower) * 1;
+            leftForePower = Math.signum(leftForePower) * 1;
+        } else if (Math.abs(rightBackPower) > 1) {
+            leftForePower -= rightBackPower - Math.signum(rightBackPower) * 1;
+            rightBackPower = Math.signum(rightBackPower) * 1;
+        }//else
 
-            if (leftBackPower < -1) {
-                rightForePower += -1 - leftBackPower;
-                leftBackPower = -1;
-            }//if
+        leftBackPower += TURNING_CONSTANT * angleError;
+        rightForePower -= TURNING_CONSTANT * angleError;
 
-            if (rightForePower > 1) {
-                leftBackPower += 1 - rightForePower;
-                rightForePower = 1;
-            }//if
-        } else {
-            rightForePower -= TURNING_CONSTANT * Math.abs(angleError);
-            leftBackPower += TURNING_CONSTANT * Math.abs(angleError);
-
-            if (rightForePower < -1) {
-                leftBackPower += -1 - rightForePower;
-                rightForePower = -1;
-            }//if
-
-            if (leftBackPower > 1) {
-                rightForePower += 1 - leftBackPower;
-                leftBackPower = 1;
-            }//if
-
-            rightBackPower -= TURNING_CONSTANT * Math.abs(angleError);
-            leftForePower += TURNING_CONSTANT * Math.abs(angleError);
-
-            if (rightBackPower < -1) {
-                leftForePower += -1 - rightBackPower;
-                rightBackPower = -1;
-            }//if
-
-            if (leftForePower > 1) {
-                rightBackPower += 1 - leftForePower;
-                leftForePower = 1;
-            }//if
+        if (Math.abs(leftBackPower) > 1) {
+            rightForePower -= leftBackPower - Math.signum(leftBackPower) * 1;
+            leftBackPower = Math.signum(leftBackPower) * 1;
+        } else if (Math.abs(rightForePower) > 1) {
+            leftBackPower -= rightForePower - Math.signum(rightForePower) * 1;
+            rightForePower = Math.signum(rightForePower) * 1;
         }//else
 
         leftFore.setPower(leftForePower);
@@ -361,9 +381,20 @@ public class NewRobot {
 
     }//veerCheck
 
-    public static int getBeaconConfig(Image img, VuforiaTrackable beacon, CameraCalibration camCal) {
+    public static int waitForBeaconConfig(Image img, VuforiaTrackableDefaultListener beacon, CameraCalibration camCal) {
 
-        OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) beacon.getListener()).getRawPose();
+        int config = BEACON_NOT_VISIBLE;
+        while (config == BEACON_NOT_VISIBLE) {
+            config = getBeaconConfig(img, beacon, camCal);
+            RC.l.idle();
+        }//while
+
+        return config;
+    }
+
+    public static int getBeaconConfig(Image img, VuforiaTrackableDefaultListener beacon, CameraCalibration camCal) {
+
+        OpenGLMatrix pose = beacon.getRawPose();
 
         if (pose != null) {
 
@@ -373,6 +404,8 @@ public class NewRobot {
             rawPose.setData(poseData);
 
             if (img != null && img.getPixels() != null) {
+
+                //calculating pixel coordinates of image target corners
                 float[][] corners = new float[4][2];
                 Vec2F[] cornerVecs = new Vec2F[4];
 
@@ -385,42 +418,50 @@ public class NewRobot {
                     corners[i] = cornerVecs[i].getData();
                 }//for
 
+                //extending bounding box to show any object immediately above the image target
                 corners[0][0] -= Math.abs(corners[0][0] - corners[3][0]);
                 corners[0][0] = Math.max(corners[0][0], 0);
 
                 corners[0][0] -= Math.abs(corners[0][1] - corners[3][1]);
                 corners[0][1] = Math.max(corners[0][1], 0);
 
+                //getting camera image...
                 Bitmap bm = Bitmap.createBitmap(img.getWidth(), img.getHeight(), Bitmap.Config.RGB_565);
                 bm.copyPixelsFromBuffer(img.getPixels());
 
+                //turning the corner pixel coordinates into a proper bounding box
                 Mat crop = OCVUtils.bitmapToMat(bm, CvType.CV_8UC3);
                 float x = Math.min(Math.min(corners[1][0], corners[3][0]), Math.min(corners[0][0], corners[2][0]));
                 float y = Math.min(Math.min(corners[1][1], corners[3][1]), Math.min(corners[0][1], corners[2][1]));
                 float width = Math.max(Math.abs(corners[0][0] - corners[2][0]), Math.abs(corners[1][0] - corners[3][0]));
                 float height = Math.max(Math.abs(corners[0][1] - corners[2][1]), Math.abs(corners[1][1] - corners[3][1]));
 
+                //make sure our bounding box doesn't go outside of the image
+                //OpenCV doesn't like that...
                 x = Math.max(x, 0);
                 y = Math.max(y, 0);
                 width = (x + width > crop.cols())? crop.cols() - x : width;
                 height = (y + height > crop.rows())? crop.rows() - y : height;
 
+                //cropping bounding box out of camera image
                 Mat cropped = new Mat(crop, new Rect((int) x, (int) y, (int) width, (int) height));
 
+                //filtering out non-beacon-blue colours in HSV colour space
                 Imgproc.cvtColor(cropped, cropped, Imgproc.COLOR_RGB2HSV_FULL);
 
+                //get filtered mask
+                //if pixel is within acceptable blue-beacon-colour range, it's changed to white. If not, it's black
                 Mat mask = new Mat();
                 Core.inRange(cropped, blueLow, blueHigh, mask);
                 Moments mmnts = Imgproc.moments(mask, true);
 
-                Imgproc.cvtColor(mask, mask, Imgproc.COLOR_GRAY2RGB);
-                Imgproc.cvtColor(cropped, cropped, Imgproc.COLOR_HSV2RGB);
-
-                Core.bitwise_and(mask, cropped, cropped);
-
+                //calculating centroid of the resulting binary mask via image moments
                 Log.i("CentroidX", "" + ((mmnts.get_m10() / mmnts.get_m00())));
                 Log.i("CentroidY", "" + ((mmnts.get_m01() / mmnts.get_m00())));
 
+                //Note: for some reason, we end up with a image that is rotated 90 degrees
+                //if centroid is in the bottom half of the image, the blue beacon is on the left
+                //if the centroid is in the top half, the blue beacon is on the right
                 if ((mmnts.get_m01() / mmnts.get_m00()) < cropped.rows() / 2) {
                     return BEACON_BLUE_RED;
                 } else {
@@ -436,10 +477,27 @@ public class NewRobot {
         return BEACON_NOT_VISIBLE;
     }//getBeaconConfig
 
+    public void strafeToBeacon(VuforiaTrackableDefaultListener beacon, double targetDistance) {
+
+        VectorF trans = beacon.getPose().getTranslation();
+
+        strafe(Math.atan2(trans.get(2), trans.get(3)), 0.5);
+
+        while (trans.magnitude() > targetDistance) {
+
+            trans = beacon.getPose().getTranslation();
+            strafe(Math.atan2(trans.get(2), trans.get(3)), 0.5);
+
+        }//while
+
+        stop();
+    }
+
     public void stop() {
         leftFore.stop();
         rightFore.stop();
         leftBack.stop();
         rightBack.stop();
-    }
-}//Alpha
+    }//stop
+
+}//Fermion

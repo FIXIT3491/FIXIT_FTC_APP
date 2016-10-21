@@ -1,17 +1,17 @@
 package org.firstinspires.ftc.teamcode.gamecode;
 
 import org.firstinspires.ftc.teamcode.opmodesupport.TeleOpMode;
-import org.firstinspires.ftc.teamcode.robots.NewRobot;
+import org.firstinspires.ftc.teamcode.robots.Fermion;
 
 /**
  * Created by FIXIT on 16-10-14.
  */
 public class MecanumDriveTest extends TeleOpMode {
-    NewRobot rbt;
+    Fermion rbt;
 
     @Override
     public void initialize() {
-        rbt = new NewRobot(false);
+        rbt = new Fermion(false);
     }
 
     @Override
