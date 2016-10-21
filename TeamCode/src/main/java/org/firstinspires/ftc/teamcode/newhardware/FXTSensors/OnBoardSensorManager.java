@@ -79,7 +79,7 @@ public class OnBoardSensorManager implements SensorEventListener {
     /**CONSTRUCTORS**/
 
     public OnBoardSensorManager() {
-        mSensorManager = (SensorManager) RC.c.getSystemService(Context.SENSOR_SERVICE);
+        mSensorManager = (SensorManager) RC.c().getSystemService(Context.SENSOR_SERVICE);
 
     }
 

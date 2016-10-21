@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.robots;
 
 import org.firstinspires.ftc.teamcode.RC;
-import org.firstinspires.ftc.teamcode.newhardware.ContinuousServo;
+import org.firstinspires.ftc.teamcode.newhardware.FXTCRServo;
 import org.firstinspires.ftc.teamcode.newhardware.FXTDevice;
 import org.firstinspires.ftc.teamcode.newhardware.FXTServo;
 import org.firstinspires.ftc.teamcode.newhardware.LinearServo;
@@ -80,7 +80,7 @@ public class Robot {
     public static HashMap<String, FXTDevice> parseRobotXML (int fileId) {
 
         String lastAddedDevice = "";
-        XmlPullParser xpp = RC.c.getResources().getXml(fileId);
+        XmlPullParser xpp = RC.c().getResources().getXml(fileId);
         HashMap<String, FXTDevice> devices = new HashMap<String, FXTDevice>();
 
         try {
@@ -96,11 +96,11 @@ public class Robot {
                             m.setReverse(true);
                         }//if
 
-                        if (xpp.getAttributeValue(null, "target").equals("check")) {
-                            m.toggleTargetChecking(true);
-                        } else if (xpp.getAttributeValue(null, "target").equals("fix")) {
-                            m.toggleTargetFixing(true);
-                        }//elseif
+//                        if (xpp.getAttributeValue(null, "target").equals("check")) {
+//                            m.toggleChecking(true);
+//                        } else if (xpp.getAttributeValue(null, "target").equals("fix")) {
+//                            m.toggleTargetFixing(true);
+//                        }//elseif
 
                         devices.put(name, m);
                         lastAddedDevice = name;
@@ -108,20 +108,22 @@ public class Robot {
                     } else if (tagName.contains("Servo")) {
 
                         FXTServo s;
+                        FXTCRServo cs;
 
                         if (tagName.equals("ContServo")) {
-                            s = new ContinuousServo(name);
+                            cs = new FXTCRServo(name);
 
                             double zero = Double.parseDouble(xpp.getAttributeValue(null, "zero"));
-                            s.setPosition(zero);
 
+                            devices.put(name, cs);
                         } else if (tagName.equals("LinearServo")) {
                             s = new LinearServo(name);
+                            devices.put(name, s);
                         } else {
                             s = new FXTServo(name);
+                            devices.put(name, s);
                         }//else
 
-                        devices.put(name, s);
                         lastAddedDevice = name;
 
                     } else if (tagName.contains("Pos")) {
@@ -165,7 +167,7 @@ public class Robot {
     }//wait
 
     public boolean allReady() {
-        return motorL.finished() && motorR.finished();
+        return motorL.isFin() && motorR.isFin();
     }//allReady
 
     public void checkAllSystems() {
@@ -198,8 +200,8 @@ public class Robot {
      */
     public void forward(double speed) {
 
-        motorL.toggleTargetChecking(false);
-        motorR.toggleTargetChecking(false);
+        motorL.toggleChecking(false);
+        motorR.toggleChecking(false);
 
         motorL.setPower(speed);
         motorR.setPower(speed);
@@ -224,8 +226,8 @@ public class Robot {
      */
     public void backward(double speed) {
 
-        motorL.toggleTargetChecking(false);
-        motorR.toggleTargetChecking(false);
+        motorL.toggleChecking(false);
+        motorR.toggleChecking(false);
 
         motorL.setPower(-speed);
         motorR.setPower(-speed);
@@ -252,8 +254,8 @@ public class Robot {
      */
     public void forwardDistance(int mm, double speed) {
 
-        motorL.toggleTargetChecking(true);
-        motorR.toggleTargetChecking(true);
+        motorL.toggleChecking(true);
+        motorR.toggleChecking(true);
 
         mm *= 1120 / (wheelDiameter * 25.4 * Math.PI); //convert mm to tiks
 
@@ -270,8 +272,8 @@ public class Robot {
      */
     public void backwardDistance(int mm, double speed) {
 
-        motorL.toggleTargetChecking(true);
-        motorR.toggleTargetChecking(true);
+        motorL.toggleChecking(true);
+        motorR.toggleChecking(true);
 
         mm *= 1120 / (wheelDiameter * 25.4 * Math.PI); //convert mm to tiks
 

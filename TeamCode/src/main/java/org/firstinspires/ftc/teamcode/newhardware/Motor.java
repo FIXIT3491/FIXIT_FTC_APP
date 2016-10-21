@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.newhardware;
 
 
-import android.util.Log;
-
 import org.firstinspires.ftc.teamcode.RC;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -11,26 +9,14 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
  * Created by FIXIT on 15-08-18.
  * This class take the basic functionality of DcMotor but adds some methods to it
  */
-public class Motor implements FXTDevice, Timeable {
-
-    public static final double CHEC_TAR_PROP_CONST = 4000.0;
-    public static final double CHEC_TAR_FIX_PROP_CONST = 500.0;
-    public static final double TAR_ACC_CONST = 5.0;
-
-    public double commandedSpeed = 0;
+public class Motor implements FXTDevice {
 
     private DcMotor m;
 
-    public boolean targetCheck = false;
-    public boolean reachedTarget = true;
-    public boolean isFixing = false;
-
-    public int target = 0;
     public int beginningPosition = 0;
     private long targetTime = -1;
 
     public double minSpeed = 0.09;
-
     public int accuracy = 20;
 
     /**
@@ -80,107 +66,38 @@ public class Motor implements FXTDevice, Timeable {
 
     //PRECISION CONTROL
 
-    public void toggleTargetChecking (boolean check) {
-        this.targetCheck = check;
-
+    public void toggleChecking(boolean check) {
         if (check) {
-            this.target = getCurrentPosition();
-        }//if
-    }//toggleTargetChecking
-
-
-    public void toggleTargetFixing(boolean fix) {
-        isFixing = fix;
-        if (fix) {
-            toggleTargetChecking(true);
-        }//if
-    }//toggleTargetFixing
-
-    public boolean isTargetChecking() {
-        return this.targetCheck;
-    }//isTargetChecking
-
-    public boolean finished() {
-        if (isTargetChecking()) {
-            return reachedTarget;
+            setMode(DcMotor.RunMode.RUN_TO_POSITION);
         } else {
-            return targetTime == -1;
+            setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }//else
-    }//finished
+    }//toggleChecking
 
-    public void setTarget(int target) {
-
-        toggleTargetChecking(true);
-        this.target += target;
-        this.reachedTarget = false;
-        accuracy = (int) (TAR_ACC_CONST * commandedSpeed);
-    }//setTarget
-
+    public void setTimer(int millis, double speed) {
+        setPower(speed);
+        targetTime = System.currentTimeMillis() + millis;
+    }//setTimer
 
     public void setTarget(int target, double speed) {
         setTarget(target);
-        setPower(Math.abs(speed));
+        setPower(speed);
     }//setTarget
 
-
-    public void checkTarget() {
-
-        if (isTargetChecking() && !reachedTarget) {
-
-            if ((getPower() > 0 && getCurrentPosition() > target)
-                    || (getPower() < 0 && getCurrentPosition() < target)) {
-                stop();
-                reachedTarget = true;
-            } else {
-
-                //proportional control system (further away we are from the target position, faster we go)
-                double multi = Math.abs(getCurrentPosition() - this.target) / (CHEC_TAR_PROP_CONST * Math.abs(commandedSpeed));
-
-                //makes sure we're not speeding past the commanded speed
-                //and we're going in the right direction
-                multi = Math.min(multi, 1) * ((getCurrentPosition() < this.target)? 1 : -1);
-
-                setPowerSuper(commandedSpeed * multi);
-            }//else
-        }//if
-    }//checkTarget
-
-    //suspected battery drainer...
-    public void checkTargetWithFixing() {
-
-        if (isTargetChecking()) {
-
-            //if we're within acceptable range of our target, don't move
-            if (getCurrentPosition() < this.target + accuracy && getCurrentPosition() > this.target - accuracy) {
-
-                setPowerSuper(0);
-                reachedTarget = true;
-
-            } else {
-
-                double multi = Math.abs(getCurrentPosition() - this.target) / CHEC_TAR_FIX_PROP_CONST;
-
-                if (getCurrentPosition() > this.target + accuracy) {
-                    multi *= -1;
-                }//if
-
-                setPowerSuper(commandedSpeed * multi);
-            }//else
-        }//if
-    }//checkTargetWithFixing
-
-
     //SET MOTOR POWER
-
     public boolean isBusy() {
         synchronized (m) {
             return m.isBusy();
         }//synchronized
     }//isBusy
 
-    public boolean reachedTarget() {
-        return Math.abs(getCurrentPosition() - getM().getTargetPosition()) < 15;
-    }//reachedTarget
+    public boolean isFin() {
+        if (getM().getMode().equals(DcMotor.RunMode.RUN_TO_POSITION)) {
+            return Math.abs(getCurrentPosition() - getM().getTargetPosition()) < accuracy;
+        } else {
+            return targetTime == -1;
+        }//else
+    }//finished
 
     public DcMotor getM() {
         synchronized (m) {
@@ -188,11 +105,17 @@ public class Motor implements FXTDevice, Timeable {
         }//synchronized
     }//getM
 
-    public void setTargetPosition(int tik) {
+    public void setTarget(int tik) {
+        toggleChecking(true);
+
         synchronized (m) {
             m.setTargetPosition(tik + m.getCurrentPosition());
-        }
-    }
+        }//synchronized
+    }//setTarget
+
+    public void setAbsTarget(int tik) {
+        setTarget(tik - getCurrentPosition());
+    }//setAbsTarget
 
     public int getCurrentPosition() {
         synchronized (m) {
@@ -213,21 +136,10 @@ public class Motor implements FXTDevice, Timeable {
     }//setMode
 
     public void setPower(double power) {
-        setPowerSuper(power);
-        this.commandedSpeed = power;
-    }//setPower
-
-    //calls the default DcMotor method (doesn't affect commandedSpeed)
-    public void setPowerSuper(double power) {
-
-        if (power > 1) {
-            power = 1;
-        } else if (power < -1) {
-            power = -1;
-        } else if (power > -minSpeed && power < 0) {
-            power = -minSpeed;
-        } else if (power < -minSpeed && power > 0) {
-            power = minSpeed;
+        if (Math.abs(power) > 1) {
+            power = 1 * Math.signum(power);
+        } else if (Math.abs(power) < minSpeed && Math.abs(power) > 0) {
+            power = minSpeed * Math.signum(power);
         }//elseif
 
         synchronized (m) {
@@ -235,12 +147,10 @@ public class Motor implements FXTDevice, Timeable {
         }//synchronized
     }//setPowerSuper
 
-
     //LOGGING
 
     public String returnCurrentState() {
         return "Current Pos: " + getCurrentPosition() +
-                ", Commanded Speed: " + commandedSpeed +
                 ", Power: " + getPower() +
                 ", Target: " + getM().getTargetPosition();
     }//returnCurrentState
@@ -248,34 +158,15 @@ public class Motor implements FXTDevice, Timeable {
 
     //INHERITED METHODS
 
-    @Override
     public void check() {
-        if (isTargetChecking()) {
 
-            if (!isFixing) {
-                checkTarget();
-            } else {
-                checkTargetWithFixing();
-            }//else
-
-        } else {
-
+        if (!getM().getMode().equals(DcMotor.RunMode.RUN_TO_POSITION)) {
             if (System.currentTimeMillis() > targetTime && targetTime != -1) {
                 stop();
                 targetTime = -1;
             }//if
+        }//if
 
-        }//else
     }//run
-
-    @Override
-    public void setTargetTime(long newTime) {
-        targetTime = System.currentTimeMillis() + newTime;
-    }//setTargetTime
-
-    @Override
-    public boolean timeFin() {
-        return targetTime == -1;
-    }
 
 }//Motor

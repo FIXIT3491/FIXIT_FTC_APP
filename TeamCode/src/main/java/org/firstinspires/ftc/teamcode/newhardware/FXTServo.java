@@ -73,9 +73,4 @@ public class FXTServo implements FXTDevice {
         setPosition(currentPos - decrement);
     }
 
-    @Override
-    public void check() {
-        //NOTHING!
-    }
-
 }//FXTServo

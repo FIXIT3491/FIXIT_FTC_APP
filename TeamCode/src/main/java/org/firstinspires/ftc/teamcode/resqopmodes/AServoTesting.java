@@ -1,13 +1,11 @@
-package org.firstinspires.ftc.teamcode.oldopmodes;
+package org.firstinspires.ftc.teamcode.resqopmodes;
 
-import org.firstinspires.ftc.teamcode.opmodesupport.DoNotRegister;
 import org.firstinspires.ftc.teamcode.opmodesupport.TeleOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
 /**
  * Created by FIXIT on 9/1/2015
  */
-@DoNotRegister
 public class AServoTesting extends TeleOpMode {
 
     Servo test2;

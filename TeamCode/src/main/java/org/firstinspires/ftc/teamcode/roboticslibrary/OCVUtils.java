@@ -21,14 +21,6 @@ public final class OCVUtils {
 
     final static String LOGTAG = "FTC OpenCV";
 
-    public static void loge(String msg) {
-        Log.e(LOGTAG, msg);
-    }//loge
-
-    public static void log(String msg) {
-        Log.i(LOGTAG, msg);
-    }//log
-
     public static Mat bitmapToMat (Bitmap bit, int cvType) {
         Mat newMat = new Mat(bit.getHeight(), bit.getWidth(), cvType);
 
@@ -49,7 +41,7 @@ public final class OCVUtils {
         Mat out = null;
 
         try {
-            AssetManager assetManager = RC.c.getAssets();
+            AssetManager assetManager = RC.c().getAssets();
             InputStream istr = null;
 
             try {
@@ -73,7 +65,7 @@ public final class OCVUtils {
         BitmapFactory.Options opt = new BitmapFactory.Options();
         opt.inPreferredConfig = Bitmap.Config.ARGB_8888;
 
-        Bitmap bm = BitmapFactory.decodeFile(RC.c.getExternalFilesDir(null).getAbsolutePath() + "/" + filename, opt);
+        Bitmap bm = BitmapFactory.decodeFile(RC.c().getExternalFilesDir(null).getAbsolutePath() + "/" + filename, opt);
 
         Mat out = bitmapToMat(bm, CvType.CV_8UC3);
 

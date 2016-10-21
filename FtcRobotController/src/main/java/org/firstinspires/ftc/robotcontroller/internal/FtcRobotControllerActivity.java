@@ -48,11 +48,14 @@ import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.TextureView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.blocks.ftcrobotcontroller.BlocksActivity;
@@ -139,7 +142,7 @@ public class FtcRobotControllerActivity extends Activity {
   protected FtcEventLoop eventLoop;
   protected Queue<UsbDevice> receivedUsbAttachmentNotifications;
 
-  public ImageView display;
+  public TextureView display;
 
   protected class RobotRestarter implements Restarter {
 
@@ -156,8 +159,6 @@ public class FtcRobotControllerActivity extends Activity {
         case LoaderCallbackInterface.SUCCESS:
         {
           RobotLog.i(TAG, "OpenCV loaded successfully");
-          // Create and set View
-
         } break;
         default:
         {
@@ -284,9 +285,7 @@ public class FtcRobotControllerActivity extends Activity {
     } else {
       RobotLog.d("OpenCV", "OpenCV library found inside package. Using it!");
       mOpenCVCallBack.onManagerConnected(LoaderCallbackInterface.SUCCESS);
-    }
-
-    display = (ImageView) findViewById(R.id.tempdisplay);
+    }//else
 
     wifiLock.acquire();
     callback.networkConnectionUpdate(WifiDirectAssistant.Event.DISCONNECTED);
@@ -566,4 +565,35 @@ public class FtcRobotControllerActivity extends Activity {
       });
     }
   }
+
+  public void addCameraStream() {
+
+    final LinearLayout layout = (LinearLayout) findViewById(R.id.cameraMonitorViewId);
+
+    display = new TextureView(this);
+    display.setRotation(90f);
+
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        layout.addView(display);
+      }
+
+    });
+
+  }
+
+  public void emptyCameraStream() {
+
+    final LinearLayout layout = (LinearLayout) findViewById(R.id.cameraMonitorViewId);
+
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        layout.removeAllViews();
+      }
+
+    });
+  }
+
 }

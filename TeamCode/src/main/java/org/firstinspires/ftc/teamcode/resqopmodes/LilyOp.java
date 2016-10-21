@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.gamecode;
+package org.firstinspires.ftc.teamcode.resqopmodes;
 
 import android.util.Log;
 
@@ -178,29 +178,29 @@ public class LilyOp extends TeleOpMode {
         RC.t.dataLogData(hardwareMap.voltageSensor.get("Motor Controller 1").getVoltage() + "\n");
         if (!currentlySwitching) {
             if (joy2.buttonA() && armStage == COLLECT) {
-                lily.elbow.setTargetPosition(12);
+                lily.elbow.setTarget(12);
                 lily.elbow.setPower(0.4);
                 armStage = MANUAL;
             } else if (joy2.buttonY() && armStage == COLLECT) {
-                lily.elbow.setTargetPosition(-12);
+                lily.elbow.setTarget(-12);
                 lily.elbow.setPower(0.4);
                 armStage = MANUAL;
             } else if (joy2.buttonA()) {
-                lily.elbow.setTargetPosition(-25);
+                lily.elbow.setTarget(-25);
                 lily.elbow.setPower(0.6);
                 armStage = MANUAL;
             } else if (joy2.buttonY()) {
-                lily.elbow.setTargetPosition(25);
+                lily.elbow.setTarget(25);
                 lily.elbow.setPower(0.6);
                 armStage = MANUAL;
             } else
 
             if (joy2.buttonB()) {
-                lily.turnTable.setTargetPosition(25);
+                lily.turnTable.setTarget(25);
                 lily.turnTable.setPower(0.6);
                 armStage = MANUAL;
             } else if (joy2.buttonX()) {
-                lily.turnTable.setTargetPosition(-25);
+                lily.turnTable.setTarget(-25);
                 lily.turnTable.setPower(0.6);
                 armStage = MANUAL;
             }//elseif

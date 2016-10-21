@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.robots;
 
 import org.firstinspires.ftc.teamcode.RC;
-import org.firstinspires.ftc.teamcode.newhardware.ContinuousServo;
+import org.firstinspires.ftc.teamcode.newhardware.FXTCRServo;
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.FXTLightSensor;
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.FXTSensor;
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.OnBoardSensorManager;
@@ -19,7 +19,7 @@ public class Larry extends Robot {
     private Motor stomper;
     public Motor scissor;
 
-    public ContinuousServo flag;
+    public FXTCRServo flag;
     public FXTServo latch;
     public FXTServo autoball;
     public FXTServo gate;
@@ -45,8 +45,7 @@ public class Larry extends Robot {
         stomper = new Motor("stomper");
         stomper.setReverse(true);
 
-        flag = new ContinuousServo("flag");
-        flag.setZeroPosition(0.52);
+        flag = new FXTCRServo("flag");
 
         latch = new FXTServo("latch");
         autoball = new FXTServo("autoball");
@@ -64,8 +63,7 @@ public class Larry extends Robot {
         stomper = new Motor("stomper");
         stomper.setReverse(true);
 
-        flag = new ContinuousServo("flag");
-        flag.setZeroPosition(0.52);
+        flag = new FXTCRServo("flag");
         latch = new FXTServo("latch");
         autoball = new FXTServo("autoball");
         gate = new FXTServo("gate");
@@ -88,12 +86,12 @@ public class Larry extends Robot {
         autoball.addPos("up", 0.58);
         latch.addPos("up", 0.66);
         gate.addPos("open", 0.11);
-        flag.addMotion("up", -566);
+//        flag.addMotion("up", -566);
 
         autoball.addPos("down", 0.03);
         latch.addPos("down", 0.41);
         gate.addPos("close", 0.53);
-        flag.addMotion("down", 566);
+//        flag.addMotion("down", 566);
     }
 
     public void setHeight(int position){

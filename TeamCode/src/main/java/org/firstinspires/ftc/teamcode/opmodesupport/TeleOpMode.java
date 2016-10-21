@@ -16,7 +16,6 @@ import java.util.List;
 /**
  * Created by FIXIT on 8/19/2015.
  */
-@DoNotRegister
 public abstract class TeleOpMode extends OpMode {
 
     /**
@@ -67,6 +66,7 @@ public abstract class TeleOpMode extends OpMode {
 
         addTimer();
         RC.setOpMode(this);
+        TaskHandler.init();
 
         initialize();
 

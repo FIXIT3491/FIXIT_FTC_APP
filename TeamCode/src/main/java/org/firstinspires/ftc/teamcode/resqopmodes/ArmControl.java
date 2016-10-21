@@ -1,14 +1,12 @@
-package org.firstinspires.ftc.teamcode.oldopmodes;
+package org.firstinspires.ftc.teamcode.resqopmodes;
 
 import org.firstinspires.ftc.teamcode.RC;
-import org.firstinspires.ftc.teamcode.opmodesupport.DoNotRegister;
 import org.firstinspires.ftc.teamcode.opmodesupport.TeleOpMode;
 import org.firstinspires.ftc.teamcode.robots.Lily;
 
 /**
  * Created by FTC on 31/10/2015.
  */
-@DoNotRegister
 public class ArmControl extends TeleOpMode {
 
     Lily lily;

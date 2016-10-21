@@ -4,7 +4,7 @@ import android.util.Log;
 
 import com.qualcomm.ftcrobotcontroller.R;
 import org.firstinspires.ftc.teamcode.RC;
-import org.firstinspires.ftc.teamcode.newhardware.ContinuousServo;
+import org.firstinspires.ftc.teamcode.newhardware.FXTCRServo;
 import org.firstinspires.ftc.teamcode.newhardware.FXTDevice;
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.AdafruitIMU;
 import org.firstinspires.ftc.teamcode.newhardware.FXTServo;
@@ -34,9 +34,9 @@ public class Lily extends Robot {
     public FXTServo redZipliner;
     public FXTServo blueZipliner;
 
-    public ContinuousServo people;
-    public ContinuousServo brush;
-    public ContinuousServo hook;
+    public FXTCRServo people;
+    public FXTCRServo brush;
+    public FXTCRServo hook;
 
     public LinearServo tapeAdjust;
     public LinearServo button;
@@ -71,9 +71,9 @@ public class Lily extends Robot {
         frontguard = (FXTServo) devs.get("frontguard");
         backguard = (FXTServo) devs.get("backguard");
 
-        people = (ContinuousServo) devs.get("people");
-        brush = (ContinuousServo) devs.get("brush");
-        hook = (ContinuousServo) devs.get("hook");
+        people = (FXTCRServo) devs.get("people");
+        brush = (FXTCRServo) devs.get("brush");
+        hook = (FXTCRServo) devs.get("hook");
 
         tapeAdjust = (LinearServo) devs.get("tapeAdjust");
         button = (LinearServo) devs.get("button");
@@ -98,8 +98,8 @@ public class Lily extends Robot {
         tapeMeasure = new Motor("tapeMeasure");
         tapeMeasure.stop();
 
-        hook = new ContinuousServo("hook");
-        hook.setZeroPosition(0.5);
+        hook = new FXTCRServo("hook");
+//        hook.setZeroPosition(0.5);
 
         frontguard = new FXTServo("frontguard");
         frontguard.addPos("down", 0.2);
@@ -124,21 +124,20 @@ public class Lily extends Robot {
         doorR.addPos("open", 0.7);
         doorR.goToPos("closed");
 
-        brush = new ContinuousServo("brush");
-        brush.setZeroPosition(0.5);
+        brush = new FXTCRServo("brush");
 
-        redZipliner = new ContinuousServo("redzip");
+        redZipliner = new FXTServo("redzip");
         redZipliner.addPos("open", 0.2);
         redZipliner.addPos("close", 0);
         redZipliner.goToPos("close");
 
-        blueZipliner = new ContinuousServo("bluezip");
+        blueZipliner = new FXTServo("bluezip");
         blueZipliner.addPos("open", 0);
         blueZipliner.addPos("close", 0.2);
         blueZipliner.goToPos("close");
 
-        people = new ContinuousServo("people");
-        people.setZeroPosition(0.53);
+        people = new FXTCRServo("people");
+//        people.setZeroPosition(0.53);
 
         turnTable = new Motor("turnTable");
         turnTable.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -185,15 +184,15 @@ public class Lily extends Robot {
 
     public void imuTurnL(double degrees, double speed) {
         turnL(speed);
-        motorL.toggleTargetChecking(true);
-        motorR.toggleTargetChecking(true);
+        motorL.toggleChecking(true);
+        motorR.toggleChecking(true);
         setTargetAngle((int) -degrees);
     }
 
     public void imuTurnR(double degrees, double speed) {
         turnR(speed);
-        motorL.toggleTargetChecking(true);
-        motorR.toggleTargetChecking(true);
+        motorL.toggleChecking(true);
+        motorR.toggleChecking(true);
         setTargetAngle((int) degrees);
     }
 
@@ -223,12 +222,12 @@ public class Lily extends Robot {
 
         if (elbowFirst) {
             if (motionStage == 0) {
-                elbow.setTargetPosition(elbow.beginningPosition + newElbowPosition - elbow.getCurrentPosition());
+                elbow.setTarget(elbow.beginningPosition + newElbowPosition - elbow.getCurrentPosition());
                 elbow.setPower(0.3);
                 motionStage++;
             } else if (motionStage == 1 && armReady()) {
                 elbow.stop();
-                turnTable.setTargetPosition(turnTable.beginningPosition + newTurnTablePosition - turnTable.getCurrentPosition());
+                turnTable.setTarget(turnTable.beginningPosition + newTurnTablePosition - turnTable.getCurrentPosition());
                 turnTable.setPower(0.3);
                 motionStage++;
             } else if (motionStage == 2 && armReady()) {
@@ -239,12 +238,12 @@ public class Lily extends Robot {
             }//elseif
         } else {
             if (motionStage == 0) {
-                turnTable.setTargetPosition(turnTable.beginningPosition + newTurnTablePosition - turnTable.getCurrentPosition());
+                turnTable.setTarget(turnTable.beginningPosition + newTurnTablePosition - turnTable.getCurrentPosition());
                 turnTable.setPower(0.3);
                 motionStage++;
             } else if (motionStage == 1 && armReady()) {
                 turnTable.stop();
-                elbow.setTargetPosition(elbow.beginningPosition + newElbowPosition - elbow.getCurrentPosition());
+                elbow.setTarget(elbow.beginningPosition + newElbowPosition - elbow.getCurrentPosition());
                 elbow.setPower(0.3);
                 motionStage++;
             } else if (motionStage == 2 && armReady()) {
@@ -276,8 +275,8 @@ public class Lily extends Robot {
             //if the angle to turn is less than 0.5 degree, we're done.
             if (Math.abs(angleToTurn) < 0.5) {
                 angleReached = true;
-                motorL.target = motorL.getCurrentPosition();
-                motorR.target = motorR.getCurrentPosition();
+//                motorL.target = motorL.getCurrentPosition();
+//                motorR.target = motorR.getCurrentPosition();
                 halt();
                 return;
             }//if
@@ -300,11 +299,11 @@ public class Lily extends Robot {
             RC.t.addData("Angle Remaining", angleToTurn);
             
             if (angleToTurn > 0) {
-                motorR.setPowerSuper(-commandedTurningSpeed * multiplier);
-                motorL.setPowerSuper(commandedTurningSpeed * multiplier);
+                motorR.setPower(-commandedTurningSpeed * multiplier);
+                motorL.setPower(commandedTurningSpeed * multiplier);
             } else if (angleToTurn < 0) {
-                motorR.setPowerSuper(commandedTurningSpeed * multiplier);
-                motorL.setPowerSuper(-commandedTurningSpeed * multiplier);
+                motorR.setPower(commandedTurningSpeed * multiplier);
+                motorL.setPower(-commandedTurningSpeed * multiplier);
             }//elseif
         }//if
 
@@ -339,11 +338,11 @@ public class Lily extends Robot {
             Log.i("Altering", "" + alter);
 
             if (angleToTurn < 0) {
-                motorR.setPowerSuper(motorSpeed - alter);
-                motorL.setPowerSuper(motorSpeed + alter);
+                motorR.setPower(motorSpeed - alter);
+                motorL.setPower(motorSpeed + alter);
             } else if (angleToTurn > 0) {
-                motorR.setPowerSuper(motorSpeed + alter);
-                motorL.setPowerSuper(motorSpeed - alter);
+                motorR.setPower(motorSpeed + alter);
+                motorL.setPower(motorSpeed - alter);
             }//elseif
 
             Log.i("MotorSpeeds", "R: " + motorR.getPower() + ", L: " + motorL.getPower());

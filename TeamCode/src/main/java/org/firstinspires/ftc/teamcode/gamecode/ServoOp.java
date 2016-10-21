@@ -1,14 +1,12 @@
 package org.firstinspires.ftc.teamcode.gamecode;
 
-import org.firstinspires.ftc.teamcode.opmodesupport.DoNotRegister;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
 /**
  * Created by User on 8/25/2015.
  */
-@DoNotRegister
-public class DefaultTeleop extends OpMode {
+public class ServoOp extends OpMode {
 
     Servo gate;
     double speed = 0.0;

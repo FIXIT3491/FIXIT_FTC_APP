@@ -1,36 +1,53 @@
 package org.firstinspires.ftc.teamcode.gamecode;
 
+import com.qualcomm.hardware.adafruit.AdafruitBNO055IMU;
+import com.qualcomm.hardware.adafruit.BNO055IMU;
+import com.qualcomm.hardware.adafruit.JustLoggingAccelerationIntegrator;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.AdafruitIMU;
-import org.firstinspires.ftc.teamcode.opmodesupport.DoNotRegister;
 import org.firstinspires.ftc.teamcode.opmodesupport.TeleOpMode;
 
 /**
  * Created by Owner on 8/31/2015.
  */
-@DoNotRegister
+@Autonomous
 public class AdafruitCheck extends TeleOpMode {
 
-    AdafruitIMU boschBNO055;
+    AdafruitBNO055IMU imu;
 
     @Override
     public void initialize() {
-        boschBNO055 = new AdafruitIMU("adafruit", (byte) AdafruitIMU.OPERATION_MODE_IMU);
+        BNO055IMU.Parameters params = new BNO055IMU.Parameters();
+        params.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        params.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        params.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+        imu = (AdafruitBNO055IMU)RC.h.i2cDeviceSynch.get("adafruit");
+        imu.initialize(params);
     }
 
     @Override
     public void loopOpMode() {
-        RC.t.addData("Angle-Heading", boschBNO055.getEulerAngles()[0]);
-        RC.t.addData("Angle-Roll", boschBNO055.getEulerAngles()[1]);
-        RC.t.addData("Angle-Pitch", boschBNO055.getEulerAngles()[2]);
+        Orientation o = imu.getAngularOrientation();
+        RC.t.addData("Angle-Heading", o.firstAngle);
+        RC.t.addData("Angle-Roll", o.secondAngle);
+        RC.t.addData("Angle-Pitch", o.thirdAngle);
 
-        RC.t.addData("Accel-X", boschBNO055.getAccelData()[0]);
-        RC.t.addData("Accel-Y", boschBNO055.getAccelData()[1]);
-        RC.t.addData("Accel-Z", boschBNO055.getAccelData()[2]);
+        Acceleration a = imu.getLinearAcceleration();
+        RC.t.addData("Lin-Accel-X", a.xAccel);
+        RC.t.addData("Lin-Accel-Y", a.yAccel);
+        RC.t.addData("Lin-Accel-Z", a.zAccel);
 
-        RC.t.addData("Gyro-X", boschBNO055.getGyroAngles()[0]);
-        RC.t.addData("Gyro-Y", boschBNO055.getGyroAngles()[1]);
-        RC.t.addData("Gyro-Z", boschBNO055.getGyroAngles()[2]);
+        AngularVelocity v = imu.getAngularVelocity();
+        RC.t.addData("Gyro-X", v.firstAngleRate);
+        RC.t.addData("Gyro-Y", v.secondAngleRate);
+        RC.t.addData("Gyro-Z", v.thirdAngleRate);
     }
 
 }

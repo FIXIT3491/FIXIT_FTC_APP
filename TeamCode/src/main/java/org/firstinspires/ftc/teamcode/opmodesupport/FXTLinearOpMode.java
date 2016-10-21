@@ -25,11 +25,6 @@ public abstract class FXTLinearOpMode extends LinearOpMode {
     int interval = 100;
 
     /**
-     * Allows or stops datalogging
-     */
-    boolean datalog = false;
-
-    /**
      * List of long numbers. Used for timers
      */
     private List<Long> startNanoTimes = new ArrayList<Long>();
@@ -39,6 +34,8 @@ public abstract class FXTLinearOpMode extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         RC.setOpMode(this);
+        TaskHandler.init();
+        TaskHandler.addLoopedTask("MainRunnable", mainTasks, 2);
         addTimer();
 
         runOp();
@@ -47,13 +44,6 @@ public abstract class FXTLinearOpMode extends LinearOpMode {
     }
 
     public abstract void runOp() throws InterruptedException;
-
-    public void initUnderLyingProcesses(int numThreads) {
-        TaskHandler.init(numThreads);
-        TaskHandler.addTask("mainTasks", mainTasks, 5);
-
-
-    }
 
     public void delay(int millis) {
         try {
@@ -155,66 +145,6 @@ public abstract class FXTLinearOpMode extends LinearOpMode {
 
         return generatedSnd;
     }
-
-
-    /**
-     * AUTOMATIC DATALOGGING METHODS
-     */
-
-    /**
-     * Method that creates the thread for automatic datalogging
-     */
-    private void createDataLoggingThread() {
-        new Thread() {
-            public void run() {
-                while (true) {
-                    if (datalog && System.currentTimeMillis() % interval < 3) {
-                        RC.t.dataLogSensorList();
-                    }
-                    try {
-                        Thread.sleep(10);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-            }
-        }.start();
-    }
-
-    /**
-     * Method to point Android to what text file to write to
-     * @param fileName name of .txt file to write to
-     * @param overWrite whether or not to overwrite the data there
-     */
-    public void setDataLogFile (String fileName, boolean overWrite) {
-        RC.t.setDataLogFile(fileName, overWrite);
-        datalog = true;
-        createDataLoggingThread();
-    }
-
-    /**
-     * Set how often automatic datalogging should occur
-     * @param ms
-     */
-    protected void setDataLogInterval (int ms) {
-        this.interval = ms;
-    }
-
-    /**
-     * Method to start automatic datalogging
-     */
-    protected void startDataLogging() {
-        this.datalog = true;
-    }
-
-    /**
-     * Method to stop datalogging
-     */
-    protected void stopDataLogging() {
-        this.datalog = false;
-    }
-
 
 
     /*************

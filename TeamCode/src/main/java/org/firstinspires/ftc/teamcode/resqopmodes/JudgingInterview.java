@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.gamecode;
+package org.firstinspires.ftc.teamcode.resqopmodes;
 
 import android.speech.tts.TextToSpeech;
 
@@ -32,7 +32,7 @@ public class JudgingInterview extends TeleOpMode implements TextToSpeech.OnInitL
     @Override
     public void initialize() {
         lily = new Lily(true);
-        text = new TextToSpeech(RC.c, this);
+        text = new TextToSpeech(RC.c(), this);
     }
 
     @Override

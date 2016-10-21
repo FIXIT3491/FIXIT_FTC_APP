@@ -248,8 +248,7 @@ public abstract class FXTSensor implements FXTDevice {
     public void setFilter (SensorFilter filter) {
         this.filter = filter;
     }
-
-
+    
     public void check() {
         getValues();
         getValue();

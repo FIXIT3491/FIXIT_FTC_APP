@@ -1,6 +1,5 @@
-package org.firstinspires.ftc.teamcode.gamecode;
+package org.firstinspires.ftc.teamcode.resqopmodes;
 
-import org.firstinspires.ftc.teamcode.opmodesupport.DoNotRegister;
 import org.firstinspires.ftc.teamcode.opmodesupport.TeleOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -10,7 +9,6 @@ import java.util.Map;
 /**
  * Created by FTC on 23/10/2015.
  */
-@DoNotRegister
 public class ServoDebug extends TeleOpMode {
 
     ArrayList<Servo> servos = new ArrayList<Servo>();

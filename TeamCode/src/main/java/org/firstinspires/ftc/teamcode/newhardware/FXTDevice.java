@@ -8,6 +8,5 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public interface FXTDevice {
 
-    void check();
 
 }

@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.gamecode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.AdafruitIMU;
 import org.firstinspires.ftc.teamcode.opmodesupport.TeleOpMode;
 import org.firstinspires.ftc.teamcode.robots.Robot;
@@ -7,6 +10,8 @@ import org.firstinspires.ftc.teamcode.robots.Robot;
 /**
  * Created by Windows on 2016-02-18.
  */
+@Autonomous
+@Disabled
 public class AdafruitOp extends TeleOpMode {
 
     AdafruitIMU adafruit;

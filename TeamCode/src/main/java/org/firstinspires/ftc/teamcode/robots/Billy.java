@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.robots;
 
 import org.firstinspires.ftc.teamcode.RC;
-import org.firstinspires.ftc.teamcode.newhardware.ContinuousServo;
+import org.firstinspires.ftc.teamcode.newhardware.FXTCRServo;
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.AdafruitIMU;
 import org.firstinspires.ftc.teamcode.newhardware.FXTServo;
 import org.firstinspires.ftc.teamcode.newhardware.LinearServo;
@@ -19,11 +19,11 @@ public class Billy extends Robot {
     public LinearServo elbow;
     public Motor ziplines;
     private Motor tapeMeasure;
-    private ContinuousServo brush;
+    private FXTCRServo brush;
     private LinearServo tapeAdjust;
     private LinearServo wrist;
     private FXTServo door;
-    private ContinuousServo hook;
+    private FXTCRServo hook;
 
     public Billy() {
         this(false);
@@ -32,19 +32,17 @@ public class Billy extends Robot {
     public Billy(boolean teleOp) {
         super();
 
-        brush = new ContinuousServo("brush");
-        brush.setZeroPosition(0.53);
+        brush = new FXTCRServo("brush");
 
         baseJoint = new Motor("base");
-        baseJoint.toggleTargetChecking(true);
+        baseJoint.toggleChecking(true);
 
         turnTable = new Motor("turnTable");
-        turnTable.toggleTargetChecking(true);
+        turnTable.toggleChecking(true);
 
         elbow = new LinearServo("elbow");
         wrist = new LinearServo("wrist");
-        hook = new ContinuousServo("hook");
-        hook.setZeroPosition(0.53);
+        hook = new FXTCRServo("hook");
 
         door = new FXTServo("door");
         door.addPos("open", 1);
@@ -115,23 +113,15 @@ public class Billy extends Robot {
             case LEFT:
                 turnTable.setPower(0.05);
                 target += degrees;
-                while (turnTable.getCurrentPosition() < target && RC.isOpModeActive()) {
-                    try {
-                        ((LinearOpMode) (RC.o)).waitOneFullHardwareCycle();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                while (turnTable.getCurrentPosition() < target && RC.l.opModeIsActive()) {
+                    RC.l.idle();
                 }
                 break;
             case RIGHT:
                 turnTable.setPower(-0.05);
                 target -= degrees;
-                while (turnTable.getCurrentPosition() > target && RC.isOpModeActive()) {
-                    try {
-                        ((LinearOpMode) (RC.o)).waitOneFullHardwareCycle();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                while (turnTable.getCurrentPosition() > target && RC.l.opModeIsActive()) {
+                    RC.l.idle();
                 }
                 break;
             case STOP:
@@ -204,24 +194,16 @@ public class Billy extends Robot {
             case UP:
                 baseJoint.setPower(0.1);
                 target += deg;
-                while (baseJoint.getCurrentPosition() < target && RC.isOpModeActive()) {
+                while (baseJoint.getCurrentPosition() < target && RC.l.opModeIsActive()) {
                     RC.t.addData("base", baseJoint.getCurrentPosition());
-                    try {
-                        ((LinearOpMode) (RC.o)).waitOneFullHardwareCycle();
-                    } catch (InterruptedException e) {
-                        RC.t.addData("Exception", "Interrupted");
-                    }
+                    RC.l.idle();
                 }
                 break;
             case DOWN:
                 baseJoint.setPower(-0.1);
                 target -= deg;
-                while (baseJoint.getCurrentPosition() > target && RC.isOpModeActive()) {
-                    try {
-                        ((LinearOpMode) (RC.o)).waitOneFullHardwareCycle();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                while (baseJoint.getCurrentPosition() > target && RC.l.opModeIsActive()) {
+                    RC.l.idle();
                 }
                 break;
             case STOP:
@@ -325,7 +307,7 @@ public class Billy extends Robot {
 
         RC.t.addData("Heading", adafruit.getEulerAngles()[0]);
 
-        while (Math.abs(adafruit.getEulerAngles()[0] - degrees) > 2 && RC.isOpModeActive()) {
+        while (Math.abs(adafruit.getEulerAngles()[0] - degrees) > 2 && RC.l.opModeIsActive()) {
             try {
                 ((LinearOpMode) RC.o).waitOneFullHardwareCycle();
             } catch (InterruptedException e) {
@@ -346,7 +328,7 @@ public class Billy extends Robot {
 
         RC.t.addData("Heading", adafruit.getEulerAngles()[0]);
 
-        while (Math.abs(adafruit.getEulerAngles()[0] - degrees) > 2 && RC.isOpModeActive()) {
+        while (Math.abs(adafruit.getEulerAngles()[0] - degrees) > 2 && RC.l.opModeIsActive()) {
             try {
                 ((LinearOpMode) RC.o).waitOneFullHardwareCycle();
             } catch (InterruptedException e) {
@@ -368,8 +350,8 @@ public class Billy extends Robot {
 
     public void checkMotorTargets() {
 
-        baseJoint.checkTargetWithFixing();
-        turnTable.checkTargetWithFixing();
+//        baseJoint.checkTargetWithFixing();
+//        turnTable.checkTargetWithFixing();
 
     }
 

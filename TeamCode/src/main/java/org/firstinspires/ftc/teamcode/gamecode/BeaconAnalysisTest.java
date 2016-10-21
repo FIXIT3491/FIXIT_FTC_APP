@@ -57,7 +57,7 @@ public class BeaconAnalysisTest extends FXTLinearOpMode {
                 Log.i("BLUE", "RED");
             } else {
                 Log.i("BEAC", "== -1");
-            }
+            }//else
 
             delay(500);
         }//while

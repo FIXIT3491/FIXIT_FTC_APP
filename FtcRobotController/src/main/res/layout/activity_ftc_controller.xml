@@ -85,13 +85,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <include layout="@layout/header"
       android:id="@+id/included_header"/>
 
-  <ImageView android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:id="@+id/tempdisplay"
-      android:minWidth="400dp"
-      android:minHeight="300dp"
-      android:maxHeight="300dp"
-      android:maxWidth="400dp" />
 
   <RelativeLayout
     android:id="@+id/RelativeLayout"

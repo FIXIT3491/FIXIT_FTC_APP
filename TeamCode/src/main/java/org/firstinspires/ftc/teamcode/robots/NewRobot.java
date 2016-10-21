@@ -38,11 +38,15 @@ public class NewRobot {
 
     public AdafruitBNO055IMU imu;
     public TrackBall mouse;
+
     public Motor leftFore;
     public Motor rightFore;
     public Motor leftBack;
     public Motor rightBack;
 
+    public double targetAngle = 0;
+
+    //hsv blue beacon range colours
     public static Scalar blueLow = new Scalar(108, 0, 220);
     public static Scalar blueHigh = new Scalar(178, 255, 255);
 
@@ -113,7 +117,7 @@ public class NewRobot {
                          |
                  -90° –     – 90°
                          |
-                        180°
+                        ±180°
      */
     public void strafe(double degrees, double speed) {
 
@@ -261,7 +265,6 @@ public class NewRobot {
 
     }//imuTurnR
 
-
     public void absoluteIMUTurn(double degrees, double speed) {
         double currentAngle = imu.getAngularOrientation().firstAngle;
 
@@ -277,6 +280,86 @@ public class NewRobot {
             imuTurnR(Math.abs(toTurn), speed);
         }//if
     }//absoluteIMUTurn
+
+    //absolute degree system
+    //only works if veerCheck is being looped
+    public void veerTo(double degrees) {
+        this.targetAngle = degrees;
+    }//veerTo
+
+    //to be used via TaskHandler
+    //therefore, it's not a loop
+    public void veerCheck() {
+
+        final double TURNING_CONSTANT = 0.1 / 90.0;
+
+        double angleError = targetAngle - imu.getAngularOrientation().firstAngle;
+
+        double leftForePower = leftFore.getPower();
+        double leftBackPower = leftBack.getPower();
+        double rightForePower = rightFore.getPower();
+        double rightBackPower = rightBack.getPower();
+
+        if (angleError < 0) {
+            leftForePower -= TURNING_CONSTANT * Math.abs(angleError);
+            rightBackPower += TURNING_CONSTANT * Math.abs(angleError);
+
+            if (leftForePower < -1) {
+                rightBackPower += -1 - leftForePower;
+                leftForePower = -1;
+            }//if
+
+            if (rightBackPower > 1) {
+                leftForePower += 1 - rightBackPower;
+                rightBackPower = 1;
+            }//if
+
+            leftBackPower -= TURNING_CONSTANT * Math.abs(angleError);
+            rightForePower += TURNING_CONSTANT * Math.abs(angleError);
+
+            if (leftBackPower < -1) {
+                rightForePower += -1 - leftBackPower;
+                leftBackPower = -1;
+            }//if
+
+            if (rightForePower > 1) {
+                leftBackPower += 1 - rightForePower;
+                rightForePower = 1;
+            }//if
+        } else {
+            rightForePower -= TURNING_CONSTANT * Math.abs(angleError);
+            leftBackPower += TURNING_CONSTANT * Math.abs(angleError);
+
+            if (rightForePower < -1) {
+                leftBackPower += -1 - rightForePower;
+                rightForePower = -1;
+            }//if
+
+            if (leftBackPower > 1) {
+                rightForePower += 1 - leftBackPower;
+                leftBackPower = 1;
+            }//if
+
+            rightBackPower -= TURNING_CONSTANT * Math.abs(angleError);
+            leftForePower += TURNING_CONSTANT * Math.abs(angleError);
+
+            if (rightBackPower < -1) {
+                leftForePower += -1 - rightBackPower;
+                rightBackPower = -1;
+            }//if
+
+            if (leftForePower > 1) {
+                rightBackPower += 1 - leftForePower;
+                leftForePower = 1;
+            }//if
+        }//else
+
+        leftFore.setPower(leftForePower);
+        leftBack.setPower(leftBackPower);
+        rightFore.setPower(rightForePower);
+        rightBack.setPower(rightBackPower);
+
+    }//veerCheck
 
     public static int getBeaconConfig(Image img, VuforiaTrackable beacon, CameraCalibration camCal) {
 
@@ -333,24 +416,15 @@ public class NewRobot {
                 Imgproc.cvtColor(mask, mask, Imgproc.COLOR_GRAY2RGB);
                 Imgproc.cvtColor(cropped, cropped, Imgproc.COLOR_HSV2RGB);
 
-                final Bitmap bit = OCVUtils.matToBitmap(mask);
-
-                AppUtil.getInstance().getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ((FtcRobotControllerActivity) AppUtil.getInstance().getActivity()).display.setImageBitmap(bit);
-                    }
-                });
-
                 Core.bitwise_and(mask, cropped, cropped);
 
                 Log.i("CentroidX", "" + ((mmnts.get_m10() / mmnts.get_m00())));
                 Log.i("CentroidY", "" + ((mmnts.get_m01() / mmnts.get_m00())));
 
                 if ((mmnts.get_m01() / mmnts.get_m00()) < cropped.rows() / 2) {
-                    return BEACON_RED_BLUE;
-                } else {
                     return BEACON_BLUE_RED;
+                } else {
+                    return BEACON_RED_BLUE;
                 }//else
 
             }//if
@@ -361,7 +435,6 @@ public class NewRobot {
 
         return BEACON_NOT_VISIBLE;
     }//getBeaconConfig
-
 
     public void stop() {
         leftFore.stop();

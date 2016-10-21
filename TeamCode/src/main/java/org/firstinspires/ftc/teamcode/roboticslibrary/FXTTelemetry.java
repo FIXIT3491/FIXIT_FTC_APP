@@ -4,6 +4,7 @@ import android.util.Log;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.FXTSensor;
+import org.firstinspires.ftc.teamcode.opmodesupport.TaskHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +17,6 @@ public class FXTTelemetry {
     private Telemetry telemetry;
     public DataWriter out;
     private List<FXTSensor> sensors = new ArrayList<FXTSensor>();
-
-    private Thread dataLogging;
 
     public void setTelemetry (Telemetry telem) {
         this.telemetry = telem;
@@ -156,21 +155,22 @@ public class FXTTelemetry {
         if (out != null && !sensors.isEmpty()) {
             for (int i = 0; i < sensors.size(); i++) {
                 out.write(sensors.get(i).getName() + ": " + sensors.get(i));
-            }
-        }
-    }
+            }//for
+        }//if
+    }//dataLogSensorList
 
     public void beginDataLogging() {
-        dataLogging = new Thread() {
+        TaskHandler.addLoopedTask("DataLogging", new Runnable() {
+            @Override
             public void run() {
                 dataLog();
             }
-        };
-        dataLogging.start();
+        });
     }
 
     public void stopDataLogging() {
         out.closeWriter();
+        TaskHandler.removeTask("DataLogging");
     }
 
     public void dataLog() {

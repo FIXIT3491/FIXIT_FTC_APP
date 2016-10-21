@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.gamecode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.newhardware.LinearServo;
 import org.firstinspires.ftc.teamcode.opmodesupport.TeleOpMode;
@@ -7,6 +9,7 @@ import org.firstinspires.ftc.teamcode.opmodesupport.TeleOpMode;
 /**
  * Created by Windows on 2016-07-08.
  */
+@Disabled
 public class LinearTester extends TeleOpMode {
     LinearServo l;
     int stage = 0;

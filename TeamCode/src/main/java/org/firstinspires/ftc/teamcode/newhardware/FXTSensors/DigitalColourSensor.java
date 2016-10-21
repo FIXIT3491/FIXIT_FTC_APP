@@ -32,7 +32,6 @@ public class DigitalColourSensor implements FXTDevice {
         this.s3.setMode(DigitalChannelController.Mode.OUTPUT);
     }
 
-    @Override
     public void check() {
         count = 0;
         boolean lastDigitalRead = true;

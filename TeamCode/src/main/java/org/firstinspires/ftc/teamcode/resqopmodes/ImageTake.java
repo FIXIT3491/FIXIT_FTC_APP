@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.gamecode;
+package org.firstinspires.ftc.teamcode.resqopmodes;
 
 import org.firstinspires.ftc.teamcode.opmodesupport.TeleOpMode;
 

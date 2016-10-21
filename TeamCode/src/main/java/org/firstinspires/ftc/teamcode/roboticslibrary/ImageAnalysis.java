@@ -107,10 +107,10 @@ public class ImageAnalysis {
         }
     }
 
-    public String saveToInternalSorage(Bitmap bitmapImage, String name){
-        ContextWrapper cw = new ContextWrapper(RC.c.getApplicationContext());
+    public String saveToInternalStorage(Bitmap bitmapImage, String name){
+        ContextWrapper cw = new ContextWrapper(RC.c().getApplicationContext());
         // path to /data/data/yourapp/app_data/imageDir
-        File directory = RC.c.getExternalFilesDir("");
+        File directory = RC.c().getExternalFilesDir("");
         // Create imageDir
         File mypath = new File(directory, name + ".jpg");
 

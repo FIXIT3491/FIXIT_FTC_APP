@@ -15,6 +15,7 @@ import java.io.FileNotFoundException;
  */
 @Autonomous
 public class UseEncoderRun extends LinearOpMode {
+
     @Override
     public void runOpMode() throws InterruptedException {
         DcMotor left = hardwareMap.dcMotor.get("driveL");

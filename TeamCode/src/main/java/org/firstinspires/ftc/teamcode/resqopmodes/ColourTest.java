@@ -1,14 +1,12 @@
-package org.firstinspires.ftc.teamcode.oldopmodes;
+package org.firstinspires.ftc.teamcode.resqopmodes;
 
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.FXTColourSensor;
-import org.firstinspires.ftc.teamcode.opmodesupport.DoNotRegister;
 import org.firstinspires.ftc.teamcode.opmodesupport.TeleOpMode;
 
 /**
  * Created by FIXIT on 15-11-08.
  */
-@DoNotRegister
 public class ColourTest extends TeleOpMode {
 
     FXTColourSensor colour;

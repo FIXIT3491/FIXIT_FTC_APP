@@ -22,12 +22,12 @@ public abstract class Mouse extends HidBridge {
     public double absolY = 0;
 
     public Mouse(UsbDevice usb) {
-        super(RC.c, usb);
+        super(RC.c(), usb);
         startReadingThread();
     }
 
     public Mouse(int vid, int pid) {
-        super(RC.c, pid, vid);
+        super(RC.c(), pid, vid);
         super.OpenDevice();
         super.startReadingThread();
     }

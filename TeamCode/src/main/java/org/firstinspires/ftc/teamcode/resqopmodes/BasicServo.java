@@ -1,13 +1,11 @@
-package org.firstinspires.ftc.teamcode.oldopmodes;
+package org.firstinspires.ftc.teamcode.resqopmodes;
 
-import org.firstinspires.ftc.teamcode.opmodesupport.DoNotRegister;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 /**
  * Created by FIXIT on 16-01-26.
  */
-@DoNotRegister
 public class BasicServo extends OpMode {
 
     DcMotor left;

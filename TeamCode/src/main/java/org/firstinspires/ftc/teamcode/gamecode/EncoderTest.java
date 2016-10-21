@@ -6,11 +6,15 @@ import org.firstinspires.ftc.teamcode.newhardware.Motor;
 import org.firstinspires.ftc.teamcode.opmodesupport.TeleOpMode;
 import org.firstinspires.ftc.teamcode.robots.Lily;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 /**
  * Created by FIXIT on 8/19/2015.
  */
+@Autonomous
+@Disabled
 public class EncoderTest extends TeleOpMode {
 
     Motor testing;

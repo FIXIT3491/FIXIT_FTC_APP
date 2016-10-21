@@ -4,20 +4,18 @@ import android.media.MediaPlayer;
 
 import com.qualcomm.ftcrobotcontroller.R;
 import org.firstinspires.ftc.teamcode.RC;
-import org.firstinspires.ftc.teamcode.opmodesupport.Name;
 import org.firstinspires.ftc.teamcode.opmodesupport.TeleOpMode;
 
 /**
  * Created by Windows on 2016-02-05.
  */
-@Name("O Canada")
 public class OCanada extends TeleOpMode {
 
     MediaPlayer mediaPlayer;
 
     @Override
     public void initialize() {
-        mediaPlayer = MediaPlayer.create(RC.c, R.raw.can);
+        mediaPlayer = MediaPlayer.create(RC.c(), R.raw.can);
     }
 
     @Override
