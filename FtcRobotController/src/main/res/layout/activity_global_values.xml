@@ -1,0 +1,56 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity"
+    android:focusable="true"
+    android:id="@+id/entire_screen"
+    android:orientation="vertical"
+    android:weightSum="1">
+
+    <!-- green bar on top -->
+    <RelativeLayout
+        android:id="@+id/top_bar"
+        android:layout_width="fill_parent"
+        android:layout_height="80dp"
+        android:background="@color/fixit_green">
+
+        <ImageView
+            android:id="@+id/robotIcon"
+            android:src="@drawable/icon_robotcontroller"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:adjustViewBounds="true"
+            android:layout_margin="1dp"/>
+
+        <TextView
+            android:layout_toEndOf="@id/robotIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:padding="8dp"
+            android:layout_marginTop="20dp"
+            android:textSize="22dp"
+            android:text="Set Global Values"/>
+
+    </RelativeLayout>
+    <!-- end of green bar -->
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="15dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@color/dark_fixit_green"></LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/globalsettings">
+
+
+    </RelativeLayout>
+
+</LinearLayout>

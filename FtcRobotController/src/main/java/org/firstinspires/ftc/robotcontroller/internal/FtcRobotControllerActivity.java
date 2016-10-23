@@ -152,6 +152,10 @@ public class FtcRobotControllerActivity extends Activity {
 
   }
 
+  static {
+    initializeGlobals();
+  }
+
   private BaseLoaderCallback mOpenCVCallBack = new BaseLoaderCallback(this) {
     @Override
     public void onManagerConnected(int status) {
@@ -286,6 +290,7 @@ public class FtcRobotControllerActivity extends Activity {
       RobotLog.d("OpenCV", "OpenCV library found inside package. Using it!");
       mOpenCVCallBack.onManagerConnected(LoaderCallbackInterface.SUCCESS);
     }//else
+
 
     wifiLock.acquire();
     callback.networkConnectionUpdate(WifiDirectAssistant.Event.DISCONNECTED);
@@ -474,6 +479,11 @@ public class FtcRobotControllerActivity extends Activity {
       startActivity(intent);
       return true;
     }
+    else if (id == R.id.action_globals) {
+      Intent intent = new Intent(this, GlobalValuesActivity.class);
+      startActivity(intent);
+      return true;
+    }
     else if (id == R.id.action_exit_app) {
       finish();
       return true;
@@ -594,6 +604,12 @@ public class FtcRobotControllerActivity extends Activity {
       }
 
     });
+  }
+
+  public static void initializeGlobals() {
+    GlobalValuesActivity.globals.put("allianceRed", true);
+    GlobalValuesActivity.globals.put("usePosition", true);
+    GlobalValuesActivity.globals.put("checkSomething", "Hello!");
   }
 
 }

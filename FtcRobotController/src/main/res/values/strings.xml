@@ -60,4 +60,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <string name="toastConfigureRobotBeforeProgrammingMode">You must Configure Robot before starting Programming Mode.</string>
 
   <string name="activeConfigCaption">Active Configuration</string>
+    <string name="title_activity_global_values">GlobalValuesActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
 </resources>

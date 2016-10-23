@@ -5,6 +5,8 @@ import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import org.firstinspires.ftc.robotcontroller.internal.GlobalValuesActivity;
+import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.opmodesupport.TeleOpMode;
 import org.firstinspires.ftc.teamcode.roboticslibrary.FXTCamera;
 

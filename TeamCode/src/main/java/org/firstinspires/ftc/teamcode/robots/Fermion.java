@@ -491,7 +491,7 @@ public class Fermion {
         }//while
 
         stop();
-    }
+    }//strafeToBeacon
 
     public void stop() {
         leftFore.stop();

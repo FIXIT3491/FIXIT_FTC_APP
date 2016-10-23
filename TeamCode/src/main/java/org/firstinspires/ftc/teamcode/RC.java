@@ -5,6 +5,7 @@ import android.content.Context;
 import android.view.View;
 
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
+import org.firstinspires.ftc.robotcontroller.internal.GlobalValuesActivity;
 import org.firstinspires.ftc.robotcore.internal.AppUtil;
 import org.firstinspires.ftc.teamcode.roboticslibrary.FXTTelemetry;
 
@@ -42,6 +43,18 @@ public class RC {
         }//if
 
     }//setOpMode
+
+    public static boolean globalBool(String key) {
+        return ((Boolean) GlobalValuesActivity.globals.get(key)).booleanValue();
+    }//globalBool
+
+    public static String globalString(String key) {
+        return (String) GlobalValuesActivity.globals.get(key);
+    }//globalString
+
+    public static double globalDouble(String key) {
+        return ((Double) GlobalValuesActivity.globals.get(key)).doubleValue();
+    }//globalDouble
 
     public static Context c() {
         return AppUtil.getInstance().getActivity();
