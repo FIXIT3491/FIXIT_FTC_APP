@@ -64,11 +64,9 @@ public class FermionBlue extends FXTLinearOpMode {
 
         muon.strafeToBeacon(gears, 40);
 
-        int beaconConfig = Fermion.waitForBeaconConfig(
+        muon.pushBeaconButton(Fermion.waitForBeaconConfig(
                 getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
-                gears, locale.getCameraCalibration());
-
-        //push button using beaconConfig!
+                gears, locale.getCameraCalibration()));
 
         muon.left(0.5);
 
@@ -78,11 +76,9 @@ public class FermionBlue extends FXTLinearOpMode {
 
         muon.strafeToBeacon(tools, 40);
 
-        beaconConfig = Fermion.waitForBeaconConfig(
+        muon.pushBeaconButton(Fermion.waitForBeaconConfig(
                 getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
-                gears, locale.getCameraCalibration());
-
-        //push button using beaconConfig!
+                tools, locale.getCameraCalibration()));
 
     }//runOp
 

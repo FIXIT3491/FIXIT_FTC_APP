@@ -50,6 +50,10 @@ public final class TaskHandler {
         return futures.containsKey(name);
     }//removeTask
 
+    public static boolean taskExists(String name) {
+        return futures.containsKey(name);
+    }//taskExists
+
     public static void switchTask(String remove, String add, Runnable task) {
         removeTask(remove);
         addTask(add, task);

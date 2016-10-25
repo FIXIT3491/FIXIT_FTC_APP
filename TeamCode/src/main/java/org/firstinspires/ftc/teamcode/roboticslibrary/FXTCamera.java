@@ -25,8 +25,8 @@ public class FXTCamera implements TextureView.SurfaceTextureListener {
 
     private boolean displayStream = false;
 
-    public final static int FACING_FORWARD = Camera.CameraInfo.CAMERA_FACING_FRONT;
     public final static int FACING_BACKWARD = Camera.CameraInfo.CAMERA_FACING_BACK;
+    public final static int FACING_FORWARD = Camera.CameraInfo.CAMERA_FACING_FRONT;
 
     public FXTCamera(int direction, boolean displayStream) {
 
@@ -51,7 +51,7 @@ public class FXTCamera implements TextureView.SurfaceTextureListener {
         }//catch
 
         Camera.Parameters params = cam.getParameters();
-        params.setPictureSize(640, 480);
+        params.setPreviewSize(640, 480);
         params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
         params.setPictureFormat(ImageFormat.JPEG);
 

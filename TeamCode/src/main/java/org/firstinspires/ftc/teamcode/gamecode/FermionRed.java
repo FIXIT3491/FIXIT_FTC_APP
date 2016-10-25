@@ -48,7 +48,7 @@ public class FermionRed extends FXTLinearOpMode {
 
         //electron.trackForward(609.6, 0.5);
         electron.forward(0.5); //uses time instead of trackball
-        delay(1000);
+        delay((int) RC.globalDouble("DriveForwardTime"));
         electron.stop();
 
         electron.imuTurnL(45, 0.5);
@@ -58,17 +58,19 @@ public class FermionRed extends FXTLinearOpMode {
             idle();
         }//while
 
-        electron.strafeToBeacon(gears, 100);
+        VectorF translation = gears.getPose().getTranslation();
+
+        electron.imuTurnL(Math.atan2(translation.get(2), translation.get(3)), 0.5);
+
+        electron.strafeToBeacon(gears, RC.globalDouble("FirstGearsBufferDistance"));
 
         electron.absoluteIMUTurn(-90, 0.5);
 
-        electron.strafeToBeacon(gears, 40);
+        electron.strafeToBeacon(gears, RC.globalDouble("SecondGearsBufferDistance"));
 
-        int beaconConfig = Fermion.waitForBeaconConfig(
+        electron.pushBeaconButton(Fermion.waitForBeaconConfig(
                 getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
-                gears, locale.getCameraCalibration());
-
-        //push button using beaconConfig!
+                gears, locale.getCameraCalibration()));
 
         electron.right(0.5);
 
@@ -76,15 +78,13 @@ public class FermionRed extends FXTLinearOpMode {
             idle();
         }//while
 
-        electron.strafeToBeacon(tools, 40);
+        electron.strafeToBeacon(tools, RC.globalDouble("ToolsBufferDistance"));
 
-        beaconConfig = Fermion.waitForBeaconConfig(
+        electron.pushBeaconButton(Fermion.waitForBeaconConfig(
                 getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
-                gears, locale.getCameraCalibration());
+                tools, locale.getCameraCalibration()));
 
-        //push button using beaconConfig!
-
-    }
+    }//runOp
 
     //this assumes the horizontal axis is the y-axis since the phone is vertical
     //robot angle is relative to "parallel with the beacon wall"

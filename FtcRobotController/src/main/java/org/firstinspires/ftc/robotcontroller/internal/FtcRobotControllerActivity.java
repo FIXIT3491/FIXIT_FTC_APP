@@ -106,7 +106,6 @@ public class FtcRobotControllerActivity extends Activity {
 
   public static final String TAG = "RCActivity";
 
-
   private static final int REQUEST_CONFIG_WIFI_CHANNEL = 1;
   private static final boolean USE_DEVICE_EMULATION = false;
   private static final int NUM_GAMEPADS = 2;
@@ -606,10 +605,15 @@ public class FtcRobotControllerActivity extends Activity {
     });
   }
 
+
   public static void initializeGlobals() {
-    GlobalValuesActivity.globals.put("allianceRed", true);
-    GlobalValuesActivity.globals.put("usePosition", true);
-    GlobalValuesActivity.globals.put("checkSomething", "Hello!");
+    GlobalValuesActivity.add("allianceRed", true);
+    GlobalValuesActivity.add("useTrackBall", true);
+    GlobalValuesActivity.add("waitInAutonomous", false);
+    GlobalValuesActivity.add("DriveForwardTime", 1000);
+    GlobalValuesActivity.add("FirstGearsBufferDistance", 100);
+    GlobalValuesActivity.add("SecondGearsBufferDistance", 40);
+    GlobalValuesActivity.add("ToolsBufferDistance", 40);
   }
 
 }

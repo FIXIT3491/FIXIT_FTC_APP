@@ -136,7 +136,7 @@ public class JudgingInterview extends TeleOpMode implements TextToSpeech.OnInitL
                 break;
         }//switch
 
-        RC.t.dataLogData(hardwareMap.voltageSensor.get("Motor Controller 1").getVoltage() + "\n");
+        dataLogData(hardwareMap.voltageSensor.get("Motor Controller 1").getVoltage() + "\n");
         if (!currentlySwitching) {
             if (joy2.buttonA() && armStage == COLLECT) {
                 lily.elbow.minSpeed = 0.2;

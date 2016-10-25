@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.robotcontroller.internal;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.InputType;
+import android.text.method.DigitsKeyListener;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -81,6 +83,7 @@ public class GlobalValuesActivity extends Activity {
                     field.setSingleLine(true);
                     field.setId(idCount++);
                     field.setInputType(InputType.TYPE_CLASS_NUMBER);
+                    field.setKeyListener(DigitsKeyListener.getInstance("-0123456789."));
                     field.setText(value.toString());
 
                     RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -96,8 +99,12 @@ public class GlobalValuesActivity extends Activity {
                 } else if (value instanceof Boolean) {
                     ToggleButton field = new ToggleButton(this);
                     field.setId(idCount++);
-                    field.setTextOn("TRUE");
+
                     field.setTextOff("FALSE");
+                    field.setTextOn("TRUE");
+
+                    field.toggle();
+                    field.toggle();
 
                     if ((((Boolean) value).booleanValue() && !field.isChecked())
                             || (!((Boolean) value).booleanValue() && field.isChecked())) {
@@ -145,7 +152,7 @@ public class GlobalValuesActivity extends Activity {
                         String key = (String) ((TextView) findViewById(i - 1)).getText();
                         View input = findViewById(i);
 
-                        if (input instanceof EditText && ((EditText) input).getInputType() == InputType.TYPE_CLASS_NUMBER) {
+                        if (input instanceof EditText && ((EditText) input).getInputType() == (InputType.TYPE_CLASS_NUMBER)) {
                             globals.put(key, new Double(Double.parseDouble(((EditText) input).getText().toString())));
                         } else if (input instanceof EditText) {
                             globals.put(key, ((EditText) input).getText().toString());
@@ -171,13 +178,30 @@ public class GlobalValuesActivity extends Activity {
         } else {
 
             TextView txt = new TextView(this);
-            txt.setText("Sorry! You haven't registered any globals!");
+            txt.setText("Sorry, you haven't registered any global values!");
+
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.addRule(RelativeLayout.CENTER_IN_PARENT);
+            params.setMargins(10, 20, 10, 0);
+            txt.setLayoutParams(params);
 
             insert.addView(txt);
 
         }//else
 
     }//onCreate
+
+    public static void add(String key, double val) {
+        globals.put(key, new Double(val));
+    }//add
+
+    public static void add(String key, String val) {
+        globals.put(key, val);
+    }//add
+
+    public static void add(String key, boolean val) {
+        globals.put(key, val);
+    }//add
 
 
     @Override

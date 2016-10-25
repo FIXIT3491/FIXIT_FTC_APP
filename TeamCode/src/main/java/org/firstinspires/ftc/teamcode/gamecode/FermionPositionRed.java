@@ -34,6 +34,7 @@ public class FermionPositionRed extends FXTLinearOpMode {
 
         VuforiaTrackables beacons = locale.loadTrackablesFromAsset("FTC_2016-17");
         VuforiaTrackableDefaultListener gears = (VuforiaTrackableDefaultListener) beacons.get(3).getListener();
+        VuforiaTrackableDefaultListener tools = (VuforiaTrackableDefaultListener) beacons.get(1).getListener();
 
         waitForStart();
         beacons.activate();
@@ -59,19 +60,15 @@ public class FermionPositionRed extends FXTLinearOpMode {
 
         tau.strafeToBeacon(gears, 40);
 
-        int beaconConfig = Fermion.waitForBeaconConfig(
+        tau.pushBeaconButton(Fermion.waitForBeaconConfig(
                 getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
-                gears, locale.getCameraCalibration());
-
-        //push button using beaconConfig!
+                gears, locale.getCameraCalibration()));
 
         tau.trackRight(1219.2, 0.5);
 
-        beaconConfig = Fermion.waitForBeaconConfig(
+        tau.pushBeaconButton(Fermion.waitForBeaconConfig(
                 getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
-                gears, locale.getCameraCalibration());
-
-        //push button using beaconConfig!
+                tools, locale.getCameraCalibration()));
 
     }//runOp
 

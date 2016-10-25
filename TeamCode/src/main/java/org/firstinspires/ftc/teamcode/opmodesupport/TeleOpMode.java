@@ -31,23 +31,6 @@ public abstract class TeleOpMode extends OpMode {
     protected Joystick joy2;
 
     /**
-     * Number of milliseconds between each time the computer datalogs
-     */
-    private int interval = 100;
-
-    /**
-     * Allows or stops datalogging
-     */
-    private boolean datalog = false;
-
-    /**
-     * Game-pads that are used by the joysticks
-     * @see TeleOpMode.Joystick
-     * @see com.qualcomm.robotcore.hardware.Gamepad
-     */
-    private Gamepad[] gamepads = new Gamepad[2];
-
-    /**
      * List of long numbers. Used for timers
      */
     private List<Long> startNanoTimes = new ArrayList<Long>();
@@ -56,13 +39,15 @@ public abstract class TeleOpMode extends OpMode {
 
     protected String TAG = "FIX IT";
 
+    protected String dataLogFileName = null;
+
     /**
      * Method that runs once at the beginning of the opmode
      */
     @Override
     public void init() {
-        joy1 = new Joystick(1);
-        joy2 = new Joystick(2);
+        joy1 = new Joystick();
+        joy2 = new Joystick();
 
         addTimer();
         RC.setOpMode(this);
@@ -76,13 +61,18 @@ public abstract class TeleOpMode extends OpMode {
 
     public abstract void initialize();
 
+
+    public void start() {
+        clearTimer();
+    }
+
     /**
      * Method that runs repeatedly. It updates the gamepads and datalogs any lines or sensors
      */
     @Override
     public void loop() {
-        gamepads[0] = gamepad1;
-        gamepads[1] = gamepad2;
+        joy1.update(gamepad1);
+        joy2.update(gamepad2);
         cycles++;
         loopOpMode();
 
@@ -99,34 +89,9 @@ public abstract class TeleOpMode extends OpMode {
         RC.t.close();
     }
 
-    public void start() {
-        clearTimer();
-    }
-
     /**
      * AUTOMATIC DATALOGGING METHODS
      */
-
-    /**
-     * Method that creates the thread for automatic datalogging
-     */
-    private void createDataLoggingThread() {
-        new Thread() {
-            public void run() {
-                while (true) {
-                    if (datalog && System.currentTimeMillis() % interval < 3) {
-                        RC.t.dataLogSensorList();
-                    }
-                    try {
-                        Thread.sleep(10);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-            }
-        }.start();
-    }
 
     /**
      * Method to point Android to what text file to write to
@@ -135,32 +100,32 @@ public abstract class TeleOpMode extends OpMode {
      */
     public void setDataLogFile (String fileName, boolean overWrite) {
         RC.t.setDataLogFile(fileName, overWrite);
-        datalog = true;
-        createDataLoggingThread();
+        this.dataLogFileName = fileName;
+    }//setDataLogFile
+
+    public void dataLogData(String key, String data) {
+        RC.t.dataLogData(dataLogFileName, key, data);
     }
 
-    /**
-     * Set how often automatic datalogging should occur
-     * @param ms
-     */
-    protected void setDataLogInterval (int ms) {
-        this.interval = ms;
+    public void dataLogData(String data) {
+        RC.t.dataLogData(dataLogFileName, data);
     }
 
-    /**
-     * Method to start automatic datalogging
-     */
-    protected void startDataLogging() {
-        this.datalog = true;
+    public void dataLogData(String key, double data) {
+        RC.t.dataLogData(dataLogFileName, key, data);
     }
 
-    /**
-     * Method to stop datalogging
-     */
-    protected void stopDataLogging() {
-        this.datalog = false;
+    public void dataLogData(double data) {
+        RC.t.dataLogData(dataLogFileName, data);
     }
 
+    public void dataLogData(String key, int data) {
+        RC.t.dataLogData(dataLogFileName, key, data);
+    }
+
+    public void dataLogData(int data) {
+        RC.t.dataLogData(dataLogFileName, data);
+    }
 
 
     /**
@@ -344,92 +309,6 @@ public abstract class TeleOpMode extends OpMode {
             }
 
         }.start();
-    }
-
-
-
-    //Joystick class: based off gamepad object
-    public class Joystick {
-
-        int padIndex;
-
-        public Joystick (int gamePad) {
-            this.padIndex = gamePad - 1;
-        }
-
-        public boolean buttonA() {
-            return gamepads[padIndex].a;
-        }
-
-        public boolean buttonB() {
-            return gamepads[padIndex].b;
-        }
-
-        public boolean buttonX() {
-            return gamepads[padIndex].x;
-        }
-
-        public boolean buttonY() {
-            return gamepads[padIndex].y;
-        }
-
-        public boolean buttonUp() {
-            return gamepads[padIndex].dpad_up;
-        }
-
-        public boolean buttonDown() {
-            return gamepads[padIndex].dpad_down;
-        }
-
-        public boolean buttonRight() {
-            return gamepads[padIndex].dpad_right;
-        }
-
-        public boolean buttonLeft() {
-            return gamepads[padIndex].dpad_left;
-        }
-
-        public boolean leftBumper() {
-            return gamepads[padIndex].left_bumper;
-        }
-
-        public boolean rightBumper() {
-            return gamepads[padIndex].right_bumper;
-        }
-
-        public boolean leftTrigger(){
-            return (gamepads[padIndex].left_trigger > 0.1);
-        }
-
-        public boolean rightTrigger(){
-            return (gamepads[padIndex].right_trigger > 0.1);
-        }
-
-        public boolean buttonStart() {
-            return gamepads[padIndex].start;
-        }
-
-        public boolean buttonBack() {
-            return gamepads[padIndex].back;
-        }
-
-        public float x1(){
-            return (Math.abs(gamepads[padIndex].left_stick_x) > 0.09) ? gamepads[padIndex].left_stick_x : 0;
-        }
-
-        public float x2(){
-            return (Math.abs(gamepads[padIndex].right_stick_x) > 0.09)? gamepads[padIndex].right_stick_x : 0;
-        }
-
-        public float y1(){
-            return (Math.abs(gamepads[padIndex].left_stick_y) > 0.09)? gamepads[padIndex].left_stick_y : 0;
-        }
-
-        public float y2(){
-            return (Math.abs(gamepads[padIndex].right_stick_y) > 0.09)? gamepads[padIndex].right_stick_y : 0;
-        }
-
-
     }
 
 

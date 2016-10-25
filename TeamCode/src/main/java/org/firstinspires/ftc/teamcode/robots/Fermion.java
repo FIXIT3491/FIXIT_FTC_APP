@@ -21,6 +21,7 @@ import org.firstinspires.ftc.robotcore.internal.AppUtil;
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.TrackBall;
 import org.firstinspires.ftc.teamcode.newhardware.Motor;
+import org.firstinspires.ftc.teamcode.opmodesupport.FXTLinearOpMode;
 import org.firstinspires.ftc.teamcode.roboticslibrary.OCVUtils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -380,6 +381,24 @@ public class Fermion {
         rightBack.setPower(rightBackPower);
 
     }//veerCheck
+
+    public void pushBeaconButton(int beaconConfig) {
+        if (beaconConfig == Fermion.BEACON_BLUE_RED) {
+            strafe(-90, 0.1);
+            FXTLinearOpMode.delay(500);
+            stop();
+        } else {
+            strafe(90, 0.1);
+            FXTLinearOpMode.delay(500);
+            stop();
+        }//else
+
+        strafe(0, 0.1);
+        FXTLinearOpMode.delay(400);
+        strafe(180, 0.1);
+        FXTLinearOpMode.delay(400);
+        stop();
+    }
 
     public static int waitForBeaconConfig(Image img, VuforiaTrackableDefaultListener beacon, CameraCalibration camCal) {
 

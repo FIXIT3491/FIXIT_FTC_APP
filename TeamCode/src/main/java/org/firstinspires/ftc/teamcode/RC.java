@@ -32,6 +32,7 @@ public class RC {
                                                     "mDHG3hlEYo7qN/vV9VcQUX9XnVLuDeZhkp885BHK5vAe8T9W3Vxj2H/R4" +
                                                     "oijQso6hEBaXsOpCHIWGcuphpoe9yoQlmNRRZ97";
 
+
     public static void setOpMode(OpMode op) {
         o = op;
         h = op.hardwareMap;
@@ -64,8 +65,10 @@ public class RC {
         return ((FtcRobotControllerActivity) AppUtil.getInstance().getActivity());
     }//activity
 
-    public void stop() {
+    public static void stop() {
         t.close();
     }//stop
+
+
 
 }

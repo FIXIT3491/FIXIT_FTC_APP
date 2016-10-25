@@ -23,8 +23,6 @@ import org.firstinspires.ftc.teamcode.robots.Fermion;
 @Autonomous
 public class BeaconAnalysisTest extends FXTLinearOpMode {
 
-    final int BEACON_BUFFER_DISTANCE = 60;
-
     @Override
     public void runOp() throws InterruptedException {
         VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
