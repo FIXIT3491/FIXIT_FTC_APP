@@ -39,6 +39,23 @@ public final class TaskHandler {
         addTask(name, loop(task, delay));
     }
 
+    public static void addDelayedTask(String name, final Runnable task, final int delay) {
+        Runnable delayed = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(delay);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }//catch
+
+                task.run();
+            }//run
+        };//delayed
+
+        addTask(name, delayed);
+    }
+
     public static boolean removeTask(String name) {
         if (futures.containsKey(name)) {
             futures.get(name).cancel(true);

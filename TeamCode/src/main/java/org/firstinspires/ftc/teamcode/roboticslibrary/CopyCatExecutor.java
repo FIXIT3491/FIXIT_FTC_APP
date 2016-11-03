@@ -2,15 +2,13 @@ package org.firstinspires.ftc.teamcode.roboticslibrary;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import org.firstinspires.ftc.teamcode.opmodesupport.FXTLinearOpMode;
+import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
 import org.firstinspires.ftc.teamcode.opmodesupport.Joystick;
 import org.firstinspires.ftc.teamcode.opmodesupport.TaskHandler;
-import org.firstinspires.ftc.teamcode.opmodesupport.TeleOpMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * Created by FIXIT on 16-10-24.
@@ -85,7 +83,7 @@ public class CopyCatExecutor {
             @Override
             public void run() {
                 for (int i = 0; i < actions.length; i++) {
-                    FXTLinearOpMode.delay((int) timing[i]);
+                    AutoOpMode.delay((int) timing[i]);
                     joy.update(actions[i]);
                 }//for
             }

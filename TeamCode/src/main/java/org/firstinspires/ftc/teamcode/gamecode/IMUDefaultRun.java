@@ -10,10 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 
-import org.firstinspires.ftc.teamcode.RC;
-import org.firstinspires.ftc.teamcode.opmodesupport.FXTLinearOpMode;
 import org.firstinspires.ftc.teamcode.roboticslibrary.DataWriter;
-import org.firstinspires.ftc.teamcode.robots.Lily;
 
 import java.io.FileNotFoundException;
 

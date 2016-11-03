@@ -119,18 +119,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       android:visibility="invisible"
       android:text="" />
 
-    <FrameLayout
+      <FrameLayout
       android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_below="@+id/textOpMode"
-      android:layout_above="@+id/textGamepad1">
+      android:layout_height="200dp"
+          android:layout_above="@+id/textGamepad1"
+          android:id="@+id/frameLayout">
 
       <LinearLayout
           android:id="@+id/cameraMonitorViewId"
           android:layout_width="match_parent"
           android:layout_height="match_parent"
           android:orientation="vertical"
-          />
+          android:weightSum="1">
+
+      </LinearLayout>
 
       <!-- When visible, the error message will overlay and thus partially
            obscure part of the camera monitor. We make this trade off so as to
@@ -173,8 +175,57 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       android:textColor="#ffffffff"
       android:textSize="40sp"
       android:textStyle="bold"
-      android:visibility="invisible"
-      android:text="" />
+      android:visibility="invisible" />
+
+      <RelativeLayout
+          android:layout_width="match_parent"
+          android:layout_height="300dp"
+          android:visibility="invisible"
+          android:id="@+id/driverstation"
+          android:layout_below="@+id/textOpMode"
+          android:layout_alignParentStart="true">
+
+        <Spinner
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/opModeList"
+            android:translationZ="50dp"
+            android:layout_above="@+id/initOpMode"
+            android:layout_alignParentStart="true" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Init OpMode"
+            android:id="@+id/initOpMode"
+            android:layout_gravity="center_horizontal"
+            android:layout_alignTop="@+id/stopOpMode"
+            android:layout_toStartOf="@+id/runOpMode"
+            android:onClick="initOpMode" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Run OpMode"
+            android:id="@+id/runOpMode"
+            android:layout_alignTop="@+id/initOpMode"
+            android:layout_centerHorizontal="true"
+            android:onClick="runOpMode" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Stop OpMode"
+            android:id="@+id/stopOpMode"
+            android:onClick="stopOpMode"
+            android:layout_marginTop="59dp"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/runOpMode" />
+
+      </RelativeLayout>
 
   </RelativeLayout>
 

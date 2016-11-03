@@ -12,13 +12,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.RC;
-import org.firstinspires.ftc.teamcode.opmodesupport.FXTLinearOpMode;
+import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
 import org.firstinspires.ftc.teamcode.robots.Fermion;
 
 /**
  * Created by FIXIT on 16-10-21.
  */
-public class FermionBlue extends FXTLinearOpMode {
+public class FermionBlue extends AutoOpMode {
 
     @Override
     public void runOp() throws InterruptedException {

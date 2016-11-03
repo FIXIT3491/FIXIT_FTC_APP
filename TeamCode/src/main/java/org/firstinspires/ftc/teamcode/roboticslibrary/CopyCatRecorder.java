@@ -91,6 +91,7 @@ public class CopyCatRecorder {
             RC.t.dataLogData(fileName, obj.toString());
         }//for
 
+        RC.t.close();
     }//writeToFile
 
 }

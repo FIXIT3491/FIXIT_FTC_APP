@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Created by FIXIT on 16-10-05.
  */
-public abstract class FXTLinearOpMode extends LinearOpMode {
+public abstract class AutoOpMode extends LinearOpMode {
 
     protected TaskHandler.MultiRunnable mainTasks = new TaskHandler.MultiRunnable();
 

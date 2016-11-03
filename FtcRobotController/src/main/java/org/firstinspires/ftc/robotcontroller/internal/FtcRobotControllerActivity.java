@@ -48,14 +48,12 @@ import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
-import android.view.TextureView;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.blocks.ftcrobotcontroller.BlocksActivity;
@@ -68,7 +66,6 @@ import com.qualcomm.ftccommon.Device;
 import com.qualcomm.ftccommon.FtcEventLoop;
 import com.qualcomm.ftccommon.FtcEventLoopIdle;
 import com.qualcomm.ftccommon.FtcRobotControllerService;
-import com.qualcomm.ftccommon.FtcRobotControllerService.FtcRobotControllerBinder;
 import com.qualcomm.ftccommon.FtcRobotControllerSettingsActivity;
 import com.qualcomm.ftccommon.LaunchActivityConstantsList;
 import com.qualcomm.ftccommon.ProgrammingModeController;
@@ -99,6 +96,7 @@ import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 
 import java.io.File;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -141,7 +139,10 @@ public class FtcRobotControllerActivity extends Activity {
   protected FtcEventLoop eventLoop;
   protected Queue<UsbDevice> receivedUsbAttachmentNotifications;
 
-  public TextureView display;
+  protected List<String> opModeNames;
+  protected String activeOpModeName;
+  protected FtcOpModeRegister storedRegister;
+  protected boolean driverStationEnabled = false;
 
   protected class RobotRestarter implements Restarter {
 
@@ -174,7 +175,7 @@ public class FtcRobotControllerActivity extends Activity {
   protected ServiceConnection connection = new ServiceConnection() {
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
-      FtcRobotControllerBinder binder = (FtcRobotControllerBinder) service;
+      FtcRobotControllerService.FtcRobotControllerBinder binder = (FtcRobotControllerService.FtcRobotControllerBinder) service;
       onServiceBind(binder.getService());
     }
 
@@ -290,10 +291,21 @@ public class FtcRobotControllerActivity extends Activity {
       mOpenCVCallBack.onManagerConnected(LoaderCallbackInterface.SUCCESS);
     }//else
 
-
     wifiLock.acquire();
     callback.networkConnectionUpdate(WifiDirectAssistant.Event.DISCONNECTED);
     bindToService();
+  }
+
+  public void initOpMode(View v) {
+    FtcRobotControllerWrapper.initOpMode(activeOpModeName);
+  }
+
+  public void runOpMode(View v) {
+    FtcRobotControllerWrapper.runOpMode(activeOpModeName);
+  }
+
+  public void stopOpMode(View v) {
+    FtcRobotControllerWrapper.stopOpMode();
   }
 
   protected UpdateUI createUpdateUI() {
@@ -483,6 +495,44 @@ public class FtcRobotControllerActivity extends Activity {
       startActivity(intent);
       return true;
     }
+    else if (id == R.id.action_driver) {
+
+      final RelativeLayout driverStation = (RelativeLayout) findViewById(R.id.driverstation);
+
+      if (!driverStationEnabled) {
+
+        controllerService.shutdownRobot();
+        FtcRobotControllerWrapper.setUpRobotWithoutWifi();
+
+        final Spinner spinner = (Spinner) findViewById(R.id.opModeList);
+
+        FtcRobotControllerWrapper.initializeSpinner(spinner);
+
+        runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            driverStation.setVisibility(View.VISIBLE);
+            cfgFileMgr.changeBackground(0xFF539E2E, R.id.idActiveConfigHeader);
+          }//run
+        });
+
+        driverStationEnabled = true;
+      } else {
+        requestRobotRestart();
+
+        runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            driverStation.setVisibility(View.INVISIBLE);
+            cfgFileMgr.changeBackground(0xFF539E2E, R.id.idActiveConfigHeader);
+          }//run
+        });
+
+        driverStationEnabled = false;
+      }//else
+
+      return true;
+    }
     else if (id == R.id.action_exit_app) {
       finish();
       return true;
@@ -507,7 +557,6 @@ public class FtcRobotControllerActivity extends Activity {
     if (request == LaunchActivityConstantsList.FTC_CONFIGURE_REQUEST_CODE_ROBOT_CONTROLLER) {
       // We always do a refresh, whether it was a cancel or an OK, for robustness
       cfgFileMgr.getActiveConfigAndUpdateUI();
-      cfgFileMgr.changeBackground(0xFF539E2E, R.id.idActiveConfigHeader);
     }
   }
 
@@ -574,37 +623,6 @@ public class FtcRobotControllerActivity extends Activity {
       });
     }
   }
-
-  public void addCameraStream() {
-
-    final LinearLayout layout = (LinearLayout) findViewById(R.id.cameraMonitorViewId);
-
-    display = new TextureView(this);
-    display.setRotation(90f);
-
-    runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        layout.addView(display);
-      }
-
-    });
-
-  }
-
-  public void emptyCameraStream() {
-
-    final LinearLayout layout = (LinearLayout) findViewById(R.id.cameraMonitorViewId);
-
-    runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        layout.removeAllViews();
-      }
-
-    });
-  }
-
 
   public static void initializeGlobals() {
     GlobalValuesActivity.add("allianceRed", true);

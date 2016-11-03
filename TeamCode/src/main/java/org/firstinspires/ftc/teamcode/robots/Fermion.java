@@ -12,16 +12,13 @@ import com.vuforia.Tool;
 import com.vuforia.Vec2F;
 import com.vuforia.Vec3F;
 
-import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
-import org.firstinspires.ftc.robotcore.internal.AppUtil;
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.TrackBall;
 import org.firstinspires.ftc.teamcode.newhardware.Motor;
-import org.firstinspires.ftc.teamcode.opmodesupport.FXTLinearOpMode;
+import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
 import org.firstinspires.ftc.teamcode.roboticslibrary.OCVUtils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -264,12 +261,11 @@ public class Fermion {
 
         stop();
 
-        targetAngle = imu.getAngularOrientation().firstAngle;
+        this.targetAngle = imu.getAngularOrientation().firstAngle;
 
-        if (targetAngle > 180) {
-            targetAngle -= 360;
+        if (this.targetAngle > 180) {
+            this.targetAngle -= 360;
         }//if
-
     }
 
     public void imuTurnR(double degrees, double speed) {
@@ -385,18 +381,18 @@ public class Fermion {
     public void pushBeaconButton(int beaconConfig) {
         if (beaconConfig == Fermion.BEACON_BLUE_RED) {
             strafe(-90, 0.1);
-            FXTLinearOpMode.delay(500);
+            AutoOpMode.delay(500);
             stop();
         } else {
             strafe(90, 0.1);
-            FXTLinearOpMode.delay(500);
+            AutoOpMode.delay(500);
             stop();
         }//else
 
         strafe(0, 0.1);
-        FXTLinearOpMode.delay(400);
+        AutoOpMode.delay(400);
         strafe(180, 0.1);
-        FXTLinearOpMode.delay(400);
+        AutoOpMode.delay(400);
         stop();
     }
 

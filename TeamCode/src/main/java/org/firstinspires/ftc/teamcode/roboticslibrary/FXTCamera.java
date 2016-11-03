@@ -10,13 +10,16 @@ import android.view.TextureView;
 import android.widget.Toast;
 
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
+import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerWrapper;
 import org.firstinspires.ftc.robotcore.internal.AppUtil;
+import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.opmodesupport.TaskHandler;
 
 /**
  * Created by FIXIT on 15-09-20.
  */
+@SuppressWarnings("deprecation")
 public class FXTCamera implements TextureView.SurfaceTextureListener {
 
     Camera cam;
@@ -58,12 +61,12 @@ public class FXTCamera implements TextureView.SurfaceTextureListener {
         cam.setParameters(params);
 
         this.displayStream = displayStream;
+
+        this.previewTexture = new TextureView(RC.c());
         if (displayStream) {
-            RC.a().addCameraStream();
-            this.previewTexture = RC.a().display;
-        } else {
-            this.previewTexture = new TextureView(RC.c());
-        }//else
+            this.previewTexture.setRotation(90f);
+            FtcRobotControllerWrapper.addView(previewTexture, R.id.cameraMonitorViewId);
+        }//if
 
         this.previewTexture.setSurfaceTextureListener(this);
 
@@ -79,12 +82,16 @@ public class FXTCamera implements TextureView.SurfaceTextureListener {
 
     public void destroy() {
 
-        if (displayStream) {
-            RC.a().emptyCameraStream();
-        }//if
+        try {
+            if (displayStream) {
+                FtcRobotControllerWrapper.emptyView(R.id.cameraMonitorViewId);
+            }//if
 
-        cam.stopPreview();
-        cam.release();
+            cam.stopPreview();
+            cam.release();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }//catch
 
     }//destroy
 

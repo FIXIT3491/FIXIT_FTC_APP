@@ -50,6 +50,15 @@ public class FXTTelemetry {
         }//if
     }//close
 
+    public void close(String key) {
+        if (out != null) {
+
+            out.get(key).closeWriter();
+            out.remove(key);
+
+        }//if
+    }//close
+
     //methods to quickly telemetry something
     public void addData(String data) {
         telemetry.addData("Data", data);
