@@ -4,6 +4,7 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
@@ -15,6 +16,7 @@ import java.util.List;
 /**
  * Created by FIXIT on 16-10-05.
  */
+@Autonomous
 public abstract class AutoOpMode extends LinearOpMode {
 
     protected TaskHandler.MultiRunnable mainTasks = new TaskHandler.MultiRunnable();
