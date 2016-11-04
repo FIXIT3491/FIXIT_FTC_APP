@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.qualcomm.hardware.adafruit.AdafruitBNO055IMU;
 import com.qualcomm.hardware.adafruit.BNO055IMU;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.vuforia.CameraCalibration;
 import com.vuforia.Image;
 import com.vuforia.Matrix34F;
@@ -21,6 +22,7 @@ import org.firstinspires.ftc.robotcore.internal.AppUtil;
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.TrackBall;
 import org.firstinspires.ftc.teamcode.newhardware.Motor;
+import org.firstinspires.ftc.teamcode.opmodesupport.FXTLinearOpMode;
 import org.firstinspires.ftc.teamcode.roboticslibrary.OCVUtils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -62,9 +64,13 @@ public class Fermion {
 
     public Fermion(boolean auto) {
         leftFore = new Motor("leftFore");
+        leftFore.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightFore = new Motor("rightFore");
+        rightFore.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftBack = new Motor("leftBack");
+        leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightBack = new Motor("rightBack");
+        rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         rightFore.setReverse(true);
         rightBack.setReverse(true);
@@ -76,8 +82,6 @@ public class Fermion {
 
             imu = (AdafruitBNO055IMU) RC.h.get(BNO055IMU.class, "adafruit");
             imu.initialize(params);
-
-            mouse = new TrackBall("leftFore", "rightFore");
         }//if
     }//Alpha
 
@@ -135,7 +139,7 @@ public class Fermion {
         double leftForeRightBack = Math.sin(Math.toRadians(degrees));
         double rightForeLeftBack = Math.cos(Math.toRadians(degrees));
 
-        double multi = speed / Math.max(leftForeRightBack, rightForeLeftBack);
+        double multi = speed / Math.max(Math.abs(leftForeRightBack), Math.abs(rightForeLeftBack));
         leftForeRightBack *= multi;
         rightForeLeftBack *= multi;
 
@@ -274,7 +278,9 @@ public class Fermion {
     public void imuTurnR(double degrees, double speed) {
 
         turnR(speed);
-        double beginAngle = imu.getAngularOrientation().firstAngle;
+        double beginAngle = -imu.getAngularOrientation().firstAngle;
+
+        Log.i("angle!!!", "" + beginAngle);
 
         if (beginAngle > 180) {
             beginAngle -= 360;
@@ -284,7 +290,9 @@ public class Fermion {
 
         while (true) {
 
-            double currentAngle = imu.getAngularOrientation().firstAngle;
+            double currentAngle = -imu.getAngularOrientation().firstAngle;
+
+            Log.i("angle!!!", currentAngle + "");
 
             if (currentAngle > 180) {
                 currentAngle -= 360;
@@ -310,7 +318,7 @@ public class Fermion {
     }//imuTurnR
 
     public void absoluteIMUTurn(double degrees, double speed) {
-        double currentAngle = imu.getAngularOrientation().firstAngle;
+        double currentAngle = -imu.getAngularOrientation().firstAngle;
 
         if (currentAngle > 180) {
             currentAngle -= 360;
@@ -477,16 +485,21 @@ public class Fermion {
         return BEACON_NOT_VISIBLE;
     }//getBeaconConfig
 
-    public void strafeToBeacon(VuforiaTrackableDefaultListener beacon, double targetDistance) {
+    public void strafeToBeacon(VuforiaTrackableDefaultListener beacon, double targetDistance, double speed) {
 
         VectorF trans = beacon.getPose().getTranslation();
 
-        strafe(Math.atan2(trans.get(2), trans.get(3)), 0.5);
+        double degree = Math.toDegrees(Math.atan2(trans.get(0), -trans.get(2)));
+        Log.i("vuf", trans.toString());
+        Log.i("vufAngle", degree + "");
+        strafe(degree, speed);
 
-        while (trans.magnitude() > targetDistance) {
+        while (Math.hypot(trans.get(0), trans.get(2)) > targetDistance) {
 
+            RC.l.idle();
             trans = beacon.getPose().getTranslation();
-            strafe(Math.atan2(trans.get(2), trans.get(3)), 0.5);
+
+//            strafe(Math.atan2(trans.get(2), trans.get(3)), 0.5);
 
         }//while
 

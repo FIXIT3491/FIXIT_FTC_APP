@@ -22,6 +22,7 @@ public class RC {
     public static OpMode o;
     public static LinearOpMode l;
     public static FXTTelemetry t;
+    public static int runNum = 0;
     public static HardwareMap h;
     public final static String VUFORIA_LICENSE_KEY = "Ad0I0ir/////AAAAAfR3NIO1HkxSqM8NPhlEftFXtFAm6DC5w4Cjcy30" +
                                                     "WUdGozklFlAkxeHpjfWc4moeL2ZTPvZ+wAoyOnlZxyB6Wr1BRE9154j6K" +

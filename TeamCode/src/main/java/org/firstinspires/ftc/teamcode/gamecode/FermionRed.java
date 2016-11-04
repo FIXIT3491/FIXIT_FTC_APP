@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.gamecode;
 
 import android.support.annotation.Nullable;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.vuforia.Image;
 import com.vuforia.PIXEL_FORMAT;
 import com.vuforia.Vuforia;
@@ -18,6 +19,7 @@ import org.firstinspires.ftc.teamcode.robots.Fermion;
 /**
  * Created by FIXIT on 16-10-18.
  */
+@Autonomous
 public class FermionRed extends FXTLinearOpMode {
 
     @Override
@@ -58,15 +60,18 @@ public class FermionRed extends FXTLinearOpMode {
             idle();
         }//while
 
-        electron.strafeToBeacon(gears, 100);
-
-        electron.absoluteIMUTurn(-90, 0.5);
-
-        electron.strafeToBeacon(gears, 40);
-
         int beaconConfig = Fermion.waitForBeaconConfig(
                 getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
                 gears, locale.getCameraCalibration());
+
+        telemetry.addData("Config", beaconConfig);
+
+        electron.strafeToBeacon(gears, 100, 0.4);
+
+        electron.absoluteIMUTurn(-90, 0.5);
+
+        electron.strafeToBeacon(gears, 40, 0.4);
+
 
         //push button using beaconConfig!
 
@@ -76,13 +81,14 @@ public class FermionRed extends FXTLinearOpMode {
             idle();
         }//while
 
-        electron.strafeToBeacon(tools, 40);
+        electron.strafeToBeacon(tools, 40, 0.4);
 
         beaconConfig = Fermion.waitForBeaconConfig(
                 getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
                 gears, locale.getCameraCalibration());
 
         //push button using beaconConfig!
+
 
     }
 

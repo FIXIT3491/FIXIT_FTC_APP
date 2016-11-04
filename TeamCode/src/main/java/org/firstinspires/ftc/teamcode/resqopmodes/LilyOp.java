@@ -42,7 +42,8 @@ public class LilyOp extends TeleOpMode {
         clearTimer(2);
         clearTimer(3);
         try {
-            writer = new DataWriter("teleopdatalog.txt", true);
+            writer = new DataWriter("teleopdatalog" + RC.runNum + ".txt", true);
+            RC.runNum++;
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -313,7 +314,6 @@ public class LilyOp extends TeleOpMode {
 
     public void stop() {
         super.stop();
-
         writer.closeWriter();
     }
 

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.gamecode;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -21,8 +23,6 @@ public class EncoderDefaultRun extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         RC.setOpMode(this);
 
-
-
         DcMotor left = hardwareMap.dcMotor.get("driveL");
         left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -32,19 +32,19 @@ public class EncoderDefaultRun extends LinearOpMode {
 
         DataWriter write = null;
         try {
-            write = new DataWriter("encoderspeedpid.txt", true);
+            write = new DataWriter("encoderspeedpid" + RC.runNum + ".txt", true);
+            RC.runNum++;
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
 
-        VoltageSensor volt = hardwareMap.voltageSensor.get("Motor Controller 2");
-
-        write.write("Voltage MC1: " + volt.getVoltage() + "\n");
+//        VoltageSensor volt = hardwareMap.voltageSensor.get("Motor Controller 2");
+//
+//        write.write("Voltage MC1: " + volt.getVoltage() + "\n");
 
         waitForStart();
 
         idle();
-
 
         right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -57,10 +57,12 @@ public class EncoderDefaultRun extends LinearOpMode {
         int lastTikLeft = left.getCurrentPosition();
         int lastTikRight = right.getCurrentPosition();
 
-        while (opModeIsActive()) {
+        while (opModeIsActive() && right.isBusy() && left.isBusy()) {
+            Log.i("MotorR", right.getCurrentPosition() + ", " + right.getTargetPosition());
+            Log.i("MotorL", left.getCurrentPosition() + ", " + left.getTargetPosition());
             write.write("Left Tiks / sec:" + ((left.getCurrentPosition() - lastTikLeft) / ((System.nanoTime() - last) / 1000000000.0)) + "\n");
             write.write("Right Tiks / sec: " + ((right.getCurrentPosition() - lastTikRight) / ((System.nanoTime() - last) / 1000000000.0)) + "\n");
-            write.write("Voltage MC1: " + volt.getVoltage() + "\n");
+//            write.write("Voltage MC1: " + volt.getVoltage() + "\n");
             last = System.currentTimeMillis();
         }
 

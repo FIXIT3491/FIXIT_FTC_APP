@@ -31,6 +31,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 package org.firstinspires.ftc.robotcontroller.internal;
 
+import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.util.Log;
+
 import com.google.blocks.ftcrobotcontroller.runtime.BlocksOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -41,12 +46,17 @@ import com.qualcomm.robotcore.eventloop.opmode.OpModeMeta;
 import com.qualcomm.robotcore.eventloop.opmode.OpModeRegister;
 import com.qualcomm.robotcore.eventloop.opmode.AnnotatedOpModeRegistrar;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.ConceptNullOp;
 import org.firstinspires.ftc.robotcore.internal.AppUtil;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 
 import dalvik.system.DexFile;
 
@@ -90,16 +100,18 @@ public class FtcOpModeRegister implements OpModeRegister {
         /**
          * Any manual OpMode class registrations should go here.
          */
-        registerOpModes(manager, "org.firstinspires.ftc.teamcode.gamecode");
+        registerOpModes(manager, "gamecode");
     }
 
     public void registerOpModes(OpModeManager manager, String pkgName) {
 
         try {
-            DexFile dxFile = new DexFile(AppUtil.getInstance().getActivity().getPackageCodePath());
+            DexFile dxFile = new DexFile(AppUtil.getInstance().getApplication().getPackageCodePath());
+            List<String> classNames = Collections.list(dxFile.entries());
 
-            for (Enumeration<String> iter = dxFile.entries(); iter.hasMoreElements();) {
-                String clazz = iter.nextElement();
+            for (String clazz : classNames) {
+
+                Log.i("Clazz", clazz);
 
                 if (clazz.contains(pkgName)) {
                     Class opMode = Class.forName(clazz);

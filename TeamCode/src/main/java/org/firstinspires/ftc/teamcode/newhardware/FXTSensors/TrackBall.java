@@ -22,4 +22,5 @@ public class TrackBall {
         return new Point(xEnc.getCurrentPosition(), yEnc.getCurrentPosition());
     }//Point
 
+
 }

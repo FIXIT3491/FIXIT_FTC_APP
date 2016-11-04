@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
+import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.roboticslibrary.DataWriter;
 
 import java.io.FileNotFoundException;
@@ -30,7 +31,7 @@ public class TimedMotorRun extends LinearOpMode{
 
         DataWriter write = null;
         try {
-            write = new DataWriter("timedrun.txt", true);
+            write = new DataWriter("timedrun" + RC.runNum + ".txt", true);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

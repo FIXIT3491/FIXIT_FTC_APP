@@ -39,8 +39,6 @@ public abstract class FXTLinearOpMode extends LinearOpMode {
         addTimer();
 
         runOp();
-
-        RC.t.close();
     }
 
     public abstract void runOp() throws InterruptedException;
