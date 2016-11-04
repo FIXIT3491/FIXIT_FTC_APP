@@ -49,7 +49,8 @@ public class EncoderTest extends TeleOpMode {
             testing.setPower(-1);
             rpm = (testing.getCurrentPosition() - lastEnc) / 1120.0 / ((System.currentTimeMillis() - lastTime) / 60000.0);
         }
-        RC.t.dataLogData(testing.getCurrentPosition() + "\n");
+
+        dataLogData(testing.getCurrentPosition() + "\n");
         RC.t.addData("Speed", (int) rpm + "RPM");
         RC.t.addData("Voltage", volts.returnValue() + "V");
         lastEnc = testing.getCurrentPosition();

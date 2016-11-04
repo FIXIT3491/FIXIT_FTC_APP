@@ -12,13 +12,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.RC;
-import org.firstinspires.ftc.teamcode.opmodesupport.FXTLinearOpMode;
+import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
 import org.firstinspires.ftc.teamcode.robots.Fermion;
 
 /**
  * Created by FIXIT on 16-10-21.
  */
-public class FermionPositionRed extends FXTLinearOpMode {
+public class FermionPositionRed extends AutoOpMode {
 
     @Override
     public void runOp() throws InterruptedException {
@@ -34,6 +34,7 @@ public class FermionPositionRed extends FXTLinearOpMode {
 
         VuforiaTrackables beacons = locale.loadTrackablesFromAsset("FTC_2016-17");
         VuforiaTrackableDefaultListener gears = (VuforiaTrackableDefaultListener) beacons.get(3).getListener();
+        VuforiaTrackableDefaultListener tools = (VuforiaTrackableDefaultListener) beacons.get(1).getListener();
 
         waitForStart();
         beacons.activate();
@@ -59,19 +60,15 @@ public class FermionPositionRed extends FXTLinearOpMode {
 
         tau.strafeToBeacon(gears, 40);
 
-        int beaconConfig = Fermion.waitForBeaconConfig(
+        tau.pushBeaconButton(Fermion.waitForBeaconConfig(
                 getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
-                gears, locale.getCameraCalibration());
-
-        //push button using beaconConfig!
+                gears, locale.getCameraCalibration()));
 
         tau.trackRight(1219.2, 0.5);
 
-        beaconConfig = Fermion.waitForBeaconConfig(
+        tau.pushBeaconButton(Fermion.waitForBeaconConfig(
                 getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
-                gears, locale.getCameraCalibration());
-
-        //push button using beaconConfig!
+                tools, locale.getCameraCalibration()));
 
     }//runOp
 

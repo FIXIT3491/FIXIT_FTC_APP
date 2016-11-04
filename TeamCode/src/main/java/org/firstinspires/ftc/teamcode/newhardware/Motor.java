@@ -136,6 +136,7 @@ public class Motor implements FXTDevice {
     }//setMode
 
     public void setPower(double power) {
+
         if (Math.abs(power) > 1) {
             power = 1 * Math.signum(power);
         } else if (Math.abs(power) < minSpeed && Math.abs(power) > 0) {

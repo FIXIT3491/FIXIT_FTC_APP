@@ -5,7 +5,6 @@ import android.util.Log;
 
 import com.qualcomm.hardware.adafruit.AdafruitBNO055IMU;
 import com.qualcomm.hardware.adafruit.BNO055IMU;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.vuforia.CameraCalibration;
 import com.vuforia.Image;
 import com.vuforia.Matrix34F;
@@ -13,16 +12,13 @@ import com.vuforia.Tool;
 import com.vuforia.Vec2F;
 import com.vuforia.Vec3F;
 
-import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
-import org.firstinspires.ftc.robotcore.internal.AppUtil;
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.TrackBall;
 import org.firstinspires.ftc.teamcode.newhardware.Motor;
-import org.firstinspires.ftc.teamcode.opmodesupport.FXTLinearOpMode;
+import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
 import org.firstinspires.ftc.teamcode.roboticslibrary.OCVUtils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -64,13 +60,9 @@ public class Fermion {
 
     public Fermion(boolean auto) {
         leftFore = new Motor("leftFore");
-        leftFore.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightFore = new Motor("rightFore");
-        rightFore.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftBack = new Motor("leftBack");
-        leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightBack = new Motor("rightBack");
-        rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         rightFore.setReverse(true);
         rightBack.setReverse(true);
@@ -82,6 +74,8 @@ public class Fermion {
 
             imu = (AdafruitBNO055IMU) RC.h.get(BNO055IMU.class, "adafruit");
             imu.initialize(params);
+
+            mouse = new TrackBall("leftFore", "rightFore");
         }//if
     }//Alpha
 
@@ -139,7 +133,7 @@ public class Fermion {
         double leftForeRightBack = Math.sin(Math.toRadians(degrees));
         double rightForeLeftBack = Math.cos(Math.toRadians(degrees));
 
-        double multi = speed / Math.max(Math.abs(leftForeRightBack), Math.abs(rightForeLeftBack));
+        double multi = speed / Math.max(leftForeRightBack, rightForeLeftBack);
         leftForeRightBack *= multi;
         rightForeLeftBack *= multi;
 
@@ -267,20 +261,17 @@ public class Fermion {
 
         stop();
 
-        targetAngle = imu.getAngularOrientation().firstAngle;
+        this.targetAngle = imu.getAngularOrientation().firstAngle;
 
-        if (targetAngle > 180) {
-            targetAngle -= 360;
+        if (this.targetAngle > 180) {
+            this.targetAngle -= 360;
         }//if
-
     }
 
     public void imuTurnR(double degrees, double speed) {
 
         turnR(speed);
-        double beginAngle = -imu.getAngularOrientation().firstAngle;
-
-        Log.i("angle!!!", "" + beginAngle);
+        double beginAngle = imu.getAngularOrientation().firstAngle;
 
         if (beginAngle > 180) {
             beginAngle -= 360;
@@ -290,9 +281,7 @@ public class Fermion {
 
         while (true) {
 
-            double currentAngle = -imu.getAngularOrientation().firstAngle;
-
-            Log.i("angle!!!", currentAngle + "");
+            double currentAngle = imu.getAngularOrientation().firstAngle;
 
             if (currentAngle > 180) {
                 currentAngle -= 360;
@@ -318,7 +307,7 @@ public class Fermion {
     }//imuTurnR
 
     public void absoluteIMUTurn(double degrees, double speed) {
-        double currentAngle = -imu.getAngularOrientation().firstAngle;
+        double currentAngle = imu.getAngularOrientation().firstAngle;
 
         if (currentAngle > 180) {
             currentAngle -= 360;
@@ -388,6 +377,24 @@ public class Fermion {
         rightBack.setPower(rightBackPower);
 
     }//veerCheck
+
+    public void pushBeaconButton(int beaconConfig) {
+        if (beaconConfig == Fermion.BEACON_BLUE_RED) {
+            strafe(-90, 0.1);
+            AutoOpMode.delay(500);
+            stop();
+        } else {
+            strafe(90, 0.1);
+            AutoOpMode.delay(500);
+            stop();
+        }//else
+
+        strafe(0, 0.1);
+        AutoOpMode.delay(400);
+        strafe(180, 0.1);
+        AutoOpMode.delay(400);
+        stop();
+    }
 
     public static int waitForBeaconConfig(Image img, VuforiaTrackableDefaultListener beacon, CameraCalibration camCal) {
 
@@ -485,26 +492,21 @@ public class Fermion {
         return BEACON_NOT_VISIBLE;
     }//getBeaconConfig
 
-    public void strafeToBeacon(VuforiaTrackableDefaultListener beacon, double targetDistance, double speed) {
+    public void strafeToBeacon(VuforiaTrackableDefaultListener beacon, double targetDistance) {
 
         VectorF trans = beacon.getPose().getTranslation();
 
-        double degree = Math.toDegrees(Math.atan2(trans.get(0), -trans.get(2)));
-        Log.i("vuf", trans.toString());
-        Log.i("vufAngle", degree + "");
-        strafe(degree, speed);
+        strafe(Math.atan2(trans.get(2), trans.get(3)), 0.5);
 
-        while (Math.hypot(trans.get(0), trans.get(2)) > targetDistance) {
+        while (trans.magnitude() > targetDistance) {
 
-            RC.l.idle();
             trans = beacon.getPose().getTranslation();
-
-//            strafe(Math.atan2(trans.get(2), trans.get(3)), 0.5);
+            strafe(Math.atan2(trans.get(2), trans.get(3)), 0.5);
 
         }//while
 
         stop();
-    }
+    }//strafeToBeacon
 
     public void stop() {
         leftFore.stop();

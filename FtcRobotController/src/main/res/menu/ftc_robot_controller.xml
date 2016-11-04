@@ -34,6 +34,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
   <item
+      android:id="@+id/action_driver"
+      android:orderInCategory="96"
+      android:title="Driver Station"/>
+  <item
+      android:id="@+id/action_globals"
+      android:orderInCategory="97"
+      android:title="Set Global Values"/>
+  <item
     android:id="@+id/action_blocks"
     android:orderInCategory="98"
     android:showAsAction="never" 

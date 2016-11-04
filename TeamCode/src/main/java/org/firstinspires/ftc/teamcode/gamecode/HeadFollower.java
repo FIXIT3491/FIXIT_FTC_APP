@@ -20,7 +20,6 @@ public class HeadFollower extends TeleOpMode {
         pan.setPosition(0.5);
         tilt = new FXTServo("tilt");
         tilt.setPosition(0.5);
-
     }
 
     @Override

@@ -599,7 +599,7 @@ public class AdafruitIMU extends I2cSensor {
         RC.t.addData("HELLO", "HEELOO");
 
         RC.t.setDataLogFile("adafruitcalibration.txt");
-        RC.t.dataLogData(Arrays.toString(calibData));
+        RC.t.dataLogData("adafruitcalibration.txt", Arrays.toString(calibData));
 
     }
 

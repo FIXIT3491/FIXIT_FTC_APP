@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.gamecode;
 
 import android.support.annotation.Nullable;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.vuforia.Image;
 import com.vuforia.PIXEL_FORMAT;
 import com.vuforia.Vuforia;
@@ -13,14 +12,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.RC;
-import org.firstinspires.ftc.teamcode.opmodesupport.FXTLinearOpMode;
+import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
 import org.firstinspires.ftc.teamcode.robots.Fermion;
 
 /**
  * Created by FIXIT on 16-10-18.
  */
-@Autonomous
-public class FermionRed extends FXTLinearOpMode {
+public class FermionRed extends AutoOpMode {
 
     @Override
     public void runOp() throws InterruptedException {
@@ -50,7 +48,7 @@ public class FermionRed extends FXTLinearOpMode {
 
         //electron.trackForward(609.6, 0.5);
         electron.forward(0.5); //uses time instead of trackball
-        delay(1000);
+        delay((int) RC.globalDouble("DriveForwardTime"));
         electron.stop();
 
         electron.imuTurnL(45, 0.5);
@@ -60,20 +58,19 @@ public class FermionRed extends FXTLinearOpMode {
             idle();
         }//while
 
-        int beaconConfig = Fermion.waitForBeaconConfig(
-                getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
-                gears, locale.getCameraCalibration());
+        VectorF translation = gears.getPose().getTranslation();
 
-        telemetry.addData("Config", beaconConfig);
+        electron.imuTurnL(Math.atan2(translation.get(2), translation.get(3)), 0.5);
 
-        electron.strafeToBeacon(gears, 100, 0.4);
+        electron.strafeToBeacon(gears, RC.globalDouble("FirstGearsBufferDistance"));
 
         electron.absoluteIMUTurn(-90, 0.5);
 
-        electron.strafeToBeacon(gears, 40, 0.4);
+        electron.strafeToBeacon(gears, RC.globalDouble("SecondGearsBufferDistance"));
 
-
-        //push button using beaconConfig!
+        electron.pushBeaconButton(Fermion.waitForBeaconConfig(
+                getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
+                gears, locale.getCameraCalibration()));
 
         electron.right(0.5);
 
@@ -81,16 +78,13 @@ public class FermionRed extends FXTLinearOpMode {
             idle();
         }//while
 
-        electron.strafeToBeacon(tools, 40, 0.4);
+        electron.strafeToBeacon(tools, RC.globalDouble("ToolsBufferDistance"));
 
-        beaconConfig = Fermion.waitForBeaconConfig(
+        electron.pushBeaconButton(Fermion.waitForBeaconConfig(
                 getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
-                gears, locale.getCameraCalibration());
+                tools, locale.getCameraCalibration()));
 
-        //push button using beaconConfig!
-
-
-    }
+    }//runOp
 
     //this assumes the horizontal axis is the y-axis since the phone is vertical
     //robot angle is relative to "parallel with the beacon wall"

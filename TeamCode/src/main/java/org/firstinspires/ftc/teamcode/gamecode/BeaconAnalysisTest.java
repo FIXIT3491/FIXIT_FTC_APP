@@ -14,16 +14,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefau
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.RC;
-import org.firstinspires.ftc.teamcode.opmodesupport.FXTLinearOpMode;
+import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
 import org.firstinspires.ftc.teamcode.robots.Fermion;
 
 /**
  * Created by FIXIT on 16-10-07.
  */
 @Autonomous
-public class BeaconAnalysisTest extends FXTLinearOpMode {
-
-    final int BEACON_BUFFER_DISTANCE = 60;
+public class BeaconAnalysisTest extends AutoOpMode {
 
     @Override
     public void runOp() throws InterruptedException {

@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.gamecode;
 
 import android.support.annotation.Nullable;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.vuforia.Image;
 import com.vuforia.PIXEL_FORMAT;
 import com.vuforia.Vuforia;
@@ -13,14 +12,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.RC;
-import org.firstinspires.ftc.teamcode.opmodesupport.FXTLinearOpMode;
+import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
 import org.firstinspires.ftc.teamcode.robots.Fermion;
 
 /**
  * Created by FIXIT on 16-10-21.
  */
-@Autonomous
-public class FermionBlue extends FXTLinearOpMode {
+public class FermionBlue extends AutoOpMode {
 
     @Override
     public void runOp() throws InterruptedException {
@@ -35,8 +33,8 @@ public class FermionBlue extends FXTLinearOpMode {
         Vuforia.setFrameFormat(PIXEL_FORMAT.RGB565, true);
 
         VuforiaTrackables beacons = locale.loadTrackablesFromAsset("FTC_2016-17");
-        VuforiaTrackableDefaultListener gears = (VuforiaTrackableDefaultListener) beacons.get(0).getListener();
-        VuforiaTrackableDefaultListener tools = (VuforiaTrackableDefaultListener) beacons.get(2).getListener();
+        VuforiaTrackableDefaultListener gears = (VuforiaTrackableDefaultListener) beacons.get(3).getListener();
+        VuforiaTrackableDefaultListener tools = (VuforiaTrackableDefaultListener) beacons.get(1).getListener();
 
         waitForStart();
         beacons.activate();
@@ -50,7 +48,7 @@ public class FermionBlue extends FXTLinearOpMode {
 
         //muon.trackForward(609.6, 0.5);
         muon.forward(0.5); //uses time instead of trackball
-        delay(500);
+        delay(1000);
         muon.stop();
 
         muon.imuTurnR(45, 0.5);
@@ -60,20 +58,15 @@ public class FermionBlue extends FXTLinearOpMode {
             idle();
         }//while
 
-        muon.stop();
-        delay(1000);
-
-        muon.strafeToBeacon(gears, 300, 0.4);
+        muon.strafeToBeacon(gears, 100);
 
         muon.absoluteIMUTurn(90, 0.5);
 
-        muon.strafeToBeacon(gears, 40, 0.1);
+        muon.strafeToBeacon(gears, 40);
 
-        int beaconConfig = Fermion.waitForBeaconConfig(
+        muon.pushBeaconButton(Fermion.waitForBeaconConfig(
                 getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
-                gears, locale.getCameraCalibration());
-
-        //push button using beaconConfig!
+                gears, locale.getCameraCalibration()));
 
         muon.left(0.5);
 
@@ -81,17 +74,11 @@ public class FermionBlue extends FXTLinearOpMode {
             idle();
         }//while
 
+        muon.strafeToBeacon(tools, 40);
 
-        beaconConfig = Fermion.waitForBeaconConfig(
+        muon.pushBeaconButton(Fermion.waitForBeaconConfig(
                 getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
-                gears, locale.getCameraCalibration());
-
-        telemetry.addData("Beacon Config", beaconConfig);
-
-        muon.strafeToBeacon(tools, 40, 0.4);
-
-
-        //push button using beaconConfig!
+                tools, locale.getCameraCalibration()));
 
     }//runOp
 

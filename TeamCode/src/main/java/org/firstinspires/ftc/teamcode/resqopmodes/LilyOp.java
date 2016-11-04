@@ -176,7 +176,7 @@ public class LilyOp extends TeleOpMode {
                 break;
         }//switch
 
-        RC.t.dataLogData(hardwareMap.voltageSensor.get("Motor Controller 1").getVoltage() + "\n");
+        //dataLogData(hardwareMap.voltageSensor.get("Motor Controller 1").getVoltage() + "\n");
         if (!currentlySwitching) {
             if (joy2.buttonA() && armStage == COLLECT) {
                 lily.elbow.setTarget(12);

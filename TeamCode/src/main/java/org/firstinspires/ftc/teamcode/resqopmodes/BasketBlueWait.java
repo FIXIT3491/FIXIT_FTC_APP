@@ -21,7 +21,7 @@ public class BasketBlueWait extends TeleOpMode {
     @Override
     public void initialize() {
         setDataLogFile("power", true);
-        RC.t.dataLogData("MotorL, MotorR");
+        dataLogData("MotorL, MotorR");
         lily = new Lily();
         analysis = new ImageAnalyzer();
     }
@@ -85,7 +85,7 @@ public class BasketBlueWait extends TeleOpMode {
 
         RC.t.addData("hello", "hiya");
         RC.t.addData("Stage", stage);
-        RC.t.dataLogData(lily.motorL.getPower() + "," + lily.motorR.getPower());
+        dataLogData(lily.motorL.getPower() + "," + lily.motorR.getPower());
 
         lily.checkAllSystems();
     }

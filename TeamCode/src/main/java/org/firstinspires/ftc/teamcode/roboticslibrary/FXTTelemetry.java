@@ -7,7 +7,10 @@ import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.FXTSensor;
 import org.firstinspires.ftc.teamcode.opmodesupport.TaskHandler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by FIXIT on 15-08-23.
@@ -15,7 +18,7 @@ import java.util.List;
 public class FXTTelemetry {
 
     private Telemetry telemetry;
-    public DataWriter out;
+    public HashMap<String, DataWriter> out = new HashMap<>();
     private List<FXTSensor> sensors = new ArrayList<FXTSensor>();
 
     public void setTelemetry (Telemetry telem) {
@@ -24,7 +27,7 @@ public class FXTTelemetry {
 
     public void setDataLogFile(String fileName, boolean overWrite) {
         try {
-            out = new DataWriter(fileName, overWrite);
+            out.put(fileName, new DataWriter(fileName, overWrite));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -35,9 +38,26 @@ public class FXTTelemetry {
     }
 
     public void close() {
-        if (out != null)
-            out.closeWriter();
-    }
+        if (out != null) {
+
+            for (Iterator<Map.Entry<String, DataWriter>> iter = out.entrySet().iterator(); iter.hasNext(); ) {
+                String key = iter.next().getKey();
+
+                out.get(key).closeWriter();
+                out.remove(key);
+            }//for
+
+        }//if
+    }//close
+
+    public void close(String key) {
+        if (out != null) {
+
+            out.get(key).closeWriter();
+            out.remove(key);
+
+        }//if
+    }//close
 
     //methods to quickly telemetry something
     public void addData(String data) {
@@ -90,48 +110,48 @@ public class FXTTelemetry {
 
     //One-time data logging primitives
 
-    public void dataLogData(String key, String data) {
+    public void dataLogData(String fileName, String key, String data) {
         telemetry.addData(key, data);
 
         if (out != null)
-            out.write(key + ": " + data);
+            out.get(fileName).write(key + ": " + data);
     }
 
-    public void dataLogData(String data) {
+    public void dataLogData(String fileName, String data) {
         if (out != null)
-            out.write(data);
+            out.get(fileName).write(data);
     }
 
-    public void dataLogData(String key, double data) {
+    public void dataLogData(String fileName, String key, double data) {
         telemetry.addData(key, data);
 
         if (out != null)
-            out.write(key + ": " + data);
+            out.get(fileName).write(key + ": " + data);
     }
 
-    public void dataLogData(double data) {
+    public void dataLogData(String fileName, double data) {
         if (out != null)
-            out.write(data);
+            out.get(fileName).write(data);
     }
 
-    public void dataLogData(String key, int data) {
+    public void dataLogData(String fileName, String key, int data) {
         telemetry.addData(key, data);
 
         if (out != null)
-            out.write(key + ": " + data);
+            out.get(fileName).write(key + ": " + data);
     }
 
-    public void dataLogData(int data) {
+    public void dataLogData(String fileName, int data) {
         if (out != null)
-            out.write(data);
+            out.get(fileName).write(data);
     }
 
 
     //DataLogging sensors
 
-    public void dataLogSensor (FXTSensor sensor) {
+    public void dataLogSensor (String fileName, FXTSensor sensor) {
         if (out != null)
-            out.write(sensor.getName() + ": " + sensor); //FXTSensor.toString() is overridden
+            out.get(fileName).write(sensor.getName() + ": " + sensor); //FXTSensor.toString() is overridden
     }
 
     public void addSensorToDataLog (FXTSensor sensor) {
@@ -150,30 +170,30 @@ public class FXTTelemetry {
         }
     }
 
-    public void dataLogSensorList () {
+    public void dataLogSensorList(String fileName) {
 
         if (out != null && !sensors.isEmpty()) {
             for (int i = 0; i < sensors.size(); i++) {
-                out.write(sensors.get(i).getName() + ": " + sensors.get(i));
+                out.get(fileName).write(sensors.get(i).getName() + ": " + sensors.get(i));
             }//for
         }//if
     }//dataLogSensorList
 
-    public void beginDataLogging() {
+    public void beginDataLogging(final String fileName) {
         TaskHandler.addLoopedTask("DataLogging", new Runnable() {
             @Override
             public void run() {
-                dataLog();
+                dataLog(fileName);
             }
         });
     }
 
-    public void stopDataLogging() {
-        out.closeWriter();
+    public void stopDataLogging(String fileName) {
+        out.get(fileName).closeWriter();
         TaskHandler.removeTask("DataLogging");
     }
 
-    public void dataLog() {
+    public void dataLog(String fileName) {
         //User-defined method
     }
 }

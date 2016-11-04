@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Created by FIXIT on 16-10-05.
  */
-public abstract class FXTLinearOpMode extends LinearOpMode {
+public abstract class AutoOpMode extends LinearOpMode {
 
     protected TaskHandler.MultiRunnable mainTasks = new TaskHandler.MultiRunnable();
 
@@ -31,6 +31,8 @@ public abstract class FXTLinearOpMode extends LinearOpMode {
 
     protected String TAG = "FIX IT";
 
+    protected String dataLogFileName;
+
     @Override
     public void runOpMode() throws InterruptedException {
         RC.setOpMode(this);
@@ -43,7 +45,7 @@ public abstract class FXTLinearOpMode extends LinearOpMode {
 
     public abstract void runOp() throws InterruptedException;
 
-    public void delay(int millis) {
+    public static void delay(int millis) {
         try {
             Thread.sleep(millis);
         } catch (Exception e) {
@@ -113,85 +115,6 @@ public abstract class FXTLinearOpMode extends LinearOpMode {
     }
 
     /**
-     * SOUND METHODS
-     */
-
-
-    /**
-     * Method for generating a beep. Used by playSound(int freq, int duration)
-     * @param freqOfTone frequency of beep to generate
-     */
-    private static byte[] genTone(int freqOfTone, int numSamples) {
-
-        double[] sample = new double[numSamples];
-        byte[] generatedSnd = new byte[2 * numSamples];
-        final int sampleRate = 4000;
-
-        // fill out the array
-        for (int i = 0; i < numSamples; ++i) {
-            sample[i] = Math.sin(2 * Math.PI * i / (sampleRate / freqOfTone));
-        }
-
-        // convert to 16 bit pcm sound array
-        // assumes the sample buffer is normalised.
-        int idx = 0;
-        for (double dVal : sample) {
-            short val = (short) (dVal * 32767);
-            generatedSnd[idx++] = (byte) (val & 0x00ff);
-            generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
-        }
-
-        return generatedSnd;
-    }
-
-
-    /*************
-    SOUND METHODS
-    *************/
-
-    /**
-     * Method to easily to play a beep with a defined frequency and duration
-     *
-     * @param frequency frequency of beep to play
-     * @param duration  how long to play the beep (in seconds)
-     */
-    public static void playSound(final int frequency, double duration) {
-
-        if (duration > 500)
-            duration /= 1000;
-        else if (duration > 50)
-            duration = 3;
-
-        final int sampleRate = 4000;
-        final int numSamples = (int) (duration * sampleRate);
-
-
-        new Thread() {
-
-            @Override
-            public void run() {
-
-                byte[] generatedSnd;
-
-                AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_ALARM,
-                        sampleRate, AudioFormat.CHANNEL_CONFIGURATION_MONO,
-                        AudioFormat.ENCODING_PCM_16BIT, numSamples,
-                        AudioTrack.MODE_STATIC);
-
-                generatedSnd = genTone(frequency, numSamples);
-
-                audioTrack.write(generatedSnd, 0, numSamples);
-                audioTrack.play();
-            }
-
-        }.start();
-    }
-
-    /*****************
-     * TIMER METHODS
-     *****************/
-
-    /**
      * Gets the count of the first timer
      * @return time since the timer has been reset (or was created) in microseconds
      */
@@ -240,6 +163,111 @@ public abstract class FXTLinearOpMode extends LinearOpMode {
      */
     public int getSeconds(int index) {
         return (int) (getNanoSeconds(index) / 1000000000);
+    }
+
+
+
+    /*************
+     SOUND METHODS
+     *************/
+
+    /**
+     * Method to easily to play a beep with a defined frequency and duration
+     *
+     * @param frequency frequency of beep to play
+     * @param duration  how long to play the beep (in seconds)
+     */
+    public static void playSound(final int frequency, double duration) {
+
+        if (duration > 500)
+            duration /= 1000;
+        else if (duration > 50)
+            duration = 3;
+
+        final int sampleRate = 4000;
+        final int numSamples = (int) (duration * sampleRate);
+
+
+        new Thread() {
+
+            @Override
+            public void run() {
+
+                byte[] generatedSnd;
+
+                AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_ALARM,
+                        sampleRate, AudioFormat.CHANNEL_CONFIGURATION_MONO,
+                        AudioFormat.ENCODING_PCM_16BIT, numSamples,
+                        AudioTrack.MODE_STATIC);
+
+                generatedSnd = genTone(frequency, numSamples);
+
+                audioTrack.write(generatedSnd, 0, numSamples);
+                audioTrack.play();
+            }
+
+        }.start();
+    }
+
+    /**
+     * Method for generating a beep. Used by playSound(int freq, int duration)
+     * @param freqOfTone frequency of beep to generate
+     */
+    private static byte[] genTone(int freqOfTone, int numSamples) {
+
+        double[] sample = new double[numSamples];
+        byte[] generatedSnd = new byte[2 * numSamples];
+        final int sampleRate = 4000;
+
+        // fill out the array
+        for (int i = 0; i < numSamples; ++i) {
+            sample[i] = Math.sin(2 * Math.PI * i / (sampleRate / freqOfTone));
+        }
+
+        // convert to 16 bit pcm sound array
+        // assumes the sample buffer is normalised.
+        int idx = 0;
+        for (double dVal : sample) {
+            short val = (short) (dVal * 32767);
+            generatedSnd[idx++] = (byte) (val & 0x00ff);
+            generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
+        }
+
+        return generatedSnd;
+    }
+
+    /**
+     * Method to point Android to what text file to write to
+     * @param fileName name of .txt file to write to
+     * @param overWrite whether or not to overwrite the data there
+     */
+    public void setDataLogFile (String fileName, boolean overWrite) {
+        RC.t.setDataLogFile(fileName, overWrite);
+        this.dataLogFileName = fileName;
+    }//setDataLogFile
+
+    public void dataLogData(String key, String data) {
+        RC.t.dataLogData(dataLogFileName, key, data);
+    }
+
+    public void dataLogData(String data) {
+        RC.t.dataLogData(dataLogFileName, data);
+    }
+
+    public void dataLogData(String key, double data) {
+        RC.t.dataLogData(dataLogFileName, key, data);
+    }
+
+    public void dataLogData(double data) {
+        RC.t.dataLogData(dataLogFileName, data);
+    }
+
+    public void dataLogData(String key, int data) {
+        RC.t.dataLogData(dataLogFileName, key, data);
+    }
+
+    public void dataLogData(int data) {
+        RC.t.dataLogData(dataLogFileName, data);
     }
 
 }
