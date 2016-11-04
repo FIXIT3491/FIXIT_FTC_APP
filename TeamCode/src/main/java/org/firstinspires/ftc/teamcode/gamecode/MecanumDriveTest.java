@@ -33,6 +33,8 @@ public class MecanumDriveTest extends TeleOpMode {
         rbt.leftFore.setPower((-joy1.x2() - joy1.y1() + joy1.x1()) / 3.0);
         rbt.leftBack.setPower((-joy1.x2() - joy1.y1() - joy1.x1())/ 3.0);
 
+        //fdsffsdf
+        telemetry.addData("Hello", "My name is joe");
 //        RC.t.addData("h", degrees);
         RC.t.addData("leftFore", rbt.leftFore.returnCurrentState());
         RC.t.addData("leftBack", rbt.leftBack.returnCurrentState());
