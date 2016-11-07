@@ -90,19 +90,18 @@ public class FermionRed extends AutoOpMode {
     //robot angle is relative to "parallel with the beacon wall"
     public VectorF movePointOffWall(VectorF trans, double robotAngle, double offWall) {
 
-        double angle = Math.abs(robotAngle) + Math.atan2(trans.get(3), trans.get(2));
-        double hypot = Math.hypot(trans.get(3), trans.get(2));
+        double alpha = Math.atan2(trans.get(2), trans.get(0));
+        double hypot = Math.hypot(trans.get(2), trans.get(0));
 
-        double xDist = hypot * Math.sin(angle) - offWall;
-        double zDist = hypot * Math.cos(angle);
+        double beta = alpha - robotAngle;
 
-        hypot = Math.hypot(xDist, zDist);
-        angle -= robotAngle;
+        double zPrime = hypot * Math.sin(beta);
+        double xPrime = hypot * Math.cos(beta);
 
-        xDist = -hypot * Math.sin(angle);
-        zDist = hypot * Math.cos(angle);
+        double epsilon = robotAngle + Math.atan2(zPrime, xPrime - offWall);
+        double hypot2 = Math.hypot(zPrime, (xPrime - offWall));
 
-        return new VectorF(trans.get(1), (float) xDist, (float) zDist);
+        return new VectorF((float) (hypot2 * Math.cos(epsilon)), trans.get(1), (float) (hypot2 * Math.sin(epsilon)));
     }
 
     @Nullable

@@ -35,6 +35,8 @@ import java.util.Arrays;
  */
 public class Fermion {
 
+    String TAG = "FERMION";
+
     public AdafruitBNO055IMU imu;
     public TrackBall mouse;
 
@@ -56,7 +58,7 @@ public class Fermion {
     public final static int BEACON_BLUE_RED = 1;
     public final static int BEACON_RED_BLUE = 2;
 
-    public final static double TURNING_ACCURACY_DEG = 10;
+    public final static double TURNING_ACCURACY_DEG = 5;
 
     public Fermion(boolean auto) {
         leftFore = new Motor("leftFore");
@@ -133,7 +135,9 @@ public class Fermion {
         double leftForeRightBack = Math.sin(Math.toRadians(degrees));
         double rightForeLeftBack = Math.cos(Math.toRadians(degrees));
 
-        double multi = speed / Math.max(leftForeRightBack, rightForeLeftBack);
+        Log.i("Fermion", "strafe: " + leftForeRightBack + " " + rightForeLeftBack);
+
+        double multi = speed / Math.max(Math.abs(leftForeRightBack), Math.abs(rightForeLeftBack));
         leftForeRightBack *= multi;
         rightForeLeftBack *= multi;
 
@@ -154,7 +158,7 @@ public class Fermion {
 
         double begin = mouse.getXY().y;
 
-        while (true) {
+        while (RC.l.opModeIsActive()) {
 
             double current = mouse.getXY().y - begin;
 
@@ -175,7 +179,7 @@ public class Fermion {
 
         double begin = mouse.getXY().y;
 
-        while (true) {
+        while (RC.l.opModeIsActive()) {
 
             double current = begin - mouse.getXY().y;
 
@@ -196,7 +200,7 @@ public class Fermion {
 
         double begin = mouse.getXY().x;
 
-        while (true) {
+        while (RC.l.opModeIsActive()) {
 
             double current = mouse.getXY().x - begin;
 
@@ -216,7 +220,7 @@ public class Fermion {
 
         double begin = mouse.getXY().x;
 
-        while (true) {
+        while (RC.l.opModeIsActive()) {
 
             double current = begin - mouse.getXY().x;
 
@@ -234,7 +238,7 @@ public class Fermion {
     public void imuTurnL(double degrees, double speed) {
 
         turnL(speed);
-        double beginAngle = imu.getAngularOrientation().firstAngle;
+        double beginAngle = -imu.getAngularOrientation().firstAngle;
 
         if (beginAngle > 180) {
             beginAngle -= 360;
@@ -242,19 +246,33 @@ public class Fermion {
 
         double targetAngle = beginAngle - degrees;
 
-        while (true) {
+        if (targetAngle > 180) {
+            targetAngle -= 360;
+        }//if
 
-            double currentAngle = imu.getAngularOrientation().firstAngle;
+        if (targetAngle < -180) {
+            targetAngle += 360;
+        }//if
+
+        Log.i("deg traget", "imuTurnL: " + targetAngle);
+        while (RC.l.opModeIsActive()) {
+
+            double currentAngle = -imu.getAngularOrientation().firstAngle;
 
             if (currentAngle > 180) {
                 currentAngle -= 360;
             }//if
 
-            double angleToTurn = currentAngle - targetAngle;
+            Log.i("deg", "imuTurnL: " + currentAngle);
 
-            turnL(angleToTurn * (speed / degrees));
 
-            if (Math.abs(angleToTurn) < TURNING_ACCURACY_DEG) {
+            if(currentAngle < targetAngle) currentAngle += 360;
+
+            double angleToTurn = Math.abs(currentAngle - targetAngle);
+
+            turnL(angleToTurn / 180 * speed);
+
+            if (angleToTurn < TURNING_ACCURACY_DEG) {
                 break;
             }//if
         }//while
@@ -271,7 +289,7 @@ public class Fermion {
     public void imuTurnR(double degrees, double speed) {
 
         turnR(speed);
-        double beginAngle = imu.getAngularOrientation().firstAngle;
+        double beginAngle = -imu.getAngularOrientation().firstAngle;
 
         if (beginAngle > 180) {
             beginAngle -= 360;
@@ -279,41 +297,55 @@ public class Fermion {
 
         double targetAngle = beginAngle + degrees;
 
-        while (true) {
+        if (targetAngle > 180) {
+            targetAngle -= 360;
+        }//if
 
-            double currentAngle = imu.getAngularOrientation().firstAngle;
+        if (targetAngle < -180) {
+            targetAngle += 360;
+        }//if
+
+        Log.i("deg traget", "imuTurnR: " + targetAngle);
+        while (RC.l.opModeIsActive()) {
+
+            double currentAngle = -imu.getAngularOrientation().firstAngle;
 
             if (currentAngle > 180) {
                 currentAngle -= 360;
             }//if
 
-            double angleToTurn = targetAngle - currentAngle;
+            Log.i("deg", "imuTurnR: " + currentAngle);
 
-            turnR(angleToTurn * (speed / degrees));
+            if(currentAngle > targetAngle) currentAngle -= 360;
 
-            if (Math.abs(angleToTurn) < TURNING_ACCURACY_DEG) {
+            double angleToTurn = Math.abs(currentAngle - targetAngle);
+
+            turnR(angleToTurn / 180 * speed);
+
+            if (angleToTurn < TURNING_ACCURACY_DEG) {
                 break;
             }//if
         }//while
 
         stop();
 
-        targetAngle = imu.getAngularOrientation().firstAngle;
+        this.targetAngle = imu.getAngularOrientation().firstAngle;
 
-        if (targetAngle > 180) {
-            targetAngle -= 360;
+        if (this.targetAngle > 180) {
+            this.targetAngle -= 360;
         }//if
 
     }//imuTurnR
 
     public void absoluteIMUTurn(double degrees, double speed) {
-        double currentAngle = imu.getAngularOrientation().firstAngle;
+        double currentAngle = -imu.getAngularOrientation().firstAngle;
 
         if (currentAngle > 180) {
             currentAngle -= 360;
         }//if
 
         double toTurn = degrees - currentAngle;
+        Log.i("deg", toTurn + "");
 
         if (toTurn < 0) {
             imuTurnL(Math.abs(toTurn), speed);

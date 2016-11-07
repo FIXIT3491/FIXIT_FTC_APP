@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.gamecode;
 
 import android.support.annotation.Nullable;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.vuforia.Image;
 import com.vuforia.PIXEL_FORMAT;
 import com.vuforia.Vuforia;
@@ -18,6 +19,7 @@ import org.firstinspires.ftc.teamcode.robots.Fermion;
 /**
  * Created by FIXIT on 16-10-21.
  */
+@Autonomous
 public class FermionBlue extends AutoOpMode {
 
     @Override
@@ -39,25 +41,27 @@ public class FermionBlue extends AutoOpMode {
         waitForStart();
         beacons.activate();
 
-        mainTasks.addRunnable(new Runnable() {
-            @Override
-            public void run() {
-                muon.veerCheck();
-            }
-        });
-
-        //muon.trackForward(609.6, 0.5);
-        muon.forward(0.5); //uses time instead of trackball
-        delay(1000);
-        muon.stop();
-
+//        mainTasks.addRunnable(new Runnable() {
+//            @Override
+//            public void run() {
+//                muon.veerCheck();
+//            }
+//        });
+//
+//        //muon.trackForward(609.6, 0.5);
+//        muon.forward(0.5); //uses time instead of trackball
+//        delay(1000);
+//        muon.stop();
+//
         muon.imuTurnR(45, 0.5);
         muon.forward(0.5);
 
-        while(!gears.isVisible()) {
+
+
+        while(!gears.isVisible() && opModeIsActive()) {
             idle();
         }//while
-
+        RC.t.addData("visible", "gears");
         muon.strafeToBeacon(gears, 100);
 
         muon.absoluteIMUTurn(90, 0.5);

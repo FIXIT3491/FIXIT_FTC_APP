@@ -22,6 +22,10 @@ public class MathUtils {
             }
             i++;
         }
-        throw new IllegalArgumentException("num not in range!");
+        throw new IllegalArgumentException("num " + num + " not in range! Range is " + lowBound +"-" + upBound);
+    }
+
+    public static boolean inRange(double num, double low, double high){
+        return num > low && num < high;
     }
 }

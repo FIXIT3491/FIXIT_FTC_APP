@@ -16,7 +16,7 @@ public class Motor implements FXTDevice {
     public int beginningPosition = 0;
     private long targetTime = -1;
 
-    public double minSpeed = 0.09;
+    public double minSpeed = 0.01;
     public int accuracy = 20;
 
     /**
@@ -32,7 +32,6 @@ public class Motor implements FXTDevice {
     public Motor (DcMotor motor) {
         this.m = motor;
         m.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        beginningPosition = getCurrentPosition();
     }//Motor
 
     public Motor(String address) {
@@ -139,9 +138,11 @@ public class Motor implements FXTDevice {
 
         if (Math.abs(power) > 1) {
             power = 1 * Math.signum(power);
-        } else if (Math.abs(power) < minSpeed && Math.abs(power) > 0) {
+        } else if (Math.abs(power) < minSpeed && Math.abs(power) > 1E-10) {
             power = minSpeed * Math.signum(power);
-        }//elseif
+        } else if(Math.abs(power) < 1E-10){
+            power = 0;
+        }
 
         synchronized (m) {
             m.setPower(power);

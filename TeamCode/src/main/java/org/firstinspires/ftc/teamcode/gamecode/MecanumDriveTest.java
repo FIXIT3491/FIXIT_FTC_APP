@@ -28,10 +28,10 @@ public class MecanumDriveTest extends TeleOpMode {
 //
 //        rbt.strafe(degrees, Math.hypot(joy1.y1(), joy1.x1()));
 
-        rbt.rightFore.setPower((joy1.x2() + joy1.y1() - joy1.x1()) / 3.0);
-        rbt.rightBack.setPower((joy1.x2() + joy1.y1() + joy1.x1()) / 3.0);
-        rbt.leftFore.setPower((-joy1.x2() + joy1.y1() + joy1.x1()) / 3.0);
-        rbt.leftBack.setPower((-joy1.x2() + joy1.y1() - joy1.x1())/ 3.0);
+        rbt.rightFore.setPower((joy1.x2() + joy1.y1() + joy1.x1()) / 3.0);
+        rbt.rightBack.setPower((joy1.x2() + joy1.y1() - joy1.x1()) / 3.0);
+        rbt.leftFore.setPower((-joy1.x2() + joy1.y1() - joy1.x1()) / 3.0);
+        rbt.leftBack.setPower((-joy1.x2() + joy1.y1() + joy1.x1())/ 3.0);
 
 //        RC.t.addData("h", degrees);
         RC.t.addData("leftFore", rbt.leftFore.returnCurrentState());
