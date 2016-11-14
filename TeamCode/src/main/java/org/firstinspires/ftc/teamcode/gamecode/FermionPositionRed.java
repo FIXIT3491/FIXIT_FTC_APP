@@ -54,21 +54,21 @@ public class FermionPositionRed extends AutoOpMode {
             idle();
         }//while
 
-        tau.strafeToBeacon(gears, 100);
+        tau.strafeToBeacon(gears, 100, 0.5);
 
         tau.absoluteIMUTurn(-90, 0.5);
 
-        tau.strafeToBeacon(gears, 40);
+        tau.strafeToBeacon(gears, 40, 0.5);
 
         tau.pushBeaconButton(Fermion.waitForBeaconConfig(
                 getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
-                gears, locale.getCameraCalibration()));
+                gears, locale.getCameraCalibration(), 5000));
 
         tau.trackRight(1219.2, 0.5);
 
         tau.pushBeaconButton(Fermion.waitForBeaconConfig(
                 getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
-                tools, locale.getCameraCalibration()));
+                tools, locale.getCameraCalibration(), 5000));
 
     }//runOp
 

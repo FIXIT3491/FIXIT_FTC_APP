@@ -16,7 +16,7 @@ public class Motor implements FXTDevice {
     public int beginningPosition = 0;
     private long targetTime = -1;
 
-    public double minSpeed = 0.01;
+    public double minSpeed = 0.09;
     public int accuracy = 20;
 
     /**

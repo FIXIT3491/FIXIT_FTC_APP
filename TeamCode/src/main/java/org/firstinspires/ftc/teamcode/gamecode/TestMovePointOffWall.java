@@ -37,32 +37,47 @@ public class TestMovePointOffWall extends AutoOpMode {
         Vuforia.setFrameFormat(PIXEL_FORMAT.RGB565, true);
 
         VuforiaTrackables beacons = locale.loadTrackablesFromAsset("FTC_2016-17");
-        VuforiaTrackableDefaultListener gears = (VuforiaTrackableDefaultListener) beacons.get(3).getListener();
+        VuforiaTrackableDefaultListener wheels = (VuforiaTrackableDefaultListener) beacons.get(0).getListener();
 
         telemetry.update();
         waitForStart();
 
         beacons.activate();
-        OpenGLMatrix pose = gears.getPose();
+        OpenGLMatrix pose = wheels.getPose();
 
         while(opModeIsActive() && pose == null) {
-            pose = gears.getPose();
+            pose = wheels.getPose();
             idle();
         }//while
 
-        VectorF translation = movePointOffWall(pose.getTranslation(), -strange.imu.getAngularOrientation().firstAngle, 375);
+//        strange.strafeToBeacon(gears, 500);
 
-        Log.i(TAG, translation.toString());
-        strange.imuTurnR(Math.atan2(translation.get(0), translation.get(2)), 0.2);
+        VectorF target = new VectorF(-380, 0, 280);
 
-        strange.forward(0.1);
+        VectorF trans = navOffWall(pose.getTranslation(), -strange.imu.getAngularOrientation().firstAngle, target);
 
-        while (opModeIsActive() && Math.hypot(translation.get(0), translation.get(2)) > 10) {
-            translation = movePointOffWall(gears.getPose().getTranslation(), -strange.imu.getAngularOrientation().firstAngle, 375);
-        }//while
+        Log.i("ANGLE", "HELLO" + Math.toDegrees(Math.atan2(trans.get(0), -trans.get(2))));
+
+        double deg = Math.toDegrees(Math.atan2(trans.get(0), -trans.get(2)));
+        if(deg < 0){
+            strange.imuTurnL(-deg, 0.3);
+        } else {
+            strange.imuTurnR(deg, 0.3);
+        }
+
+        strange.forward(0.2);
+
+        do {
+            trans = navOffWall(wheels.getPose().getTranslation(), -strange.imu.getAngularOrientation().firstAngle, target);
+            idle();
+            Log.i(TAG, "HELLOIP: " + Math.hypot(trans.get(0), trans.get(2)));
+        } while (wheels.getPose() != null && Math.hypot(trans.get(0), trans.get(2)) > 100 && opModeIsActive());
+
+        if(wheels.getPose() == null){
+            Log.i(TAG, "wheels " + "null");
+        }
 
         strange.stop();
-
     }
 
     public VectorF movePointOffWall(VectorF trans, double robotAngle, double offWall) {
@@ -79,6 +94,10 @@ public class TestMovePointOffWall extends AutoOpMode {
         double hypot2 = Math.hypot(zPrime, (xPrime - offWall));
 
         return new VectorF((float) (hypot2 * Math.cos(epsilon)), trans.get(1), (float) (hypot2 * Math.sin(epsilon)));
+    }
+
+    public VectorF navOffWall(VectorF trans, double robotAngle, VectorF offWall){
+        return new VectorF((float) (trans.get(0) - offWall.get(0) * Math.sin(Math.toRadians(robotAngle)) - offWall.get(2) * Math.cos(Math.toRadians(robotAngle))), trans.get(1), (float) (trans.get(2) + offWall.get(0) * Math.cos(Math.toRadians(robotAngle)) - offWall.get(2) * Math.sin(Math.toRadians(robotAngle))));
     }
 
 }

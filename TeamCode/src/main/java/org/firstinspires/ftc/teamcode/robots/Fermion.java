@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.qualcomm.hardware.adafruit.AdafruitBNO055IMU;
 import com.qualcomm.hardware.adafruit.BNO055IMU;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.vuforia.CameraCalibration;
 import com.vuforia.Image;
 import com.vuforia.Matrix34F;
@@ -27,6 +28,7 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
+import org.opencv.ml.LogisticRegression;
 
 import java.util.Arrays;
 
@@ -58,13 +60,17 @@ public class Fermion {
     public final static int BEACON_BLUE_RED = 1;
     public final static int BEACON_RED_BLUE = 2;
 
-    public final static double TURNING_ACCURACY_DEG = 5;
+    public final static double TURNING_ACCURACY_DEG = 2;
 
     public Fermion(boolean auto) {
         leftFore = new Motor("leftFore");
+        leftFore.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightFore = new Motor("rightFore");
+        rightFore.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftBack = new Motor("leftBack");
+        leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightBack = new Motor("rightBack");
+        rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         rightFore.setReverse(true);
         rightBack.setReverse(true);
@@ -135,7 +141,6 @@ public class Fermion {
         double leftForeRightBack = Math.sin(Math.toRadians(degrees));
         double rightForeLeftBack = Math.cos(Math.toRadians(degrees));
 
-        Log.i("Fermion", "strafe: " + leftForeRightBack + " " + rightForeLeftBack);
 
         double multi = speed / Math.max(Math.abs(leftForeRightBack), Math.abs(rightForeLeftBack));
         leftForeRightBack *= multi;
@@ -236,7 +241,7 @@ public class Fermion {
     }//strafeRight
 
     public void imuTurnL(double degrees, double speed) {
-
+        if(degrees < TURNING_ACCURACY_DEG) return;
         turnL(speed);
         double beginAngle = -imu.getAngularOrientation().firstAngle;
 
@@ -287,6 +292,7 @@ public class Fermion {
     }
 
     public void imuTurnR(double degrees, double speed) {
+        if(degrees < TURNING_ACCURACY_DEG) return;
 
         turnR(speed);
         double beginAngle = -imu.getAngularOrientation().firstAngle;
@@ -428,10 +434,11 @@ public class Fermion {
         stop();
     }
 
-    public static int waitForBeaconConfig(Image img, VuforiaTrackableDefaultListener beacon, CameraCalibration camCal) {
+    public static int waitForBeaconConfig(Image img, VuforiaTrackableDefaultListener beacon, CameraCalibration camCal, long timeOut) {
 
         int config = BEACON_NOT_VISIBLE;
-        while (config == BEACON_NOT_VISIBLE) {
+        long beginTime = System.currentTimeMillis();
+        while (config == BEACON_NOT_VISIBLE && System.currentTimeMillis() - beginTime < timeOut && RC.l.opModeIsActive()) {
             config = getBeaconConfig(img, beacon, camCal);
             RC.l.idle();
         }//while
@@ -510,9 +517,9 @@ public class Fermion {
                 //if centroid is in the bottom half of the image, the blue beacon is on the left
                 //if the centroid is in the top half, the blue beacon is on the right
                 if ((mmnts.get_m01() / mmnts.get_m00()) < cropped.rows() / 2) {
-                    return BEACON_BLUE_RED;
-                } else {
                     return BEACON_RED_BLUE;
+                } else {
+                    return BEACON_BLUE_RED;
                 }//else
 
             }//if
@@ -524,16 +531,38 @@ public class Fermion {
         return BEACON_NOT_VISIBLE;
     }//getBeaconConfig
 
-    public void strafeToBeacon(VuforiaTrackableDefaultListener beacon, double targetDistance) {
+    public void strafeToBeacon(VuforiaTrackableDefaultListener beacon, double targetDistance, double speed) {
+
+        strafeToBeacon(beacon, targetDistance, speed, new VectorF(0, -0.1f, 0));
+
+    }//strafeToBeacon
+
+
+    public void strafeToBeacon(VuforiaTrackableDefaultListener beacon, double targetDistance, double speed, VectorF coordinate) {
 
         VectorF trans = beacon.getPose().getTranslation();
 
-        strafe(Math.atan2(trans.get(2), trans.get(3)), 0.5);
+        for (int i = 0; i < coordinate.length(); i++) {
+            if (coordinate.get(i) == -0.1f) {
+                coordinate.put(i, trans.get(i));
 
-        while (trans.magnitude() > targetDistance) {
+            }//if
+        }//for
+
+        trans.subtract(coordinate);
+
+        Log.i("DIMENS", trans.get(0) + ", " + trans.get(2));
+        Log.i(TAG, "DIMENSION " + coordinate.get(0) + ", " + coordinate.get(2));
+
+        Log.i("ANGLE", Math.toDegrees(Math.atan2(trans.get(0), -trans.get(2))) + "");
+        strafe(Math.toDegrees(Math.atan2(trans.get(0), -trans.get(2))), speed);
+
+        while (RC.l.opModeIsActive() && trans.magnitude() > targetDistance) {
 
             trans = beacon.getPose().getTranslation();
-            strafe(Math.atan2(trans.get(2), trans.get(3)), 0.5);
+            trans.subtract(coordinate);
+
+            strafe(Math.toDegrees(Math.atan2(trans.get(0), -trans.get(2))), speed);
 
         }//while
 

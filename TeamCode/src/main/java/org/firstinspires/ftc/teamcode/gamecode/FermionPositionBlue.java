@@ -54,21 +54,21 @@ public class FermionPositionBlue extends AutoOpMode {
             idle();
         }//while
 
-        lepton.strafeToBeacon(gears, 100);
+        lepton.strafeToBeacon(gears, 100, 0.5);
 
         lepton.absoluteIMUTurn(-90, 0.5);
 
-        lepton.strafeToBeacon(gears, 40);
+        lepton.strafeToBeacon(gears, 40, 0.5);
 
         lepton.pushBeaconButton(Fermion.waitForBeaconConfig(
                 getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
-                gears, locale.getCameraCalibration()));
+                gears, locale.getCameraCalibration(), 5000));
 
         lepton.trackLeft(1219.2, 0.5);
 
         lepton.pushBeaconButton(Fermion.waitForBeaconConfig(
                 getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
-                tools, locale.getCameraCalibration()));
+                tools, locale.getCameraCalibration(), 5000));
 
     }//runOp
 

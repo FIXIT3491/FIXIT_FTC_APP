@@ -42,10 +42,19 @@ public abstract class AutoOpMode extends LinearOpMode {
         TaskHandler.addLoopedTask("MainRunnable", mainTasks, 2);
         addTimer();
 
-        runOp();
+        try {
+            runOp();
+        } finally {
+            stopOpMode();
+        }
+
     }
 
     public abstract void runOp() throws InterruptedException;
+
+    public void stopOpMode(){
+
+    }
 
     public static void delay(int millis) {
         try {

@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.gamecode;
 
 import android.support.annotation.Nullable;
+import android.util.Log;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.vuforia.Image;
 import com.vuforia.PIXEL_FORMAT;
 import com.vuforia.Vuforia;
@@ -11,20 +13,25 @@ import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
+import org.firstinspires.ftc.teamcode.roboticslibrary.MathUtils;
 import org.firstinspires.ftc.teamcode.robots.Fermion;
 
 /**
- * Created by FIXIT on 16-10-18.
+ * Created by FIXIT on 16-10-21.
  */
+@Autonomous
 public class FermionRed extends AutoOpMode {
+
+    Fermion muon;
 
     @Override
     public void runOp() throws InterruptedException {
-        final Fermion electron = new Fermion(true);
+        muon = new Fermion(true);
 
-        VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters();
+        VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
         params.vuforiaLicenseKey = RC.VUFORIA_LICENSE_KEY;
         params.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
 
@@ -39,70 +46,144 @@ public class FermionRed extends AutoOpMode {
         waitForStart();
         beacons.activate();
 
-        mainTasks.addRunnable(new Runnable() {
-            @Override
-            public void run() {
-                electron.veerCheck();
+        muon.forward(0.3);
+        sleep(300);
+        muon.stop();
+
+        muon.imuTurnL(50, 0.5);
+
+        muon.forward(0.3);
+
+        while (gears.getPose() == null && opModeIsActive()) {
+            idle();
+        }//while
+
+
+        VectorF trans = gears.getPose().getTranslation();
+
+        Log.i("ANGLE", "HELLO" + Math.toDegrees(Math.atan2(trans.get(0), -trans.get(2))));
+
+        double deg = Math.toDegrees(Math.atan2(trans.get(0), -trans.get(2)));
+        if(deg < 0){
+            muon.imuTurnL(-deg, 0.3);
+        } else {
+            muon.imuTurnR(deg, 0.3);
+        }
+
+        int config = Fermion.BEACON_NOT_VISIBLE;
+        try{
+            config = Fermion.waitForBeaconConfig(
+                    getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
+                    gears, locale.getCameraCalibration(), 5000);
+            telemetry.addData("Beacon", config);
+            Log.i(TAG, "runOp: " + config);
+        } catch (Exception e){
+            telemetry.addData("Beacon", "could not not be found");
+        }
+
+
+        muon.strafeToBeacon(gears, 800, 0.3);
+
+        muon.absoluteIMUTurn(-90, 0.5);
+
+        muon.stop();
+        sleep(1000);
+
+        muon.right(0.13);
+
+        boolean saidNull = false;
+        while (opModeIsActive() && (gears.getPose() == null || gears.getPose().getTranslation().get(0) > ((config == Fermion.BEACON_RED_BLUE)? -35 : 10))) {
+            if(gears.getPose() == null ){
+                if(!saidNull) Log.i(TAG, "HELLO null");
+                saidNull = true;
+            } else {
+                Log.i(TAG, "HELLO" + gears.getPose().getTranslation().get(0));
             }
-        });
-
-        //electron.trackForward(609.6, 0.5);
-        electron.forward(0.5); //uses time instead of trackball
-        delay((int) RC.globalDouble("DriveForwardTime"));
-        electron.stop();
-
-        electron.imuTurnL(45, 0.5);
-        electron.forward(0.5);
-
-        while(!gears.isVisible()) {
             idle();
         }//while
 
-        VectorF translation = gears.getPose().getTranslation();
 
-        electron.imuTurnL(Math.atan2(translation.get(2), translation.get(3)), 0.5);
+        Log.i(TAG, "HELLO FNIale" + gears.getPose().getTranslation().get(0));
 
-        electron.strafeToBeacon(gears, RC.globalDouble("FirstGearsBufferDistance"));
 
-        electron.absoluteIMUTurn(-90, 0.5);
 
-        electron.strafeToBeacon(gears, RC.globalDouble("SecondGearsBufferDistance"));
+        muon.forward(0.15);
+        sleep(1000);
+        muon.stop();
 
-        electron.pushBeaconButton(Fermion.waitForBeaconConfig(
-                getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
-                gears, locale.getCameraCalibration()));
+        sleep(100);
 
-        electron.right(0.5);
+        muon.backward(0.2);
+        sleep(800);
+        muon.stop();
 
-        while (!tools.isVisible()) {
+        sleep(1000000);
+
+        muon.absoluteIMUTurn(-90, 0.5);
+
+        muon.right(1);
+        sleep(1600);
+
+        muon.absoluteIMUTurn(-90, 0.5);
+        muon.stop();
+
+        clearTimer();
+
+        while (tools.getPose() == null && opModeIsActive()) {
+            if(getMilliSeconds() > 1500){
+                Log.i(TAG, "runOp: " + "can't see");
+                muon.backward(0.3);
+                sleep(300);
+                muon.stop();
+                clearTimer();
+            }
             idle();
         }//while
 
-        electron.strafeToBeacon(tools, RC.globalDouble("ToolsBufferDistance"));
 
-        electron.pushBeaconButton(Fermion.waitForBeaconConfig(
-                getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
-                tools, locale.getCameraCalibration()));
+        muon.backward(0.3);
+        sleep(600);
+        muon.stop();
+
+        config = Fermion.BEACON_NOT_VISIBLE;
+        try{
+            config = Fermion.waitForBeaconConfig(
+                    getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
+                    tools, locale.getCameraCalibration(), 5000);
+            telemetry.addData("Beacon", config);
+            Log.i(TAG, "runOp: " + config);
+        } catch (Exception e){
+            telemetry.addData("Beacon", "could not not be found");
+        }
+
+        sleep(1000);
+
+        while (opModeIsActive() && (tools.getPose() == null || !MathUtils.inRange(tools.getPose().getTranslation().get(0), ((config == Fermion.BEACON_BLUE_RED)? -35 : 0), ((config == Fermion.BEACON_RED_BLUE)? -15 : 10)))) {
+
+            if(tools.getPose().getTranslation().get(0) < ((config == Fermion.BEACON_RED_BLUE)? -35 : 0)){
+                muon.left(0.13);
+            } else {
+                muon.right(0.13);
+            }
+
+
+            if(tools.getPose() == null){
+                Log.i(TAG, "HELLO null");
+            } else {
+                Log.i(TAG, "HELLO" + tools.getPose().getTranslation().get(0));
+            }
+            idle();
+        }//while
+
+        Log.i(TAG, "HELLO FNIale" + tools.getPose().getTranslation().get(0));
+
+        muon.forward(0.2);
+        sleep(1400);
+        muon.stop();
+
 
     }//runOp
 
-    //this assumes the horizontal axis is the y-axis since the phone is vertical
-    //robot angle is relative to "parallel with the beacon wall"
-    public VectorF movePointOffWall(VectorF trans, double robotAngle, double offWall) {
-
-        double alpha = Math.atan2(trans.get(2), trans.get(0));
-        double hypot = Math.hypot(trans.get(2), trans.get(0));
-
-        double beta = alpha - robotAngle;
-
-        double zPrime = hypot * Math.sin(beta);
-        double xPrime = hypot * Math.cos(beta);
-
-        double epsilon = robotAngle + Math.atan2(zPrime, xPrime - offWall);
-        double hypot2 = Math.hypot(zPrime, (xPrime - offWall));
-
-        return new VectorF((float) (hypot2 * Math.cos(epsilon)), trans.get(1), (float) (hypot2 * Math.sin(epsilon)));
-    }
 
     @Nullable
     public static Image getImageFromFrame(VuforiaLocalizer.CloseableFrame frame, int format) {
@@ -117,4 +198,12 @@ public class FermionRed extends AutoOpMode {
         return null;
     }
 
+
+    public VectorF navOffWall(VectorF trans, double robotAngle, VectorF offWall){
+        return new VectorF((float) (trans.get(0) - offWall.get(0) * Math.sin(Math.toRadians(robotAngle)) - offWall.get(2) * Math.cos(Math.toRadians(robotAngle))), trans.get(1), (float) (trans.get(2) + offWall.get(0) * Math.cos(Math.toRadians(robotAngle)) - offWall.get(2) * Math.sin(Math.toRadians(robotAngle))));
+    }
+
+    public void stopOpMode(){
+        muon.stop();
+    }
 }

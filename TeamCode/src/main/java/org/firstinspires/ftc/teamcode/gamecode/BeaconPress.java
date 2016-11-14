@@ -10,6 +10,7 @@ import com.vuforia.PIXEL_FORMAT;
 import com.vuforia.Vuforia;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
@@ -45,46 +46,78 @@ public class BeaconPress extends AutoOpMode {
         waitForStart();
 
         beacons.activate();
-        sleep(200);
-        while (!gears.isVisible() && opModeIsActive()){
-            strange.strafe(-90, 0.1);
-            sleep(400);
-            strange.stop();
-            sleep(100);
-        }
-        strange.stop();
+//        sleep(200);
+//        while (!gears.isVisible() && opModeIsActive()){
+//            strange.strafe(-90, 0.1);
+//            sleep(400);
+//            strange.stop();
+//            sleep(100);
+//        }
+//        strange.stop();
 
+//
+//        double x = gears.getPose().getTranslation().get(0);
+//        while(!MathUtils.inRange(x, 0, 10) && opModeIsActive()){
+//            if(x < 0) strange.strafe(-90, 0.01);
+//            if(x > 10) strange.strafe(90, 0.01);
+//            x = gears.getPose().getTranslation().get(0);
+//            telemetry.addData("x", x);
+//            telemetry.addData("motor", strange.leftBack.returnCurrentState());
+//            telemetry.update();
+//            Log.i(TAG, "runOp: " + x);
+//        }
+//        strange.stop();
 
-
-
-        double x = gears.getPose().getTranslation().get(0);
-        while(!MathUtils.inRange(x, -60, -40) && opModeIsActive()){
-            if(x < -60) strange.strafe(-90, 0.01);
-            if(x > -40) strange.strafe(90, 0.01);
-            x = gears.getPose().getTranslation().get(0);
-            telemetry.addData("x", x);
-            telemetry.update();
-
-        }
-        strange.stop();
-        strange.absoluteIMUTurn(0, 0.1);
+//        strange.absoluteIMUTurn(0, 0.1);
+        int config = Fermion.BEACON_NOT_VISIBLE;
         try{
-            int config = Fermion.waitForBeaconConfig(
+            config = Fermion.waitForBeaconConfig(
                     getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
-                    gears, locale.getCameraCalibration());
+                    gears, locale.getCameraCalibration(), 5000);
             telemetry.addData("Beacon", config);
             Log.i(TAG, "runOp: " + config);
         } catch (Exception e){
             telemetry.addData("Beacon", "could not not be found");
         }
-        telemetry.addData("x", x);
+//        telemetry.addData("x", x);
         telemetry.update();
 
-        strange.strafe(0, 0.5);
-        sleep(500);
+        if (config == Fermion.BEACON_BLUE_RED) {
+            strange.strafeToBeacon(gears, 10, 0.1, new VectorF(40, -0.1f, -0.1f));
+        } else {
+            strange.strafeToBeacon(gears, 10, 0.1, new VectorF(-60, -0.1f, -0.1f));
+        }//else
 
+        strange.forward(0.4);
+        sleep(1000);
+        strange.stop();
 
-
+//        int lowerBound = 0;
+//        int upperBound = 0;
+//
+//        if((config == Fermion.BEACON_BLUE_RED)){
+//            lowerBound = 0;
+//            upperBound = 10;
+//        } else {
+//            lowerBound = -60;
+//            upperBound = -40;
+//        }
+//
+//        while(opModeIsActive() && getMilliSeconds(1) < 5000){
+//            if(x < lowerBound) strange.strafe(-90, 0.01);
+//            else if(x > upperBound) strange.strafe(90, 0.01);
+//            else strange.strafe(0, 0.2);
+//            try{
+//                x = gears.getPose().getTranslation().get(0);
+//            } catch (Exception e){
+//                telemetry.addData("Vuforia", "image target no longer visible");
+//                x = (lowerBound + upperBound) / 2;
+//            }
+//            telemetry.addData("x", x);
+//            Log.i(TAG, "runOp: " + x);
+//            telemetry.update();
+//        }
+        strange.stop();
     }
 
     @Nullable
