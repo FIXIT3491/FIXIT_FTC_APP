@@ -121,15 +121,15 @@ public class FtcOpModeRegister implements OpModeRegister {
                         OpModeMeta meta;
 
                         if (opMode.isInstance(LinearOpMode.class)) {
-                            meta = new OpModeMeta(OpModeMeta.Flavor.AUTONOMOUS, OpModeMeta.DefaultGroup);
+                            meta = new OpModeMeta(opMode.getSimpleName(), OpModeMeta.Flavor.AUTONOMOUS, OpModeMeta.DefaultGroup);
                         } else {
-                            meta = new OpModeMeta(OpModeMeta.Flavor.TELEOP, OpModeMeta.DefaultGroup);
+                            meta = new OpModeMeta(opMode.getSimpleName(), OpModeMeta.Flavor.TELEOP, OpModeMeta.DefaultGroup);
                         }//else
 
                         manager.register(meta, opMode);
                     }//if
                 }//if
-            }
+            }//for
 
         } catch (Exception e) {
             e.printStackTrace();

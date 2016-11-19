@@ -40,12 +40,19 @@ public abstract class AutoOpMode extends LinearOpMode {
         RC.setOpMode(this);
         TaskHandler.init();
         TaskHandler.addLoopedTask("MainRunnable", mainTasks, 2);
+        TaskHandler.addLoopedTask("Telemetry", new Runnable() {
+            @Override
+            public void run() {
+                telemetry.update();
+            }
+        }, 20);
         addTimer();
 
         try {
             runOp();
         } finally {
             stopOpMode();
+            TaskHandler.removeAllTasks();
         }
 
     }

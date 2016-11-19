@@ -59,13 +59,19 @@ public final class TaskHandler {
     public static boolean removeTask(String name) {
         if (futures.containsKey(name)) {
             futures.get(name).cancel(true);
-            futures.put(name, null);
+            //futures.put(name, null);
         } else {
             Log.e("TaskHandler", "Attempted to remove nonexistent task!");
         }//else
 
         return futures.containsKey(name);
     }//removeTask
+
+    public static void removeAllTasks() {
+        for (Map.Entry<String, Future> future : futures.entrySet()) {
+            future.getValue().cancel(true);
+        }//for
+    }//removeAllTasks
 
     public static boolean taskExists(String name) {
         return futures.containsKey(name);
@@ -93,7 +99,7 @@ public final class TaskHandler {
                         }//catch
                     }//if
 
-                    if (!Thread.currentThread().isInterrupted()) {
+                    if (Thread.currentThread().isInterrupted()) {
                         break;
                     }//if
 

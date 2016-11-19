@@ -16,6 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
+import org.firstinspires.ftc.teamcode.opmodesupport.TaskHandler;
 import org.firstinspires.ftc.teamcode.roboticslibrary.MathUtils;
 import org.firstinspires.ftc.teamcode.robots.Fermion;
 
@@ -44,6 +45,13 @@ public class FermionRed extends AutoOpMode {
         VuforiaTrackableDefaultListener tools = (VuforiaTrackableDefaultListener) beacons.get(1).getListener();
 
         waitForStart();
+//        TaskHandler.addLoopedTask("veerCheck", new Runnable() {
+//            @Override
+//            public void run() {
+//                muon.veerCheck();
+//            }
+//        }, 5);
+
         beacons.activate();
 
         muon.forward(0.3);
@@ -57,7 +65,6 @@ public class FermionRed extends AutoOpMode {
         while (gears.getPose() == null && opModeIsActive()) {
             idle();
         }//while
-
 
         VectorF trans = gears.getPose().getTranslation();
 
@@ -79,10 +86,10 @@ public class FermionRed extends AutoOpMode {
             Log.i(TAG, "runOp: " + config);
         } catch (Exception e){
             telemetry.addData("Beacon", "could not not be found");
-        }
+        }//catch
 
 
-        muon.strafeToBeacon(gears, 800, 0.3);
+        muon.strafeToBeacon(gears, 600, 0.3);
 
         muon.absoluteIMUTurn(-90, 0.5);
 
@@ -92,19 +99,24 @@ public class FermionRed extends AutoOpMode {
         muon.right(0.13);
 
         boolean saidNull = false;
-        while (opModeIsActive() && (gears.getPose() == null || gears.getPose().getTranslation().get(0) > ((config == Fermion.BEACON_RED_BLUE)? -35 : 10))) {
-            if(gears.getPose() == null ){
-                if(!saidNull) Log.i(TAG, "HELLO null");
-                saidNull = true;
+        while (opModeIsActive() && (gears.getPose() == null || !MathUtils.inRange(gears.getPose().getTranslation().get(0), ((config == Fermion.BEACON_RED_BLUE)? -80 : 45), ((config == Fermion.BEACON_RED_BLUE)? -15 : 10)))) {
+
+            if(gears.getPose().getTranslation().get(0) < ((config == Fermion.BEACON_RED_BLUE)? -80 : 45)){
+                muon.left(0.13);
             } else {
-                Log.i(TAG, "HELLO" + gears.getPose().getTranslation().get(0));
+                muon.right(0.13);
+            }//else
+
+            if(gears.getPose() == null){
+                Log.i(TAG, "HELLO null");
+            } else {
+                Log.i(TAG, "Gears: " + gears.getPose().getTranslation().get(0));
             }
             idle();
         }//while
 
 
-        Log.i(TAG, "HELLO FNIale" + gears.getPose().getTranslation().get(0));
-
+        Log.i(TAG, "Gears Final: " + gears.getPose().getTranslation().get(0));
 
 
         muon.forward(0.15);
@@ -117,23 +129,23 @@ public class FermionRed extends AutoOpMode {
         sleep(800);
         muon.stop();
 
-        sleep(1000000);
-
         muon.absoluteIMUTurn(-90, 0.5);
 
         muon.right(1);
-        sleep(1600);
+        sleep(1800);
 
         muon.absoluteIMUTurn(-90, 0.5);
         muon.stop();
 
         clearTimer();
 
+        int timeBack = 0;
         while (tools.getPose() == null && opModeIsActive()) {
             if(getMilliSeconds() > 1500){
                 Log.i(TAG, "runOp: " + "can't see");
                 muon.backward(0.3);
                 sleep(300);
+                timeBack += 300;
                 muon.stop();
                 clearTimer();
             }
@@ -154,36 +166,41 @@ public class FermionRed extends AutoOpMode {
             Log.i(TAG, "runOp: " + config);
         } catch (Exception e){
             telemetry.addData("Beacon", "could not not be found");
-        }
+        }//catch
 
         sleep(1000);
 
-        while (opModeIsActive() && (tools.getPose() == null || !MathUtils.inRange(tools.getPose().getTranslation().get(0), ((config == Fermion.BEACON_BLUE_RED)? -35 : 0), ((config == Fermion.BEACON_RED_BLUE)? -15 : 10)))) {
+        while (opModeIsActive() && (tools.getPose() == null || !MathUtils.inRange(tools.getPose().getTranslation().get(0), ((config == Fermion.BEACON_RED_BLUE)? -80 : 45), ((config == Fermion.BEACON_RED_BLUE)? -15 : 10)))) {
 
-            if(tools.getPose().getTranslation().get(0) < ((config == Fermion.BEACON_RED_BLUE)? -35 : 0)){
+            if(tools.getPose().getTranslation().get(0) < ((config == Fermion.BEACON_RED_BLUE)? -80 : 45)){
                 muon.left(0.13);
             } else {
                 muon.right(0.13);
-            }
-
+            }//else
 
             if(tools.getPose() == null){
                 Log.i(TAG, "HELLO null");
             } else {
-                Log.i(TAG, "HELLO" + tools.getPose().getTranslation().get(0));
+                Log.i(TAG, "Tools: " + tools.getPose().getTranslation().get(0));
             }
             idle();
         }//while
 
-        Log.i(TAG, "HELLO FNIale" + tools.getPose().getTranslation().get(0));
+        Log.i(TAG, "Tools Final: " + tools.getPose().getTranslation().get(0));
 
         muon.forward(0.2);
+        sleep(1400 + timeBack);
+        muon.stop();
+
+        sleep(1000);
+
+        muon.backward(0.2);
         sleep(1400);
         muon.stop();
 
+        RC.setGlobalDouble("TeleBeginAngle", -muon.imu.getAngularOrientation().firstAngle);
 
     }//runOp
-
 
     @Nullable
     public static Image getImageFromFrame(VuforiaLocalizer.CloseableFrame frame, int format) {

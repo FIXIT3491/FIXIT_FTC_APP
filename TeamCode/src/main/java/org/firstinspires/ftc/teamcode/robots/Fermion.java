@@ -20,6 +20,7 @@ import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.TrackBall;
 import org.firstinspires.ftc.teamcode.newhardware.Motor;
 import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
+import org.firstinspires.ftc.teamcode.roboticslibrary.MathUtils;
 import org.firstinspires.ftc.teamcode.roboticslibrary.OCVUtils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -61,6 +62,9 @@ public class Fermion {
     public final static int BEACON_RED_BLUE = 2;
 
     public final static double TURNING_ACCURACY_DEG = 2;
+
+    public final static double DEFAULT_VEER_STRENGTH = 0.7 / 90;
+    public static double VEER_TURNING_STRENGTH = DEFAULT_VEER_STRENGTH;
 
     public Fermion(boolean auto) {
         leftFore = new Motor("leftFore");
@@ -113,6 +117,8 @@ public class Fermion {
     }//right
 
     public void turnL(double speed) {
+        VEER_TURNING_STRENGTH = 0;
+
         leftFore.setPower(-speed);
         leftBack.setPower(-speed);
         rightFore.setPower(speed);
@@ -120,6 +126,8 @@ public class Fermion {
     }//turnL
 
     public void turnR(double speed) {
+        VEER_TURNING_STRENGTH = 0;
+
         leftFore.setPower(speed);
         leftBack.setPower(speed);
         rightFore.setPower(-speed);
@@ -135,6 +143,7 @@ public class Fermion {
                         ±180°
      */
     public void strafe(double degrees, double speed) {
+        VEER_TURNING_STRENGTH = DEFAULT_VEER_STRENGTH;
 
         degrees += 45;
 
@@ -155,7 +164,6 @@ public class Fermion {
         rightBack.setPower(leftForeRightBack);
 
     }//strafe
-
 
     public void trackForward(double mm, double speed) {
 
@@ -241,37 +249,19 @@ public class Fermion {
     }//strafeRight
 
     public void imuTurnL(double degrees, double speed) {
+
+        this.targetAngle = MathUtils.cvtAngleToNewDomain(targetAngle - degrees);
+
         if(degrees < TURNING_ACCURACY_DEG) return;
         turnL(speed);
-        double beginAngle = -imu.getAngularOrientation().firstAngle;
+        double beginAngle = MathUtils.cvtAngleToNewDomain(-imu.getAngularOrientation().firstAngle);
+        double targetAngle = MathUtils.cvtAngleToNewDomain(beginAngle - degrees);
 
-        if (beginAngle > 180) {
-            beginAngle -= 360;
-        }//if
-
-        double targetAngle = beginAngle - degrees;
-
-        if (targetAngle > 180) {
-            targetAngle -= 360;
-        }//if
-
-        if (targetAngle < -180) {
-            targetAngle += 360;
-        }//if
 
         Log.i("deg traget", "imuTurnL: " + targetAngle);
         while (RC.l.opModeIsActive()) {
 
-            double currentAngle = -imu.getAngularOrientation().firstAngle;
-
-            if (currentAngle > 180) {
-                currentAngle -= 360;
-            }//if
-
-            Log.i("deg", "imuTurnL: " + currentAngle);
-
-
-            if(currentAngle < targetAngle) currentAngle += 360;
+            double currentAngle = MathUtils.cvtAngleToNewDomain(-imu.getAngularOrientation().firstAngle);
 
             double angleToTurn = Math.abs(currentAngle - targetAngle);
 
@@ -283,46 +273,22 @@ public class Fermion {
         }//while
 
         stop();
-
-        this.targetAngle = imu.getAngularOrientation().firstAngle;
-
-        if (this.targetAngle > 180) {
-            this.targetAngle -= 360;
-        }//if
-    }
+    }//imuTurnL
 
     public void imuTurnR(double degrees, double speed) {
+
+        this.targetAngle = MathUtils.cvtAngleToNewDomain(targetAngle + degrees);
+
         if(degrees < TURNING_ACCURACY_DEG) return;
-
         turnR(speed);
-        double beginAngle = -imu.getAngularOrientation().firstAngle;
+        double beginAngle = MathUtils.cvtAngleToNewDomain(-imu.getAngularOrientation().firstAngle);
 
-        if (beginAngle > 180) {
-            beginAngle -= 360;
-        }//if
+        double targetAngle = MathUtils.cvtAngleToNewDomain(beginAngle + degrees);
 
-        double targetAngle = beginAngle + degrees;
-
-        if (targetAngle > 180) {
-            targetAngle -= 360;
-        }//if
-
-        if (targetAngle < -180) {
-            targetAngle += 360;
-        }//if
-
-        Log.i("deg traget", "imuTurnR: " + targetAngle);
+        Log.i("deg traget", "imuTurnL: " + targetAngle);
         while (RC.l.opModeIsActive()) {
 
-            double currentAngle = -imu.getAngularOrientation().firstAngle;
-
-            if (currentAngle > 180) {
-                currentAngle -= 360;
-            }//if
-
-            Log.i("deg", "imuTurnR: " + currentAngle);
-
-            if(currentAngle > targetAngle) currentAngle -= 360;
+            double currentAngle = MathUtils.cvtAngleToNewDomain(-imu.getAngularOrientation().firstAngle);
 
             double angleToTurn = Math.abs(currentAngle - targetAngle);
 
@@ -334,13 +300,6 @@ public class Fermion {
         }//while
 
         stop();
-
-        this.targetAngle = imu.getAngularOrientation().firstAngle;
-
-        if (this.targetAngle > 180) {
-            this.targetAngle -= 360;
-        }//if
-
     }//imuTurnR
 
     public void absoluteIMUTurn(double degrees, double speed) {
@@ -360,60 +319,63 @@ public class Fermion {
         }//if
     }//absoluteIMUTurn
 
-    //absolute degree system
-    //only works if veerCheck is being looped
-    public void veerTo(double degrees) {
-        this.targetAngle = degrees;
-    }//veerTo
 
     //to be used via TaskHandler
     //therefore, it's not a loop
     //no idea if this works...
     //simultaneously turning and strafing with mecanum wheels seems extremely complicated
     public void veerCheck() {
+        if (VEER_TURNING_STRENGTH > 0) {
+            double currentAngle = -imu.getAngularOrientation().firstAngle;
 
-        final double TURNING_CONSTANT = 0.1 / 90.0; //random guess
+            if (currentAngle > 180) {
+                currentAngle -= 360;
+            } else if (currentAngle < -180) {
+                currentAngle += 360;
+            }//elseif
 
-        double currentAngle = imu.getAngularOrientation().firstAngle;
+            double angleError = targetAngle - currentAngle;
 
-        if (currentAngle > 180) {
-            currentAngle -= 360;
+            if (angleError > 180) {
+                angleError -= 360;
+            } else if (angleError < -180) {
+                angleError += 360;
+            }//elseif
+
+            Log.i("A!", targetAngle + ", " + currentAngle);
+
+            double leftForePower = leftForeRightBackStrafeSpeed;
+            double leftBackPower = rightForeLeftBackStrafeSpeed;
+            double rightForePower = rightForeLeftBackStrafeSpeed;
+            double rightBackPower = leftForeRightBackStrafeSpeed;
+
+            leftForePower += VEER_TURNING_STRENGTH * angleError;
+            rightBackPower -= VEER_TURNING_STRENGTH * angleError;
+
+            if (Math.abs(leftForePower) > 1) {
+                rightBackPower -= leftForePower - Math.signum(leftForePower) * 1;
+                leftForePower = Math.signum(leftForePower) * 1;
+            } else if (Math.abs(rightBackPower) > 1) {
+                leftForePower -= rightBackPower - Math.signum(rightBackPower) * 1;
+                rightBackPower = Math.signum(rightBackPower) * 1;
+            }//else
+
+            leftBackPower += VEER_TURNING_STRENGTH * angleError;
+            rightForePower -= VEER_TURNING_STRENGTH * angleError;
+
+            if (Math.abs(leftBackPower) > 1) {
+                rightForePower -= leftBackPower - Math.signum(leftBackPower) * 1;
+                leftBackPower = Math.signum(leftBackPower) * 1;
+            } else if (Math.abs(rightForePower) > 1) {
+                leftBackPower -= rightForePower - Math.signum(rightForePower) * 1;
+                rightForePower = Math.signum(rightForePower) * 1;
+            }//else
+
+            leftFore.setPower(leftForePower);
+            leftBack.setPower(leftBackPower);
+            rightFore.setPower(rightForePower);
+            rightBack.setPower(rightBackPower);
         }//if
-
-        double angleError = targetAngle - currentAngle;
-
-        double leftForePower = leftForeRightBackStrafeSpeed;
-        double leftBackPower = rightForeLeftBackStrafeSpeed;
-        double rightForePower = rightForeLeftBackStrafeSpeed;
-        double rightBackPower = leftForeRightBackStrafeSpeed;
-
-        leftForePower += TURNING_CONSTANT * angleError;
-        rightBackPower -= TURNING_CONSTANT * angleError;
-
-        if (Math.abs(leftForePower) > 1) {
-            rightBackPower -= leftForePower - Math.signum(leftForePower) * 1;
-            leftForePower = Math.signum(leftForePower) * 1;
-        } else if (Math.abs(rightBackPower) > 1) {
-            leftForePower -= rightBackPower - Math.signum(rightBackPower) * 1;
-            rightBackPower = Math.signum(rightBackPower) * 1;
-        }//else
-
-        leftBackPower += TURNING_CONSTANT * angleError;
-        rightForePower -= TURNING_CONSTANT * angleError;
-
-        if (Math.abs(leftBackPower) > 1) {
-            rightForePower -= leftBackPower - Math.signum(leftBackPower) * 1;
-            leftBackPower = Math.signum(leftBackPower) * 1;
-        } else if (Math.abs(rightForePower) > 1) {
-            leftBackPower -= rightForePower - Math.signum(rightForePower) * 1;
-            rightForePower = Math.signum(rightForePower) * 1;
-        }//else
-
-        leftFore.setPower(leftForePower);
-        leftBack.setPower(leftBackPower);
-        rightFore.setPower(rightForePower);
-        rightBack.setPower(rightBackPower);
-
     }//veerCheck
 
     public void pushBeaconButton(int beaconConfig) {

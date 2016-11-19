@@ -625,13 +625,8 @@ public class FtcRobotControllerActivity extends Activity {
   }
 
   public static void initializeGlobals() {
-    GlobalValuesActivity.add("allianceRed", true);
-    GlobalValuesActivity.add("useTrackBall", true);
-    GlobalValuesActivity.add("waitInAutonomous", false);
-    GlobalValuesActivity.add("DriveForwardTime", 1000);
-    GlobalValuesActivity.add("FirstGearsBufferDistance", 100);
-    GlobalValuesActivity.add("SecondGearsBufferDistance", 40);
-    GlobalValuesActivity.add("ToolsBufferDistance", 40);
+    GlobalValuesActivity.add("RedAlliance", true);
+    GlobalValuesActivity.add("TeleBeginAngle", 0);
   }
 
 }

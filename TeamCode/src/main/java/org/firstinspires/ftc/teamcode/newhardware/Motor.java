@@ -98,6 +98,10 @@ public class Motor implements FXTDevice {
         }//else
     }//finished
 
+    public boolean isThere(){
+        return Math.abs(getCurrentPosition() - getM().getTargetPosition()) < accuracy;
+    }
+
     public DcMotor getM() {
         synchronized (m) {
             return m;
@@ -156,6 +160,16 @@ public class Motor implements FXTDevice {
                 ", Power: " + getPower() +
                 ", Target: " + getM().getTargetPosition();
     }//returnCurrentState
+
+    public void runToPosition(int tiks, double speed){
+        DcMotor.RunMode initial = m.getMode();
+//        if(!initial.equals(DcMotor.RunMode.RUN_TO_POSITION)){
+//            m.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        }
+
+        m.setTargetPosition(m.getCurrentPosition() + tiks);
+        setPower(speed);
+    }
 
 
     //INHERITED METHODS

@@ -58,6 +58,20 @@ public class RC {
         return ((Double) GlobalValuesActivity.globals.get(key)).doubleValue();
     }//globalDouble
 
+    public static void setGlobalBool(String key, boolean val) {
+        GlobalValuesActivity.add(key, val);
+    }//globalBool
+
+    public static void setGlobalString(String key, String val) {
+        GlobalValuesActivity.add(key, val);
+    }//globalString
+
+    public static void setGlobalDouble(String key, double val) {
+        GlobalValuesActivity.add(key, val);
+    }//globalDouble
+
+
+
     public static Context c() {
         return AppUtil.getInstance().getActivity();
     }//context

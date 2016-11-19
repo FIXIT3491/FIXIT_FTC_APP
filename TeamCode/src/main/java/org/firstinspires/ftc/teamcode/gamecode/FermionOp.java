@@ -40,6 +40,7 @@ public class FermionOp extends LinearTeleOpMode {
         locale.setFrameQueueCapacity(1);
         Vuforia.setFrameFormat(PIXEL_FORMAT.RGB565, true);
 
+        telemetry.addData("Red Alliance: ", RC.globalBool("RedAlliance"));
 
         beacons = locale.loadTrackablesFromAsset("FTC_2016-17");
         gears = (VuforiaTrackableDefaultListener) beacons.get(3).getListener();
@@ -71,13 +72,13 @@ public class FermionOp extends LinearTeleOpMode {
         }
 
 
-        if(joy1.buttonB()){
-            charm.absoluteIMUTurn(90, 1);
-        }
-
         if(joy1.buttonA()){
-            charm.absoluteIMUTurn(0, 1);
-        }
+            charm.absoluteIMUTurn(MathUtils.cvtAngleToNewDomain(90 - RC.globalDouble("TeleBeginAngle")), 1);
+        }//if
+
+        if(joy1.buttonB()){
+            charm.absoluteIMUTurn(-RC.globalDouble("TeleBeginAngle"), 1);
+        }//if
 
         if(gears.isVisible()){
             try {

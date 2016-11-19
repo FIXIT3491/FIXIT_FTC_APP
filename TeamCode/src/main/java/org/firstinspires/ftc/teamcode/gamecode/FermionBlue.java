@@ -8,6 +8,7 @@ import com.vuforia.Image;
 import com.vuforia.PIXEL_FORMAT;
 import com.vuforia.Vuforia;
 
+import org.firstinspires.ftc.robotcontroller.internal.GlobalValuesActivity;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
@@ -118,11 +119,13 @@ public class FermionBlue extends AutoOpMode {
 
         clearTimer();
 
+        long timeBack = 0;
         while (legos.getPose() == null && opModeIsActive()) {
             if(getMilliSeconds() > 1500){
                 Log.i(TAG, "runOp: " + "can't see");
                 muon.backward(0.3);
                 sleep(300);
+                timeBack += 300;
                 muon.stop();
                 clearTimer();
             }
@@ -170,7 +173,6 @@ public class FermionBlue extends AutoOpMode {
                 muon.left(0.13);
             }
 
-
             if(legos.getPose() == null){
                 Log.i(TAG, "HELLO null");
             } else {
@@ -182,9 +184,14 @@ public class FermionBlue extends AutoOpMode {
         Log.i(TAG, "HELLO FNIale" + legos.getPose().getTranslation().get(0));
 
         muon.forward(0.2);
+        sleep(1400 + timeBack);
+        muon.stop();
+
+        muon.backward(0.2);
         sleep(1400);
         muon.stop();
 
+        RC.setGlobalDouble("TeleBeginAngle", -muon.imu.getAngularOrientation().firstAngle);
 
     }//runOp
 

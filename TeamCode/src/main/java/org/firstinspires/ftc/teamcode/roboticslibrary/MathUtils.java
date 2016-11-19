@@ -25,7 +25,17 @@ public class MathUtils {
         throw new IllegalArgumentException("num " + num + " not in range! Range is " + lowBound +"-" + upBound);
     }
 
-    public static boolean inRange(double num, double low, double high){
-        return num > low && num < high;
+    public static boolean inRange(double num, double bound1, double bound2){
+        return (num > bound1 && num < bound2) || (num > bound2 && num < bound1);
+    }
+
+    public static double cvtAngleToNewDomain(double angle) {
+        if (angle < -180) {
+            angle += 360;
+        } else if (angle > 180) {
+            angle -= 360;
+        }//elseif
+
+        return angle;
     }
 }
