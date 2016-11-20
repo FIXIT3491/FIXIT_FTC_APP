@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.newhardware.FXTSensors;
 import android.util.Log;
 
 import org.firstinspires.ftc.teamcode.RC;
-import org.firstinspires.ftc.teamcode.roboticslibrary.BitUtils;
+import org.firstinspires.ftc.teamcode.util.BitUtils;
 
 import java.util.Arrays;
 

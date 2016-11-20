@@ -33,8 +33,8 @@ public class FermionPositionBlue extends AutoOpMode {
         Vuforia.setFrameFormat(PIXEL_FORMAT.RGB565, true);
 
         VuforiaTrackables beacons = locale.loadTrackablesFromAsset("FTC_2016-17");
-        VuforiaTrackableDefaultListener gears = (VuforiaTrackableDefaultListener) beacons.get(3).getListener();
-        VuforiaTrackableDefaultListener tools = (VuforiaTrackableDefaultListener) beacons.get(1).getListener();
+        VuforiaTrackableDefaultListener wheels = (VuforiaTrackableDefaultListener) beacons.get(3).getListener();
+        VuforiaTrackableDefaultListener legos = (VuforiaTrackableDefaultListener) beacons.get(1).getListener();
 
         waitForStart();
         beacons.activate();
@@ -46,49 +46,95 @@ public class FermionPositionBlue extends AutoOpMode {
             }
         });
 
-        lepton.trackForward(609.6, 0.5);
-        lepton.imuTurnL(45, 0.5);
+        lepton.trackForward(500, 0.5);
+
+        lepton.imuTurnR(45, 0.5);
+
         lepton.forward(0.5);
 
-        while(!gears.isVisible()) {
+        while (opModeIsActive() && wheels.getPose() == null) {
             idle();
         }//while
 
-        lepton.strafeToBeacon(gears, 100, 0.5);
+        lepton.stop();
 
-        lepton.absoluteIMUTurn(-90, 0.5);
+        VectorF trans = wheels.getPose().getTranslation();
 
-        lepton.strafeToBeacon(gears, 40, 0.5);
-
-        lepton.pushBeaconButton(Fermion.waitForBeaconConfig(
+        int config = Fermion.waitForBeaconConfig(
                 getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
-                gears, locale.getCameraCalibration(), 5000));
+                wheels, locale.getCameraCalibration(), 5000);
 
-        lepton.trackLeft(1219.2, 0.5);
 
-        lepton.pushBeaconButton(Fermion.waitForBeaconConfig(
-                getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
-                tools, locale.getCameraCalibration(), 5000));
+        if (config == Fermion.BEACON_BLUE_RED) {
+            trans = navOffWall(trans, -lepton.imu.getAngularOrientation().firstAngle, new VectorF(-69.85f, 0, 340f));
+        } else {
+            trans = navOffWall(trans, -lepton.imu.getAngularOrientation().firstAngle, new VectorF(69.85f, 0, 340f));
+        }//else
+
+        double targetAngle = Math.atan2(trans.get(0), -trans.get(2));
+
+        if (targetAngle < 0) {
+            lepton.imuTurnL(-targetAngle, 0.5);
+        } else {
+            lepton.imuTurnR(targetAngle, 0.5);
+        }//else
+
+        lepton.trackForward(Math.hypot(trans.get(0), trans.get(2)), 0.5);
+
+        lepton.absoluteIMUTurn(90, 0.5);
+
+        lepton.trackForward(40, 0.2);
+
+        lepton.trackBackward(50, 0.5);
+
+        lepton.turnL(0.2);
+
+        while (opModeIsActive() && legos.getPose() == null) {
+            idle();
+        }//while
+
+        lepton.stop();
+
+        config = Fermion.waitForBeaconConfig(
+                    getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
+                    legos, locale.getCameraCalibration(), 5000);
+
+        trans = legos.getPose().getTranslation();
+
+        if (config == Fermion.BEACON_BLUE_RED) {
+            trans = navOffWall(trans, -lepton.imu.getAngularOrientation().firstAngle, new VectorF(-69.85f, 0, 500f));
+        } else {
+            trans = navOffWall(trans, -lepton.imu.getAngularOrientation().firstAngle, new VectorF(69.85f, 0, 500f));
+        }//else
+
+        targetAngle = Math.atan2(trans.get(0), -trans.get(2));
+
+        if (targetAngle < 0) {
+            lepton.imuTurnL(-targetAngle, 0.5);
+        } else {
+            lepton.imuTurnR(targetAngle, 0.5);
+        }//else
+
+        lepton.trackForward(Math.hypot(trans.get(0), trans.get(2)), 0.5);
+
+        lepton.absoluteIMUTurn(90, 0.5);
+
+        lepton.trackForward(200, 0.2);
+
+        lepton.trackBackward(200, 0.2);
+
+        lepton.imuTurnL(45, 0.5);
+
+        lepton.trackBackward(1000, 0.5);
+
+        RC.setGlobalDouble("TeleBeginAngle", -lepton.imu.getAngularOrientation().firstAngle);
 
     }//runOp
 
     //this assumes the horizontal axis is the y-axis since the phone is vertical
     //robot angle is relative to "parallel with the beacon wall"
-    public VectorF movePointOffWall(VectorF trans, double robotAngle, double offWall) {
-
-        double angle = Math.abs(robotAngle) + Math.atan2(trans.get(3), trans.get(2));
-        double hypot = Math.hypot(trans.get(3), trans.get(2));
-
-        double xDist = hypot * Math.sin(angle) - offWall;
-        double zDist = hypot * Math.cos(angle);
-
-        hypot = Math.hypot(xDist, zDist);
-        angle -= robotAngle;
-
-        xDist = -hypot * Math.sin(angle);
-        zDist = hypot * Math.cos(angle);
-
-        return new VectorF(trans.get(1), (float) xDist, (float) zDist);
+    public VectorF navOffWall(VectorF trans, double robotAngle, VectorF offWall){
+        return new VectorF((float) (trans.get(0) - offWall.get(0) * Math.sin(Math.toRadians(robotAngle)) - offWall.get(2) * Math.cos(Math.toRadians(robotAngle))), trans.get(1), (float) (trans.get(2) + offWall.get(0) * Math.cos(Math.toRadians(robotAngle)) - offWall.get(2) * Math.sin(Math.toRadians(robotAngle))));
     }
 
     @Nullable

@@ -8,7 +8,6 @@ import com.vuforia.Image;
 import com.vuforia.PIXEL_FORMAT;
 import com.vuforia.Vuforia;
 
-import org.firstinspires.ftc.robotcontroller.internal.GlobalValuesActivity;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
@@ -17,7 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
-import org.firstinspires.ftc.teamcode.roboticslibrary.MathUtils;
+import org.firstinspires.ftc.teamcode.util.MathUtils;
 import org.firstinspires.ftc.teamcode.robots.Fermion;
 
 /**
@@ -152,6 +151,8 @@ public class FermionBlue extends AutoOpMode {
         sleep(600);
         muon.stop();
 
+        muon.absoluteIMUTurn(90, 0.5);
+
         config = Fermion.BEACON_NOT_VISIBLE;
         try{
             config = Fermion.waitForBeaconConfig(
@@ -167,7 +168,7 @@ public class FermionBlue extends AutoOpMode {
 
         while (opModeIsActive() && (legos.getPose() == null || !MathUtils.inRange(legos.getPose().getTranslation().get(0), ((config == Fermion.BEACON_BLUE_RED)? -80 : 45), ((config == Fermion.BEACON_BLUE_RED)? -60 : 65)))) {
 
-            if(legos.getPose().getTranslation().get(0) > ((config == Fermion.BEACON_BLUE_RED)? -60 : 65)){
+            if(legos.getPose() != null && legos.getPose().getTranslation().get(0) > ((config == Fermion.BEACON_BLUE_RED)? -60 : 65)){
                 muon.right(0.13);
             } else {
                 muon.left(0.13);
@@ -184,7 +185,7 @@ public class FermionBlue extends AutoOpMode {
         Log.i(TAG, "HELLO FNIale" + legos.getPose().getTranslation().get(0));
 
         muon.forward(0.2);
-        sleep(1400 + timeBack);
+        sleep(1800 + timeBack);
         muon.stop();
 
         muon.backward(0.2);

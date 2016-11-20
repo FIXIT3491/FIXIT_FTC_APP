@@ -74,21 +74,8 @@ public class FermionPositionRed extends AutoOpMode {
 
     //this assumes the horizontal axis is the y-axis since the phone is vertical
     //robot angle is relative to "parallel with the beacon wall"
-    public VectorF movePointOffWall(VectorF trans, double robotAngle, double offWall) {
-
-        double angle = Math.abs(robotAngle) + Math.atan2(trans.get(3), trans.get(2));
-        double hypot = Math.hypot(trans.get(3), trans.get(2));
-
-        double xDist = hypot * Math.sin(angle) - offWall;
-        double zDist = hypot * Math.cos(angle);
-
-        hypot = Math.hypot(xDist, zDist);
-        angle -= robotAngle;
-
-        xDist = -hypot * Math.sin(angle);
-        zDist = hypot * Math.cos(angle);
-
-        return new VectorF(trans.get(1), (float) xDist, (float) zDist);
+    public VectorF navOffWall(VectorF trans, double robotAngle, VectorF offWall){
+        return new VectorF((float) (trans.get(0) - offWall.get(0) * Math.sin(Math.toRadians(robotAngle)) - offWall.get(2) * Math.cos(Math.toRadians(robotAngle))), trans.get(1), (float) (trans.get(2) + offWall.get(0) * Math.cos(Math.toRadians(robotAngle)) - offWall.get(2) * Math.sin(Math.toRadians(robotAngle))));
     }
 
     @Nullable

@@ -16,8 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
-import org.firstinspires.ftc.teamcode.opmodesupport.TaskHandler;
-import org.firstinspires.ftc.teamcode.roboticslibrary.MathUtils;
+import org.firstinspires.ftc.teamcode.util.MathUtils;
 import org.firstinspires.ftc.teamcode.robots.Fermion;
 
 /**
@@ -101,7 +100,7 @@ public class FermionRed extends AutoOpMode {
         boolean saidNull = false;
         while (opModeIsActive() && (gears.getPose() == null || !MathUtils.inRange(gears.getPose().getTranslation().get(0), ((config == Fermion.BEACON_RED_BLUE)? -80 : 45), ((config == Fermion.BEACON_RED_BLUE)? -15 : 10)))) {
 
-            if(gears.getPose().getTranslation().get(0) < ((config == Fermion.BEACON_RED_BLUE)? -80 : 45)){
+            if(gears.getPose() != null && gears.getPose().getTranslation().get(0) < ((config == Fermion.BEACON_RED_BLUE)? -80 : 45)){
                 muon.left(0.13);
             } else {
                 muon.right(0.13);
@@ -172,7 +171,7 @@ public class FermionRed extends AutoOpMode {
 
         while (opModeIsActive() && (tools.getPose() == null || !MathUtils.inRange(tools.getPose().getTranslation().get(0), ((config == Fermion.BEACON_RED_BLUE)? -80 : 45), ((config == Fermion.BEACON_RED_BLUE)? -15 : 10)))) {
 
-            if(tools.getPose().getTranslation().get(0) < ((config == Fermion.BEACON_RED_BLUE)? -80 : 45)){
+            if(tools.getPose() != null && tools.getPose().getTranslation().get(0) < ((config == Fermion.BEACON_RED_BLUE)? -80 : 45)){
                 muon.left(0.13);
             } else {
                 muon.right(0.13);
@@ -182,14 +181,14 @@ public class FermionRed extends AutoOpMode {
                 Log.i(TAG, "HELLO null");
             } else {
                 Log.i(TAG, "Tools: " + tools.getPose().getTranslation().get(0));
-            }
+            }//else
             idle();
         }//while
 
         Log.i(TAG, "Tools Final: " + tools.getPose().getTranslation().get(0));
 
         muon.forward(0.2);
-        sleep(1400 + timeBack);
+        sleep(2000 + timeBack);
         muon.stop();
 
         sleep(1000);
