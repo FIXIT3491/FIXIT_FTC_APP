@@ -14,6 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
 import org.firstinspires.ftc.teamcode.robots.Fermion;
+import org.firstinspires.ftc.teamcode.util.VortexUtils;
 
 /**
  * Created by FIXIT on 16-10-21.
@@ -38,45 +39,70 @@ public class FermionPositionRed extends AutoOpMode {
 
         waitForStart();
         beacons.activate();
+        tau.addVeerCheckRunnable();
 
-        mainTasks.addRunnable(new Runnable() {
-            @Override
-            public void run() {
-                tau.veerCheck();
-            }
-        });
+        tau.trackForward(500, 0.5);
 
-        tau.trackForward(609.6, 0.5);
         tau.imuTurnL(45, 0.5);
+
         tau.forward(0.5);
 
-        while(!gears.isVisible()) {
+        while (opModeIsActive() && gears.getPose() == null) {
             idle();
         }//while
 
-        tau.strafeToBeacon(gears, 100, 0.5);
+        tau.stop();
+
+        int config = VortexUtils.waitForBeaconConfig(
+                getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
+                gears, locale.getCameraCalibration(), 5000);
+
+        //since the beacon config can also be "ALL_BLUE" or "NO_BLUE"
+        //we technically are assuming the beacon config is "RED_BLUE" by default
+        if (config == VortexUtils.BEACON_BLUE_RED) {
+            tau.strafeToBeacon(gears, 0, 0.5, tau.getIMUAngle()[0], new VectorF(-69.85f, 0, 500f));
+        } else {
+            tau.strafeToBeacon(gears, 0, 0.5, tau.getIMUAngle()[0], new VectorF(69.85f, 0, 500f));
+        }//else
 
         tau.absoluteIMUTurn(-90, 0.5);
 
-        tau.strafeToBeacon(gears, 40, 0.5);
+        tau.trackForward(40, 0.2);
 
-        tau.pushBeaconButton(Fermion.waitForBeaconConfig(
+        tau.trackBackward(150, 0.5);
+
+        tau.turnR(0.2);
+
+        while (opModeIsActive() && tools.getPose() == null) {
+            idle();
+        }//while
+
+        tau.stop();
+
+        config = VortexUtils.waitForBeaconConfig(
                 getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
-                gears, locale.getCameraCalibration(), 5000));
+                tools, locale.getCameraCalibration(), 5000);
 
-        tau.trackRight(1219.2, 0.5);
+        if (config == VortexUtils.BEACON_BLUE_RED) {
+            tau.strafeToBeacon(tools, 0, 0.5, tau.getIMUAngle()[0], new VectorF(-69.85f, 0, 500f));
+        } else {
+            tau.strafeToBeacon(tools, 0, 0.5, tau.getIMUAngle()[0], new VectorF(69.85f, 0, 500f));
+        }//else
 
-        tau.pushBeaconButton(Fermion.waitForBeaconConfig(
-                getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
-                tools, locale.getCameraCalibration(), 5000));
+        tau.absoluteIMUTurn(-90, 0.5);
+
+        tau.trackForward(200, 0.2);
+
+        tau.trackBackward(200, 0.2);
+
+        tau.imuTurnR(45, 0.5);
+
+        tau.trackBackward(1000, 0.5);
+
+        RC.setGlobalDouble("TeleBeginAngle", tau.getIMUAngle()[0]);
 
     }//runOp
 
-    //this assumes the horizontal axis is the y-axis since the phone is vertical
-    //robot angle is relative to "parallel with the beacon wall"
-    public VectorF navOffWall(VectorF trans, double robotAngle, VectorF offWall){
-        return new VectorF((float) (trans.get(0) - offWall.get(0) * Math.sin(Math.toRadians(robotAngle)) - offWall.get(2) * Math.cos(Math.toRadians(robotAngle))), trans.get(1), (float) (trans.get(2) + offWall.get(0) * Math.cos(Math.toRadians(robotAngle)) - offWall.get(2) * Math.sin(Math.toRadians(robotAngle))));
-    }
 
     @Nullable
     public static Image getImageFromFrame(VuforiaLocalizer.CloseableFrame frame, int format) {

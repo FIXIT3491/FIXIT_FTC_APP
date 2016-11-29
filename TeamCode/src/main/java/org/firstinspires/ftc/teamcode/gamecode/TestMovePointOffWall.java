@@ -54,7 +54,7 @@ public class TestMovePointOffWall extends AutoOpMode {
 
         VectorF target = new VectorF(-380, 0, 280);
 
-        VectorF trans = navOffWall(pose.getTranslation(), -strange.imu.getAngularOrientation().firstAngle, target);
+        VectorF trans = navOffWall(pose.getTranslation(), strange.getIMUAngle()[0], target);
 
         Log.i("ANGLE", "HELLO" + Math.toDegrees(Math.atan2(trans.get(0), -trans.get(2))));
 
@@ -68,7 +68,7 @@ public class TestMovePointOffWall extends AutoOpMode {
         strange.forward(0.2);
 
         do {
-            trans = navOffWall(wheels.getPose().getTranslation(), -strange.imu.getAngularOrientation().firstAngle, target);
+            trans = navOffWall(wheels.getPose().getTranslation(), strange.getIMUAngle()[0], target);
             idle();
             Log.i(TAG, "HELLOIP: " + Math.hypot(trans.get(0), trans.get(2)));
         } while (wheels.getPose() != null && Math.hypot(trans.get(0), trans.get(2)) > 100 && opModeIsActive());

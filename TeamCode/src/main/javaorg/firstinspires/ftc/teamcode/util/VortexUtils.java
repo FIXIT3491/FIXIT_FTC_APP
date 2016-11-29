@@ -1,81 +1,60 @@
-package org.firstinspires.ftc.teamcode.gamecode;
+package org.firstinspires.ftc.teamcode.util;
 
 import android.graphics.Bitmap;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.ImageView;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.vuforia.CameraCalibration;
 import com.vuforia.Image;
 import com.vuforia.Matrix34F;
-import com.vuforia.PIXEL_FORMAT;
 import com.vuforia.Tool;
+import com.vuforia.Vec2F;
 import com.vuforia.Vec3F;
-import com.vuforia.Vuforia;
 
-import org.firstinspires.ftc.robotcontroller.internal.FtcControllerUtils;
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
-import org.firstinspires.ftc.robotcore.internal.AppUtil;
-import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.RC;
-import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
-import org.firstinspires.ftc.teamcode.robots.Fermion;
-import org.firstinspires.ftc.teamcode.util.OCVUtils;
-import org.firstinspires.ftc.teamcode.util.VortexUtils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 
 import java.util.Arrays;
 
 /**
- * Created by FIXIT on 16-10-07.
+ * Created by FIXIT on 16-11-20.
  */
-@Autonomous
-public class BeaconAnalysisTest extends AutoOpMode {
+public class VortexUtils {
 
-    ImageView display;
+    public final static int BEACON_NOT_VISIBLE = 0;
+    public final static int BEACON_BLUE_RED = 1;
+    public final static int BEACON_RED_BLUE = 2;
+    public final static int BEACON_ALL_BLUE = 3;
+    public final static int BEACON_NO_BLUE = 4;
 
-    @Override
-    public void runOp() throws InterruptedException {
-        VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters();
-        params.vuforiaLicenseKey = RC.VUFORIA_LICENSE_KEY;
-        params.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+    //hsv blue beacon range colours
+    //DON'T CHANGE THESE NUMBERS
+    public final static Scalar blueLow = new Scalar(108, 0, 220);
+    public final static Scalar blueHigh = new Scalar(178, 255, 255);
 
-        VuforiaLocalizer locale = ClassFactory.createVuforiaLocalizer(params);
-        Vuforia.setFrameFormat(PIXEL_FORMAT.RGB565, true);
-        locale.setFrameQueueCapacity(1);
+    public static int waitForBeaconConfig(Image img, VuforiaTrackableDefaultListener beacon, CameraCalibration camCal, long timeOut) {
 
-        VuforiaTrackables beacons = locale.loadTrackablesFromAsset("FTC_2016-17");
-        VuforiaTrackableDefaultListener tools = (VuforiaTrackableDefaultListener) beacons.get(1).getListener();
-
-        display = new ImageView(RC.c());
-        FtcControllerUtils.addView(display, R.id.cameraMonitorViewId);
-
-        waitForStart();
-        beacons.activate();
-
-        while (opModeIsActive() && !tools.isVisible()) {
-            delay(1);
+        int config = BEACON_NOT_VISIBLE;
+        long beginTime = System.currentTimeMillis();
+        while (config == BEACON_NOT_VISIBLE && System.currentTimeMillis() - beginTime < timeOut && RC.l.opModeIsActive()) {
+            config = getBeaconConfig(img, beacon, camCal);
+            RC.l.idle();
         }//while
 
-        while (opModeIsActive()) {
-            getBeaconConfig(VortexUtils.getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565), tools, locale.getCameraCalibration());
-            idle();
-            idle();
-        }//while
+        return config;
+    }
 
-    }//runOp
-
-    public int getBeaconConfig(Image img, VuforiaTrackableDefaultListener beacon, CameraCalibration camCal) {
+    public static int getBeaconConfig(Image img, VuforiaTrackableDefaultListener beacon, CameraCalibration camCal) {
 
         OpenGLMatrix pose = beacon.getRawPose();
 
@@ -152,5 +131,28 @@ public class BeaconAnalysisTest extends AutoOpMode {
         return VortexUtils.BEACON_NOT_VISIBLE;
     }//getBeaconConfig
 
+
+    @Nullable
+    public static Image getImageFromFrame(VuforiaLocalizer.CloseableFrame frame, int format) {
+
+        long numImgs = frame.getNumImages();
+        for (int i = 0; i < numImgs; i++) {
+            if (frame.getImage(i).getFormat() == format) {
+                return frame.getImage(i);
+            }//if
+        }//for
+
+        return null;
+    }
+
+    //this assumes the horizontal axis is the y-axis since the phone is vertical
+    //robot angle is relative to "parallel with the beacon wall"
+    public static VectorF navOffWall(VectorF trans, double robotAngle, VectorF offWall){
+        return new VectorF(
+                (float) (trans.get(0) - offWall.get(0) * Math.sin(Math.toRadians(robotAngle)) - offWall.get(2) * Math.cos(Math.toRadians(robotAngle))),
+                trans.get(1),
+                (float) (trans.get(2) + offWall.get(0) * Math.cos(Math.toRadians(robotAngle)) - offWall.get(2) * Math.sin(Math.toRadians(robotAngle)))
+        );
+    }
 
 }

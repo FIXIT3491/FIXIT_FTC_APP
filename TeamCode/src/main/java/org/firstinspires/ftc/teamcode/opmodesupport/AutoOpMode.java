@@ -19,8 +19,6 @@ import java.util.List;
 @Autonomous
 public abstract class AutoOpMode extends LinearOpMode {
 
-    protected TaskHandler.MultiRunnable mainTasks = new TaskHandler.MultiRunnable();
-
     /**
      * Number of milliseconds between each time the computer datalogs
      */
@@ -39,7 +37,6 @@ public abstract class AutoOpMode extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         RC.setOpMode(this);
         TaskHandler.init();
-        TaskHandler.addLoopedTask("MainRunnable", mainTasks, 2);
         TaskHandler.addLoopedTask("Telemetry", new Runnable() {
             @Override
             public void run() {

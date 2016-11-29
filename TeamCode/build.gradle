@@ -15,4 +15,5 @@
 apply from: '../build.common.gradle'
 dependencies {
     compile project(':openCV')
+    compile project(':FtcRobotController')
 }

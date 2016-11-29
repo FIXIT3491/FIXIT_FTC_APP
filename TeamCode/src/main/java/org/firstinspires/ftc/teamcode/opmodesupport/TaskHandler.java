@@ -59,7 +59,6 @@ public final class TaskHandler {
     public static boolean removeTask(String name) {
         if (futures.containsKey(name)) {
             futures.get(name).cancel(true);
-            //futures.put(name, null);
         } else {
             Log.e("TaskHandler", "Attempted to remove nonexistent task!");
         }//else
@@ -77,10 +76,6 @@ public final class TaskHandler {
         return futures.containsKey(name);
     }//taskExists
 
-    public static void switchTask(String remove, String add, Runnable task) {
-        removeTask(remove);
-        addTask(add, task);
-    }
 
     private static Runnable loop (final Runnable r, final int delay) {
 
@@ -94,7 +89,6 @@ public final class TaskHandler {
                         try {
                             Thread.sleep(delay);
                         } catch (InterruptedException e) {
-                            e.printStackTrace();
                             break;
                         }//catch
                     }//if

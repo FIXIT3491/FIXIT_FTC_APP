@@ -146,7 +146,7 @@ public class Motor implements FXTDevice {
             power = minSpeed * Math.signum(power);
         } else if(Math.abs(power) < 1E-10){
             power = 0;
-        }
+        }//else
 
         synchronized (m) {
             m.setPower(power);
@@ -162,10 +162,8 @@ public class Motor implements FXTDevice {
     }//returnCurrentState
 
     public void runToPosition(int tiks, double speed){
-        DcMotor.RunMode initial = m.getMode();
-//        if(!initial.equals(DcMotor.RunMode.RUN_TO_POSITION)){
-//            m.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        }
+
+        m.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         m.setTargetPosition(m.getCurrentPosition() + tiks);
         setPower(speed);
