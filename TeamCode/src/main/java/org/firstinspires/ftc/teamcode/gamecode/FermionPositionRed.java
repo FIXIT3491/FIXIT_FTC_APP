@@ -39,6 +39,8 @@ public class FermionPositionRed extends AutoOpMode {
         VuforiaTrackableDefaultListener gears = (VuforiaTrackableDefaultListener) beacons.get(3).getListener();
         VuforiaTrackableDefaultListener tools = (VuforiaTrackableDefaultListener) beacons.get(1).getListener();
 
+        lepton.stop();
+
         waitForStart();
 
         beacons.activate();
