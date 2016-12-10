@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
 import org.firstinspires.ftc.teamcode.util.MathUtils;
 import org.firstinspires.ftc.teamcode.robots.Fermion;
+import org.firstinspires.ftc.teamcode.util.VortexUtils;
 
 /**
  * Created by FIXIT on 16-10-21.
@@ -76,9 +77,9 @@ public class FermionRed extends AutoOpMode {
             muon.imuTurnR(deg, 0.3);
         }
 
-        int config = Fermion.BEACON_NOT_VISIBLE;
+        int config = VortexUtils.BEACON_NOT_VISIBLE;
         try{
-            config = Fermion.waitForBeaconConfig(
+            config = VortexUtils.waitForBeaconConfig(
                     getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
                     gears, locale.getCameraCalibration(), 5000);
             telemetry.addData("Beacon", config);
@@ -98,9 +99,9 @@ public class FermionRed extends AutoOpMode {
         muon.right(0.13);
 
         boolean saidNull = false;
-        while (opModeIsActive() && (gears.getPose() == null || !MathUtils.inRange(gears.getPose().getTranslation().get(0), ((config == Fermion.BEACON_RED_BLUE)? -80 : 45), ((config == Fermion.BEACON_RED_BLUE)? -15 : 10)))) {
+        while (opModeIsActive() && (gears.getPose() == null || !MathUtils.inRange(gears.getPose().getTranslation().get(0), ((config == VortexUtils.BEACON_RED_BLUE)? -80 : 45), ((config == VortexUtils.BEACON_RED_BLUE)? -15 : 10)))) {
 
-            if(gears.getPose() != null && gears.getPose().getTranslation().get(0) < ((config == Fermion.BEACON_RED_BLUE)? -80 : 45)){
+            if(gears.getPose() != null && gears.getPose().getTranslation().get(0) < ((config == VortexUtils.BEACON_RED_BLUE)? -80 : 45)){
                 muon.left(0.13);
             } else {
                 muon.right(0.13);
@@ -156,9 +157,9 @@ public class FermionRed extends AutoOpMode {
         sleep(600);
         muon.stop();
 
-        config = Fermion.BEACON_NOT_VISIBLE;
+        config = VortexUtils.BEACON_NOT_VISIBLE;
         try{
-            config = Fermion.waitForBeaconConfig(
+            config = VortexUtils.waitForBeaconConfig(
                     getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
                     tools, locale.getCameraCalibration(), 5000);
             telemetry.addData("Beacon", config);
@@ -169,9 +170,9 @@ public class FermionRed extends AutoOpMode {
 
         sleep(1000);
 
-        while (opModeIsActive() && (tools.getPose() == null || !MathUtils.inRange(tools.getPose().getTranslation().get(0), ((config == Fermion.BEACON_RED_BLUE)? -80 : 45), ((config == Fermion.BEACON_RED_BLUE)? -15 : 10)))) {
+        while (opModeIsActive() && (tools.getPose() == null || !MathUtils.inRange(tools.getPose().getTranslation().get(0), ((config == VortexUtils.BEACON_RED_BLUE)? -80 : 45), ((config == VortexUtils.BEACON_RED_BLUE)? -15 : 10)))) {
 
-            if(tools.getPose() != null && tools.getPose().getTranslation().get(0) < ((config == Fermion.BEACON_RED_BLUE)? -80 : 45)){
+            if(tools.getPose() != null && tools.getPose().getTranslation().get(0) < ((config == VortexUtils.BEACON_RED_BLUE)? -80 : 45)){
                 muon.left(0.13);
             } else {
                 muon.right(0.13);

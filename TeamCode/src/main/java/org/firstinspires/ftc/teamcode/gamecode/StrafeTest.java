@@ -16,9 +16,18 @@ public class StrafeTest extends AutoOpMode {
     @Override
     public void runOp() {
         Fermion f = new Fermion(true);
+
+        f.targetAngle = 0;
         waitForStart();
-        f.strafe(0, 0.2);
-        sleep(1000);
+        f.addVeerCheckRunnable();
+
+        f.right(0.5);
+        sleep(3000);
+        f.stop();
+
+        f.imuTurnL(90, 0.5);
 
     }
+
+
 }//StrafeTest

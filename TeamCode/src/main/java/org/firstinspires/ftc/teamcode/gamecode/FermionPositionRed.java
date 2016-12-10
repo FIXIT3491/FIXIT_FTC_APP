@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.gamecode;
 
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.vuforia.Image;
 import com.vuforia.PIXEL_FORMAT;
@@ -11,9 +12,11 @@ import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
 import org.firstinspires.ftc.teamcode.robots.Fermion;
+import org.firstinspires.ftc.teamcode.util.VortexUtils;
 
 /**
  * Created by FIXIT on 16-10-21.
@@ -22,9 +25,9 @@ public class FermionPositionRed extends AutoOpMode {
 
     @Override
     public void runOp() throws InterruptedException {
-        final Fermion tau = new Fermion(true);
+        final Fermion lepton = new Fermion(true);
 
-        VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters();
+        VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
         params.vuforiaLicenseKey = RC.VUFORIA_LICENSE_KEY;
         params.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
 
@@ -37,38 +40,67 @@ public class FermionPositionRed extends AutoOpMode {
         VuforiaTrackableDefaultListener tools = (VuforiaTrackableDefaultListener) beacons.get(1).getListener();
 
         waitForStart();
-        beacons.activate();
 
+        beacons.activate();
+        lepton.resetTargetAngle();
         mainTasks.addRunnable(new Runnable() {
             @Override
             public void run() {
-                tau.veerCheck();
+                lepton.veerCheck();
             }
         });
 
-        tau.trackForward(609.6, 0.5);
-        tau.imuTurnL(45, 0.5);
-        tau.forward(0.5);
+        lepton.forward(0.5);
 
-        while(!gears.isVisible()) {
+        while (opModeIsActive() && gears.getPose() == null) {
             idle();
         }//while
 
-        tau.strafeToBeacon(gears, 100, 0.5);
+        Log.i(TAG, "runOp: a");
 
-        tau.absoluteIMUTurn(-90, 0.5);
+        lepton.stop();
 
-        tau.strafeToBeacon(gears, 40, 0.5);
+        VectorF trans = gears.getPose().getTranslation();
 
-        tau.pushBeaconButton(Fermion.waitForBeaconConfig(
-                getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
-                gears, locale.getCameraCalibration(), 5000));
 
-        tau.trackRight(1219.2, 0.5);
+        int config = VortexUtils.waitForBeaconConfig(
+                VortexUtils.getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
+                gears, locale.getCameraCalibration(), 5000);
 
-        tau.pushBeaconButton(Fermion.waitForBeaconConfig(
-                getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
-                tools, locale.getCameraCalibration(), 5000));
+        Log.i(TAG, "runOp: b");
+
+        trans = VortexUtils.navOffWall(trans, lepton.getIMUAngle()[0], new VectorF(540f, 0, 0));
+
+        double targetAngle = Math.atan2(trans.get(0), -trans.get(2));
+
+        lepton.track(Math.toDegrees(targetAngle), trans.magnitude(), 0.5);
+
+        lepton.absoluteIMUTurn(-85, 0.5);
+
+        if (config == VortexUtils.BEACON_BLUE_RED) {
+            lepton.track(90, 120, 0.35);
+        }//if
+
+        Log.i(TAG, "runOp: " + trans.toString());
+        Log.i(TAG, "runOp: " + config);
+
+        lepton.forward(0.5);
+        sleep(1500);
+        lepton.stop();
+
+        lepton.backward(0.5);
+        sleep(1500);
+        lepton.stop();
+
+
+        lepton.absoluteIMUTurn(-55, 0.5);
+
+        Log.i(TAG, "runOp: " + config);
+
+
+        while (opModeIsActive() && tools.getPose() == null) {
+            idle();
+        }//while
 
     }//runOp
 

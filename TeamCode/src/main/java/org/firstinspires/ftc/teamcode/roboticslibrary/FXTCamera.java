@@ -9,8 +9,7 @@ import android.util.Log;
 import android.view.TextureView;
 import android.widget.Toast;
 
-import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
-import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerWrapper;
+import org.firstinspires.ftc.robotcontroller.internal.FtcControllerUtils;
 import org.firstinspires.ftc.robotcore.internal.AppUtil;
 import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.RC;
@@ -65,7 +64,7 @@ public class FXTCamera implements TextureView.SurfaceTextureListener {
         this.previewTexture = new TextureView(RC.c());
         if (displayStream) {
             this.previewTexture.setRotation(90f);
-            FtcRobotControllerWrapper.addView(previewTexture, R.id.cameraMonitorViewId);
+            FtcControllerUtils.addView(previewTexture, R.id.cameraMonitorViewId);
         }//if
 
         this.previewTexture.setSurfaceTextureListener(this);
@@ -84,7 +83,7 @@ public class FXTCamera implements TextureView.SurfaceTextureListener {
 
         try {
             if (displayStream) {
-                FtcRobotControllerWrapper.emptyView(R.id.cameraMonitorViewId);
+                FtcControllerUtils.emptyView(R.id.cameraMonitorViewId);
             }//if
 
             cam.stopPreview();

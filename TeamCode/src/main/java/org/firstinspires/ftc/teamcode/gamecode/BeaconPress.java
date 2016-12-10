@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
 import org.firstinspires.ftc.teamcode.robots.*;
+import org.firstinspires.ftc.teamcode.util.VortexUtils;
 
 /**
  * Created by Windows on 2016-11-06.
@@ -67,9 +68,9 @@ public class BeaconPress extends AutoOpMode {
 //        strange.stop();
 
 //        strange.absoluteIMUTurn(0, 0.1);
-        int config = Fermion.BEACON_NOT_VISIBLE;
+        int config = VortexUtils.BEACON_NOT_VISIBLE;
         try{
-            config = Fermion.waitForBeaconConfig(
+            config = VortexUtils.waitForBeaconConfig(
                     getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
                     gears, locale.getCameraCalibration(), 5000);
             telemetry.addData("Beacon", config);
@@ -80,10 +81,10 @@ public class BeaconPress extends AutoOpMode {
 //        telemetry.addData("x", x);
         telemetry.update();
 
-        if (config == Fermion.BEACON_BLUE_RED) {
-            strange.strafeToBeacon(gears, 10, 0.1, new VectorF(40, -0.1f, -0.1f));
+        if (config == VortexUtils.BEACON_BLUE_RED) {
+            strange.strafeToBeacon(gears, 10, 0.1, 0, new VectorF(40, -0.1f, -0.1f));
         } else {
-            strange.strafeToBeacon(gears, 10, 0.1, new VectorF(-60, -0.1f, -0.1f));
+            strange.strafeToBeacon(gears, 10, 0.1, 0, new VectorF(-60, -0.1f, -0.1f));
         }//else
 
         strange.forward(0.4);
@@ -93,7 +94,7 @@ public class BeaconPress extends AutoOpMode {
 //        int lowerBound = 0;
 //        int upperBound = 0;
 //
-//        if((config == Fermion.BEACON_BLUE_RED)){
+//        if((config == VortexUtils.BEACON_BLUE_RED)){
 //            lowerBound = 0;
 //            upperBound = 10;
 //        } else {

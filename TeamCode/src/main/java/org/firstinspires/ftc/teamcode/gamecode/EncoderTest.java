@@ -7,6 +7,7 @@ import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.FXTVoltageSensor;
 import org.firstinspires.ftc.teamcode.newhardware.Motor;
 import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
 import org.firstinspires.ftc.teamcode.opmodesupport.TeleOpMode;
+import org.firstinspires.ftc.teamcode.robots.Fermion;
 import org.firstinspires.ftc.teamcode.robots.Lily;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -23,37 +24,48 @@ public class EncoderTest extends AutoOpMode {
     Motor lFore;
     Motor rBack;
     Motor lBack;
-
+    Fermion top;
 
     @Override
     public void runOp() throws InterruptedException {
 
-        lFore = new Motor("leftFore");
-        rFore = new Motor("rightFore");
-        rFore.setReverse(true);
-        lBack = new Motor("leftBack");
-        rBack = new Motor("rightBack");
-        rBack.setReverse(true);
+        Motor forward = new Motor("rightBack");
+        Motor lateral = new Motor("rightFore");
+        top = new Fermion(true);
 
+        top.targetAngle = 0;
         waitForStart();
 
-        lBack.runToPosition(1000, 0.5);
-        lFore.runToPosition(1000, 0.5);
-        rBack.runToPosition(1000, 0.5);
-        rFore.runToPosition(1000, 0.5);
+        top.addVeerCheckRunnable();
 
-        while(opModeIsActive() &&( !lBack.isThere() || !lFore.isThere() || !rBack.isThere() || !rFore.isThere())){
-            idle();
-            Log.i("TOG lBack", lBack.returnCurrentState());
-            Log.i("TOG rBack", rBack.returnCurrentState());
-            Log.i("TOG lFore", lFore.returnCurrentState());
-            Log.i("TOG rFore", rFore.returnCurrentState());
-        }
+        double mm = RC.globalDouble("EncoderDistance");
 
-        lBack.stop();
-        lFore.stop();
-        rBack.stop();
-        rFore.stop();
+        mm *= (1440 / (4 * Math.PI * 25.4));
+
+        Log.i("MM", mm + "");
+
+        int beginX = lateral.getCurrentPosition();
+        int beginY = forward.getCurrentPosition();
+        int currentX = beginX;
+        int currentY = beginY;
+
+        double remaining = mm;
+//
+//        top.strafe(90, 0.5);
+//        while (opModeIsActive() && remaining > 0) {
+//            currentX = lateral.getCurrentPosition();
+//            currentY = forward.getCurrentPosition();
+//            remaining = mm - Math.hypot((currentX - beginX), (currentY - beginY));
+//
+//            top.strafe(90, (0.45 * (remaining) + 0.05));
+//            Log.i("INFO", "Begin: " + beginX + ", MM: " + mm + ", CURRENT: " + remaining);
+//        }//while
+
+        top.track(28, 1000, 0.5);
+
+    }
+
+    public void moveForward(int mm, double speed){
 
     }
 }

@@ -34,7 +34,12 @@ import java.util.List;
 /**
  * Created by FIXIT on 16-10-25.
  */
-public class FtcRobotControllerWrapper {
+public class FtcControllerUtils {
+
+    private static int STOPPED = 0;
+    private static int INIT = 1;
+    private static int RUN = 2;
+    private static int opModeStatus = STOPPED;
 
     public static FtcRobotControllerActivity activity() {
         return (FtcRobotControllerActivity) AppUtil.getInstance().getActivity();
@@ -82,11 +87,11 @@ public class FtcRobotControllerWrapper {
 
         OpModeRegister register = activity().createOpModeRegister();
         activity().eventLoop = new FtcEventLoop(factory, register, activity().callback, activity(), activity().programmingModeController);
+        activity().eventLoop.getOpModeManager().init(evtLpManager);
         FtcEventLoopIdle idleLoop = new FtcEventLoopIdle(factory, activity().callback, activity(), activity().programmingModeController);
         evtLpManager.setIdleEventLoop(idleLoop);
 
-        Robot robot = null;
-
+        Robot robot;
         try {
             robot = RobotFactory.createRobot(evtLpManager);
             robot.start(activity().eventLoop);
@@ -103,17 +108,36 @@ public class FtcRobotControllerWrapper {
     }//setUpRobotWithoutWifi
 
     public static void initOpMode(String opModeName) {
-//        processCommand(new Command(CommandList.CMD_INIT_OP_MODE, opModeName));
+
+        opModeStatus = INIT;
         activity().eventLoop.getOpModeManager().initActiveOpMode(opModeName);
+
+        activity().initOpMode.setEnabled(false);
+        activity().runOpMode.setEnabled(true);
+        activity().stopOpMode.setEnabled(true);
+
     }//initOpMode
 
-    public static void runOpMode(String opModeName) {
-//        processCommand(new Command(CommandList.CMD_RUN_OP_MODE, opModeName));
+    public static void runOpMode() {
+
+        opModeStatus = RUN;
         activity().eventLoop.getOpModeManager().startActiveOpMode();
+
+        activity().initOpMode.setEnabled(false);
+        activity().runOpMode.setEnabled(false);
+        activity().stopOpMode.setEnabled(true);
+
     }//runOpMode
 
     public static void stopOpMode() {
+
+        opModeStatus = STOPPED;
         activity().eventLoop.getOpModeManager().stopActiveOpMode();
+
+        activity().initOpMode.setEnabled(true);
+        activity().runOpMode.setEnabled(false);
+        activity().stopOpMode.setEnabled(false);
+
     }//stopOpMode
 
     public static List<String> getStringsFromOpmodes(List<OpModeMeta> metas) {
@@ -124,11 +148,10 @@ public class FtcRobotControllerWrapper {
         }//for
 
         return names;
-    }
+    }//getStringsFromOpmodes
 
     public static void initializeSpinner(final Spinner spinner) {
-        Log.i("sdfdf", "sdfdf");
-        activity().opModeNames = FtcRobotControllerWrapper.getStringsFromOpmodes(activity().eventLoop.getOpModeManager().getOpModes());
+        activity().opModeNames = getStringsFromOpmodes(activity().eventLoop.getOpModeManager().getOpModes());
 
         final ArrayAdapter<String> adapter = new ArrayAdapter<String>(activity(), android.R.layout.simple_spinner_dropdown_item, activity().opModeNames);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -152,6 +175,6 @@ public class FtcRobotControllerWrapper {
             }
         });
 
-    }
+    }//initializeSpinner
 
 }//FtcRobotControllerWrapper

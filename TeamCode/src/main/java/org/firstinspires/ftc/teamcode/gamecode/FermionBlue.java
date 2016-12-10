@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
 import org.firstinspires.ftc.teamcode.util.MathUtils;
 import org.firstinspires.ftc.teamcode.robots.Fermion;
+import org.firstinspires.ftc.teamcode.util.VortexUtils;
 
 /**
  * Created by FIXIT on 16-10-21.
@@ -68,9 +69,9 @@ public class FermionBlue extends AutoOpMode {
             muon.imuTurnR(deg, 0.3);
         }
 
-        int config = Fermion.BEACON_NOT_VISIBLE;
+        int config = VortexUtils.BEACON_NOT_VISIBLE;
         try{
-            config = Fermion.waitForBeaconConfig(
+            config = VortexUtils.waitForBeaconConfig(
                     getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
                     wheels, locale.getCameraCalibration(), 5000);
             telemetry.addData("Beacon", config);
@@ -86,7 +87,7 @@ public class FermionBlue extends AutoOpMode {
 
         muon.left(0.13);
 
-        while (opModeIsActive() && (wheels.getPose() == null || wheels.getPose().getTranslation().get(0) < ((config == Fermion.BEACON_BLUE_RED)? -80 : 45))) {
+        while (opModeIsActive() && (wheels.getPose() == null || wheels.getPose().getTranslation().get(0) < ((config == VortexUtils.BEACON_BLUE_RED)? -80 : 45))) {
             if(wheels.getPose() == null){
                 Log.i(TAG, "HELLO null");
             } else {
@@ -153,9 +154,9 @@ public class FermionBlue extends AutoOpMode {
 
         muon.absoluteIMUTurn(90, 0.5);
 
-        config = Fermion.BEACON_NOT_VISIBLE;
+        config = VortexUtils.BEACON_NOT_VISIBLE;
         try{
-            config = Fermion.waitForBeaconConfig(
+            config = VortexUtils.waitForBeaconConfig(
                     getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
                     legos, locale.getCameraCalibration(), 5000);
             telemetry.addData("Beacon", config);
@@ -166,9 +167,9 @@ public class FermionBlue extends AutoOpMode {
 
         sleep(1000);
 
-        while (opModeIsActive() && (legos.getPose() == null || !MathUtils.inRange(legos.getPose().getTranslation().get(0), ((config == Fermion.BEACON_BLUE_RED)? -80 : 45), ((config == Fermion.BEACON_BLUE_RED)? -60 : 65)))) {
+        while (opModeIsActive() && (legos.getPose() == null || !MathUtils.inRange(legos.getPose().getTranslation().get(0), ((config == VortexUtils.BEACON_BLUE_RED)? -80 : 45), ((config == VortexUtils.BEACON_BLUE_RED)? -60 : 65)))) {
 
-            if(legos.getPose() != null && legos.getPose().getTranslation().get(0) > ((config == Fermion.BEACON_BLUE_RED)? -60 : 65)){
+            if(legos.getPose() != null && legos.getPose().getTranslation().get(0) > ((config == VortexUtils.BEACON_BLUE_RED)? -60 : 65)){
                 muon.right(0.13);
             } else {
                 muon.left(0.13);

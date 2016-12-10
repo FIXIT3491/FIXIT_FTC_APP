@@ -12,27 +12,27 @@ public class PathUtils {
     public static int COMPLETE_MOTION = 0;
     public static int STAGED_MOTION = 1;
 
-    public static void driveOnFunction(ParameteredRunnable deriv, AdafruitBNO055IMU imu, TrackBall mouse,
-                                        boolean turnWithDeriv, double startingPosition) {
-
-        double beginAngle = cvtAngleToNewDomain(-imu.getAngularOrientation().firstAngle);
-        double x = 0;
-
-        while (true) {
-            double currentAngle = cvtAngleToNewDomain(-imu.getAngularOrientation().firstAngle);
-            x += mouse.getXYIncrement().y * Math.cos(currentAngle - beginAngle);
-            x += mouse.getXYIncrement().x * Math.sin(currentAngle - beginAngle);
-
-            double degree = Math.atan((Double) deriv.run(new Double(x))); //replace with f'(x)
-
-            if (turnWithDeriv) {
-                //veerTo(currentTargetAngle + degree)
-            } else {
-                //strafe(degree, speed)
-            }//else
-        }//while
-
-    }
+//    public static void driveOnFunction(ParameteredRunnable deriv, AdafruitBNO055IMU imu, TrackBall mouse,
+//                                        boolean turnWithDeriv, double startingPosition) {
+//
+//        double beginAngle = cvtAngleToNewDomain(-imu.getAngularOrientation().firstAngle);
+//        double x = 0;
+//
+//        while (true) {
+//            double currentAngle = cvtAngleToNewDomain(-imu.getAngularOrientation().firstAngle);
+//            x += mouse.getXYIncrement().y * Math.cos(currentAngle - beginAngle);
+//            x += mouse.getXYIncrement().x * Math.sin(currentAngle - beginAngle);
+//
+//            double degree = Math.atan((Double) deriv.run(new Double(x))); //replace with f'(x)
+//
+//            if (turnWithDeriv) {
+//                //veerTo(currentTargetAngle + degree)
+//            } else {
+//                //strafe(degree, speed)
+//            }//else
+//        }//while
+//
+//    }
 
     public static void driveCircle(final double radius, double beginRad, AdafruitBNO055IMU imu, TrackBall mouse) {
         ParameteredRunnable circleDeriv = new ParameteredRunnable() {
@@ -42,7 +42,7 @@ public class PathUtils {
             }
         };
 
-        driveOnFunction(circleDeriv, imu, mouse, true, radius * Math.cos(beginRad));
+        //driveOnFunction(circleDeriv, imu, mouse, true, radius * Math.cos(beginRad));
     }
 
     public static double cvtAngleToNewDomain(double angle) {

@@ -50,6 +50,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebView;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -96,9 +97,12 @@ import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import dalvik.system.DexFile;
 
 public class FtcRobotControllerActivity extends Activity {
 
@@ -141,8 +145,11 @@ public class FtcRobotControllerActivity extends Activity {
 
   protected List<String> opModeNames;
   protected String activeOpModeName;
-  protected FtcOpModeRegister storedRegister;
   protected boolean driverStationEnabled = false;
+  DexFile dxFile;
+  protected Button initOpMode;
+  protected Button runOpMode;
+  protected Button stopOpMode;
 
   protected class RobotRestarter implements Restarter {
 
@@ -291,21 +298,33 @@ public class FtcRobotControllerActivity extends Activity {
       mOpenCVCallBack.onManagerConnected(LoaderCallbackInterface.SUCCESS);
     }//else
 
+    initOpMode = (Button) findViewById(R.id.initOpMode);
+    runOpMode = (Button) findViewById(R.id.runOpMode);
+    stopOpMode = (Button) findViewById(R.id.stopOpMode);
+    runOpMode.setEnabled(false);
+    stopOpMode.setEnabled(false);
+
     wifiLock.acquire();
     callback.networkConnectionUpdate(WifiDirectAssistant.Event.DISCONNECTED);
     bindToService();
+
+    try {
+      dxFile = new DexFile(getPackageCodePath());
+    } catch (IOException e) {
+      e.printStackTrace();
+    }//catch
   }
 
   public void initOpMode(View v) {
-    FtcRobotControllerWrapper.initOpMode(activeOpModeName);
+    FtcControllerUtils.initOpMode(activeOpModeName);
   }
 
   public void runOpMode(View v) {
-    FtcRobotControllerWrapper.runOpMode(activeOpModeName);
+    FtcControllerUtils.runOpMode();
   }
 
   public void stopOpMode(View v) {
-    FtcRobotControllerWrapper.stopOpMode();
+    FtcControllerUtils.stopOpMode();
   }
 
   protected UpdateUI createUpdateUI() {
@@ -331,7 +350,7 @@ public class FtcRobotControllerActivity extends Activity {
     updateUIAndRequestRobotSetup();
 
     cfgFileMgr.getActiveConfigAndUpdateUI();
-    cfgFileMgr.changeBackground(0xFF539E2E, R.id.idActiveConfigHeader);
+    cfgFileMgr.changeBackground(R.color.opaque_dark_fixit_green, R.id.idActiveConfigHeader);
 
     entireScreenLayout.setOnTouchListener(new View.OnTouchListener() {
       @Override
@@ -502,17 +521,17 @@ public class FtcRobotControllerActivity extends Activity {
       if (!driverStationEnabled) {
 
         controllerService.shutdownRobot();
-        FtcRobotControllerWrapper.setUpRobotWithoutWifi();
+        FtcControllerUtils.setUpRobotWithoutWifi();
 
         final Spinner spinner = (Spinner) findViewById(R.id.opModeList);
 
-        FtcRobotControllerWrapper.initializeSpinner(spinner);
+        FtcControllerUtils.initializeSpinner(spinner);
 
         runOnUiThread(new Runnable() {
           @Override
           public void run() {
             driverStation.setVisibility(View.VISIBLE);
-            cfgFileMgr.changeBackground(0xFF539E2E, R.id.idActiveConfigHeader);
+            cfgFileMgr.changeBackground(R.color.opaque_dark_fixit_green, R.id.idActiveConfigHeader);
           }//run
         });
 
@@ -524,7 +543,7 @@ public class FtcRobotControllerActivity extends Activity {
           @Override
           public void run() {
             driverStation.setVisibility(View.INVISIBLE);
-            cfgFileMgr.changeBackground(0xFF539E2E, R.id.idActiveConfigHeader);
+            cfgFileMgr.changeBackground(R.color.opaque_dark_fixit_green, R.id.idActiveConfigHeader);
           }//run
         });
 
@@ -581,7 +600,7 @@ public class FtcRobotControllerActivity extends Activity {
 
     HardwareFactory factory;
     RobotConfigFile file = cfgFileMgr.getActiveConfigAndUpdateUI();
-    cfgFileMgr.changeBackground(0xFF539E2E, R.id.idActiveConfigHeader);
+    cfgFileMgr.changeBackground(R.color.opaque_dark_fixit_green, R.id.idActiveConfigHeader);
     
     HardwareFactory hardwareFactory = new HardwareFactory(context);
     hardwareFactory.setXmlPullParser(file.getXml());
@@ -627,6 +646,10 @@ public class FtcRobotControllerActivity extends Activity {
   public static void initializeGlobals() {
     GlobalValuesActivity.add("RedAlliance", true);
     GlobalValuesActivity.add("TeleBeginAngle", 0);
+    GlobalValuesActivity.add("EncoderDistance", 500);
+    GlobalValuesActivity.add("VeerProportional", 0.7 / 90);
+    GlobalValuesActivity.add("VeerDerivative", /*(0.5 / 90) / 10*/0);
+    GlobalValuesActivity.add("VeerIntegral", /*(0.1 / 90) / 1000)*/0);
   }
 
 }
