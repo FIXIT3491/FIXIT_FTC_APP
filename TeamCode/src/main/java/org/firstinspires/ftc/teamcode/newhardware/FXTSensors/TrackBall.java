@@ -10,26 +10,18 @@ import org.opencv.core.Point;
  */
 public class TrackBall {
 
-    DcMotor xEnc;
-    DcMotor yEnc;
-    private Point lastGivenPoint;
+    public DcMotor xEnc;
+    public DcMotor yEnc;
 
     public TrackBall(String xAddr, String yAddr) {
         xEnc = RC.h.dcMotor.get(xAddr);
         yEnc = RC.h.dcMotor.get(yAddr);
 
-        lastGivenPoint = new Point(0, 0);
     }//TrackBall
 
-    public Point getXY() {
-        lastGivenPoint = new Point(xEnc.getCurrentPosition(), yEnc.getCurrentPosition());
-        return lastGivenPoint;
-    }//Point
+    public Point getEncTiks() {
+        return new Point(-xEnc.getCurrentPosition(), -yEnc.getCurrentPosition());
+    }
 
-    public Point getXYIncrement() {
-        Point ret = new Point(xEnc.getCurrentPosition() - lastGivenPoint.x, yEnc.getCurrentPosition() - lastGivenPoint.y);
-        getXY();
-        return ret;
-    }//Point
 
 }

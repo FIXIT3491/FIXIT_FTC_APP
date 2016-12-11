@@ -5,6 +5,18 @@ package org.firstinspires.ftc.teamcode.util;
  */
 public class MathUtils {
 
+    public static double max(double... values) {
+        double max = 0;
+
+        for (int i = 0; i < values.length; i++) {
+            if (max < values[i]) {
+                max = values[i];
+            }//if
+        }//for
+
+        return max;
+    }
+
     public static int getQuadrant(double x, double y){
         if(x >= 0){
             if(y >= 0) return 1;
@@ -25,6 +37,14 @@ public class MathUtils {
         throw new IllegalArgumentException("num " + num + " not in range! Range is " + lowBound +"-" + upBound);
     }
 
+    public static double roundToNearest(double num, double increment, double lowBound){
+
+        num -= lowBound;
+        num = increment * Math.round(num / increment);
+
+        return num;
+    }
+
     public static boolean inRange(double num, double bound1, double bound2){
         return (num > bound1 && num < bound2) || (num > bound2 && num < bound1);
     }
@@ -37,5 +57,13 @@ public class MathUtils {
         }//elseif
 
         return angle;
+    }
+
+    public static double cvtAngleJumpToNewDomain(double delta) {
+        if (Math.abs(delta) > 180) {
+            delta = Math.signum(delta) * 360 - delta;
+        }//if
+
+        return delta;
     }
 }

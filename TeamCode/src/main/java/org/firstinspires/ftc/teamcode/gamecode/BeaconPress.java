@@ -82,9 +82,9 @@ public class BeaconPress extends AutoOpMode {
         telemetry.update();
 
         if (config == VortexUtils.BEACON_BLUE_RED) {
-            strange.strafeToBeacon(gears, 10, 0.1, strange.getIMUAngle()[0], new VectorF(40, -0.1f, -0.1f));
+            strange.strafeToBeacon(gears, 10, 0.1, 0, new VectorF(40, -0.1f, -0.1f));
         } else {
-            strange.strafeToBeacon(gears, 10, 0.1, strange.getIMUAngle()[0], new VectorF(-60, -0.1f, -0.1f));
+            strange.strafeToBeacon(gears, 10, 0.1, 0, new VectorF(-60, -0.1f, -0.1f));
         }//else
 
         strange.forward(0.4);
@@ -94,7 +94,7 @@ public class BeaconPress extends AutoOpMode {
 //        int lowerBound = 0;
 //        int upperBound = 0;
 //
-//        if((config == Fermion.BEACON_BLUE_RED)){
+//        if((config == VortexUtils.BEACON_BLUE_RED)){
 //            lowerBound = 0;
 //            upperBound = 10;
 //        } else {

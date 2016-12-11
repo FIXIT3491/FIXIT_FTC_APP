@@ -180,7 +180,7 @@ public class FXTTelemetry {
     }//dataLogSensorList
 
     public void beginDataLogging(final String fileName) {
-        TaskHandler.addLoopedTask("DataLogging", new Runnable() {
+        TaskHandler.addLoopedTask("DataLogging–" + fileName, new Runnable() {
             @Override
             public void run() {
                 dataLog(fileName);
@@ -190,7 +190,7 @@ public class FXTTelemetry {
 
     public void stopDataLogging(String fileName) {
         out.get(fileName).closeWriter();
-        TaskHandler.removeTask("DataLogging");
+        TaskHandler.removeTask("DataLogging–" + fileName);
     }
 
     public void dataLog(String fileName) {

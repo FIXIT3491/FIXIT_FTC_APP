@@ -646,6 +646,10 @@ public class FtcRobotControllerActivity extends Activity {
   public static void initializeGlobals() {
     GlobalValuesActivity.add("RedAlliance", true);
     GlobalValuesActivity.add("TeleBeginAngle", 0);
+    GlobalValuesActivity.add("EncoderDistance", 500);
+    GlobalValuesActivity.add("VeerProportional", 0.7 / 90);
+    GlobalValuesActivity.add("VeerDerivative", /*(0.5 / 90) / 10*/0);
+    GlobalValuesActivity.add("VeerIntegral", /*(0.1 / 90) / 1000)*/0);
   }
 
 }
