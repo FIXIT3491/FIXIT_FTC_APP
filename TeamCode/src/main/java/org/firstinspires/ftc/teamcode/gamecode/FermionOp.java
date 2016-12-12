@@ -56,6 +56,10 @@ public class FermionOp extends LinearTeleOpMode {
             charm.strafe(Math.toDegrees(MathUtils.roundToNearest(theta, Math.PI / 4, -Math.PI, Math.PI)), speed);
         }
 
+        if (joy1.rightTrigger()){
+            charm.fireParticle();
+        }
+
         telemetry.addData("FL", charm.leftFore.returnCurrentState());
         telemetry.addData("FR", charm.rightFore.returnCurrentState());
         telemetry.addData("BL", charm.leftBack.returnCurrentState());

@@ -374,7 +374,7 @@ public class Fermion {
     }//strafeToBeacon
 
     public void fireParticle() {
-        catapult.runToPosition(1120, 0.5); //spin one full revolution
+        catapult.runToPosition(1680, 0.5); //spin one full revolution, Andymark 60 motor
     }
 
 }//Fermion
