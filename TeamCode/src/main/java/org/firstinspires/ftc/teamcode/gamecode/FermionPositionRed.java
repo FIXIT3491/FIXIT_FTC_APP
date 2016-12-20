@@ -45,14 +45,10 @@ public class FermionPositionRed extends AutoOpMode {
 
         beacons.activate();
         lepton.resetTargetAngle();
-        mainTasks.addRunnable(new Runnable() {
-            @Override
-            public void run() {
-                lepton.veerCheck();
-            }
-        });
+//        lepton.addVeerCheckRunnable();
 
         lepton.forward(0.5);
+
 
         while (opModeIsActive() && gears.getPose() == null) {
             idle();
@@ -63,7 +59,6 @@ public class FermionPositionRed extends AutoOpMode {
         lepton.stop();
 
         VectorF trans = gears.getPose().getTranslation();
-
 
         int config = VortexUtils.waitForBeaconConfig(
                 VortexUtils.getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
@@ -79,30 +74,24 @@ public class FermionPositionRed extends AutoOpMode {
 
         lepton.absoluteIMUTurn(-85, 0.5);
 
-        if (config == VortexUtils.BEACON_BLUE_RED) {
-            lepton.track(90, 120, 0.35);
-        }//if
+        if (config == VortexUtils.BEACON_RED_BLUE) {
+            lepton.track(-90, 160, 0.35);
+        } else {
+            lepton.track(-90, 240, 0.35);
+        }//else
 
         Log.i(TAG, "runOp: " + trans.toString());
         Log.i(TAG, "runOp: " + config);
 
-        lepton.forward(0.5);
-        sleep(1500);
+        lepton.forward(0.35);
+        sleep(2142);
         lepton.stop();
 
         lepton.backward(0.5);
         sleep(1500);
         lepton.stop();
 
-
-        lepton.absoluteIMUTurn(-55, 0.5);
-
         Log.i(TAG, "runOp: " + config);
-
-
-        while (opModeIsActive() && tools.getPose() == null) {
-            idle();
-        }//while
 
     }//runOp
 
