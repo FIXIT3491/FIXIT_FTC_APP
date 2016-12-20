@@ -1,17 +1,21 @@
 package org.firstinspires.ftc.teamcode.gamecode;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.RC;
+import org.firstinspires.ftc.teamcode.util.VortexUtils;
 
 /**
  * Created by FIXIT on 16-09-18.
@@ -21,9 +25,8 @@ public class CropBeacon extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-
         VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
-        params.vuforiaLicenseKey = "Ad0I0ir/////AAAAAfR3NIO1HkxSqM8NPhlEftFXtFAm6DC5w4Cjcy30WUdGozklFlAkxeHpjfWc4moeL2ZTPvZ+wAoyOnlZxyB6Wr1BRE9154j6K1/8tPvu21y5ke1MIbyoJ/5BAQuiwoAadjptZ8fpS7A0QGPrMe0VauJIM1mW3UU2ezYFSOcPghCOCvQ8zid1Bb8A92IkbLcBUcv3DEC6ia4SEkbRMY7TpOh2gzsXdsue4tqj9g7vj7zBU5Hu4WhkMDJRsThn+5QoHXqvavDsCElwmDHG3hlEYo7qN/vV9VcQUX9XnVLuDeZhkp885BHK5vAe8T9W3Vxj2H/R4oijQso6hEBaXsOpCHIWGcuphpoe9yoQlmNRRZ97";
+        params.vuforiaLicenseKey = RC.VUFORIA_LICENSE_KEY;
         params.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
 
         VuforiaLocalizer vuforia = ClassFactory.createVuforiaLocalizer(params);
@@ -33,21 +36,20 @@ public class CropBeacon extends LinearOpMode {
         beacons.get(1).setName("Tools");
         beacons.get(2).setName("Lego");
         beacons.get(3).setName("Gears");
+        VuforiaTrackableDefaultListener beacon = (VuforiaTrackableDefaultListener) beacons.get(3).getListener();
 
         waitForStart();
-
         beacons.activate();
 
-        while(opModeIsActive()) {
+        while (opModeIsActive()) {
 
-            for (VuforiaTrackable track : beacons) {
-                OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) track.getListener()).getPose();
+            while (opModeIsActive() && beacon.getPose() == null) {
+                idle();
+            }//while
 
-                if (pose != null)
-                    telemetry.addData(track.getName(), pose.getTranslation().length());
-            }//for
+            Log.i("NEW Trans", VortexUtils.navOffWall2(beacon.getPose().getTranslation(), 45, new VectorF(0, 0, 500)).toString());
 
-        }
+        }//while
 
     }
 }

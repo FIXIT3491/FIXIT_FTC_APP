@@ -21,7 +21,7 @@ public class StrafeTest extends AutoOpMode {
         waitForStart();
         f.addVeerCheckRunnable();
 
-        f.right(0.5);
+        f.backward(0.5);
         sleep(3000);
         f.stop();
 

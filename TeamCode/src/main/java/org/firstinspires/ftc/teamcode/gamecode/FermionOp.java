@@ -3,17 +3,11 @@ package org.firstinspires.ftc.teamcode.gamecode;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.vuforia.PIXEL_FORMAT;
-import com.vuforia.Vuforia;
 
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
-import org.firstinspires.ftc.teamcode.R;
-import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.opmodesupport.LinearTeleOpMode;
-import org.firstinspires.ftc.teamcode.opmodesupport.TaskHandler;
+import org.firstinspires.ftc.teamcode.roboticslibrary.TaskHandler;
 import org.firstinspires.ftc.teamcode.util.MathUtils;
 import org.firstinspires.ftc.teamcode.robots.*;
 
@@ -40,10 +34,10 @@ public class FermionOp extends LinearTeleOpMode {
         double theta = 0;
 
         if(joy1.y1() == 0 && joy1.x1() == 0){
-            charm.rightFore.setPower(Math.round(joy1.x2()) / 3.0);
-            charm.rightBack.setPower(Math.round(joy1.x2()) / 3.0);
-            charm.leftFore.setPower(-Math.round(joy1.x2()) / 3.0);
-            charm.leftBack.setPower(-Math.round(joy1.x2()) / 3.0);
+            charm.rightFore.setPower(Math.round(-joy1.x2()) / 3.0);
+            charm.rightBack.setPower(Math.round(-joy1.x2()) / 3.0);
+            charm.leftFore.setPower(Math.round(joy1.x2()) / 3.0);
+            charm.leftBack.setPower(Math.round(joy1.x2()) / 3.0);
 
             Log.i("Speeds", charm.leftBack.getPower() + ", " + charm.leftFore.getPower() + ", " + charm.rightBack.getPower() + ", " + charm.rightFore.getPower());
         } else {
@@ -55,6 +49,10 @@ public class FermionOp extends LinearTeleOpMode {
             double speed = (joy1.rightBumper())?0.3:1;
             charm.strafe(Math.toDegrees(MathUtils.roundToNearest(theta, Math.PI / 4, -Math.PI, Math.PI)), speed);
         }
+
+        if (joy1.rightTrigger()) {
+            charm.fireParticle();
+        }//if
 
         telemetry.addData("FL", charm.leftFore.returnCurrentState());
         telemetry.addData("FR", charm.rightFore.returnCurrentState());

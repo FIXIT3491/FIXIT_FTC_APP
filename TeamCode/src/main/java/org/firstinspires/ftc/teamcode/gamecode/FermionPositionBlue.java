@@ -43,7 +43,7 @@ public class FermionPositionBlue extends AutoOpMode {
 
         beacons.activate();
         lepton.resetTargetAngle();
-        lepton.addVeerCheckRunnable();
+//        lepton.addVeerCheckRunnable();
 
         lepton.forward(0.5);
 
@@ -73,31 +73,36 @@ public class FermionPositionBlue extends AutoOpMode {
         lepton.absoluteIMUTurn(85, 0.5);
 
         if (config == VortexUtils.BEACON_BLUE_RED) {
-            lepton.track(90, 120, 0.35);
-        }//if
+            lepton.track(90, 160, 0.35);
+        } else {
+            lepton.track(90, 240, 0.35);
+        }//else
 
         Log.i(TAG, "runOp: " + trans.toString());
         Log.i(TAG, "runOp: " + config);
+//
+//        lepton.track(0, 540, 0.5);
+//        lepton.track(180, 540, 0.5);
 
-        lepton.forward(0.5);
-        sleep(1500);
-        lepton.stop();
+        lepton.forward(0.35);
+        sleep((int) (1500 * 5 / 0.35));
 
         lepton.backward(0.5);
         sleep(1500);
         lepton.stop();
-
-        Log.i(TAG, "runOp: " + config);
-
-        if (config == VortexUtils.BEACON_BLUE_RED) {
-            lepton.track(-90, 609.6, 0.5);
-        } else {
-            lepton.track(-90, 509.6, 0.5);
-        }//else
-
-        while (opModeIsActive() && legos.getPose() == null) {
-            idle();
-        }//while
+//
+//
+//        Log.i(TAG, "runOp: " + config);
+//
+//        if (config == VortexUtils.BEACON_BLUE_RED) {
+//            lepton.track(-90, 609.6, 0.5);
+//        } else {
+//            lepton.track(-90, 509.6, 0.5);
+//        }//else
+//
+//        while (opModeIsActive() && legos.getPose() == null) {
+//            idle();
+//        }//while
 
 
 ////

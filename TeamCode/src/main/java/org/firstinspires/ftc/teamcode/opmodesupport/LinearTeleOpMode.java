@@ -5,10 +5,9 @@ import android.media.AudioManager;
 import android.media.AudioTrack;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.RC;
-import org.firstinspires.ftc.teamcode.roboticslibrary.FXTTelemetry;
+import org.firstinspires.ftc.teamcode.roboticslibrary.TaskHandler;
 
 import java.util.ArrayList;
 import java.util.List;

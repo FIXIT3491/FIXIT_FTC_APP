@@ -156,12 +156,13 @@ public class VortexUtils {
     }
 
     public static VectorF navOffWall2(VectorF trans, double robotAngle, VectorF offWall){
-        double theta = Math.toDegrees(Math.atan2(offWall.get(0), offWall.get(2)));
+        double theta = Math.atan2(offWall.get(2), offWall.get(0)) + Math.toRadians(robotAngle);
+        double hypot = Math.hypot(trans.get(0), trans.get(2));
 
         return new VectorF(
-                (float) (trans.get(0) - offWall.get(0) * Math.sin(Math.toRadians(robotAngle)) - offWall.get(2) * Math.cos(Math.toRadians(robotAngle))),
+                (float) (trans.get(0) - hypot * Math.sin(theta)),
                 trans.get(1),
-                (float) (-trans.get(2) + offWall.get(0) * Math.cos(Math.toRadians(robotAngle)) - offWall.get(2) * Math.sin(Math.toRadians(robotAngle)))
+                (float) (-trans.get(2) + hypot * Math.cos(theta))
         );
     }
 }
