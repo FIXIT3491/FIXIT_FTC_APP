@@ -12,7 +12,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefau
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.TrackBall;
 import org.firstinspires.ftc.teamcode.newhardware.Motor;
-import org.firstinspires.ftc.teamcode.opmodesupport.TaskHandler;
+import org.firstinspires.ftc.teamcode.roboticslibrary.FXTCamera;
+import org.firstinspires.ftc.teamcode.roboticslibrary.TaskHandler;
 import org.firstinspires.ftc.teamcode.util.MathUtils;
 import org.firstinspires.ftc.teamcode.util.PID;
 import org.firstinspires.ftc.teamcode.util.VortexUtils;
@@ -64,6 +65,8 @@ public class Fermion {
         rightBack = new Motor("rightBack");
         rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightBack.minSpeed = 0;
+
+        catapult = new Motor("catapult");
 
         leftFore.setReverse(true);
         leftBack.setReverse(true);
@@ -131,7 +134,7 @@ public class Fermion {
     }//stop
 
     public void resetTargetAngle() {
-        this.targetAngle = getIMUAngle()[0];
+        this.targetAngle = MathUtils.cvtAngleToNewDomain(getIMUAngle()[0]);
     }
 
     /*
@@ -216,6 +219,7 @@ public class Fermion {
             }//if
         }//while
 
+
         stop();
         useVeerCheck = true;
     }//imuTurnL
@@ -288,7 +292,6 @@ public class Fermion {
             double strength = Math.signum(angleError) * Math.abs(veerAlgorithm.update(angleError));
 
             Log.i("PID Val", "" + strength);
-
             veer(strength, preservingStrafeSpeed);
         }//if
     }//veerCheck
@@ -299,6 +302,7 @@ public class Fermion {
     //if speed < 0, robot will veer left
     //if speed > 0, robot will veer right
     public void veer(double speed, boolean preservingStrafeSpeed) {
+
         double leftForePower = (leftFore.getPower() + rightBack.getPower()) / 2.0;
         double leftBackPower = (leftBack.getPower() + rightFore.getPower()) / 2.0;
         double rightForePower = (leftBack.getPower() + rightFore.getPower()) / 2.0;
@@ -320,21 +324,21 @@ public class Fermion {
         } else {
 
             double max = MathUtils.max(Math.abs(leftBackPower + speed), Math.abs(leftForePower + speed), Math.abs(rightBackPower - speed), Math.abs(rightForePower - speed));
+            double highestSpeed = MathUtils.max(Math.abs(leftBackPower), Math.abs(leftForePower), Math.abs(rightBackPower), Math.abs(rightForePower));
 
             if (max > 1) {
                 double maxAllowed = 1 - (max - 1);
 
-                leftForePower *= maxAllowed;
-                leftBackPower *= maxAllowed;
-                rightForePower *= maxAllowed;
-                rightBackPower *= maxAllowed;
+                leftForePower *= maxAllowed / highestSpeed;
+                leftBackPower *= maxAllowed / highestSpeed;
+                rightForePower *= maxAllowed / highestSpeed;
+                rightBackPower *= maxAllowed / highestSpeed;
             }//if
 
             leftForePower += speed;
             leftBackPower += speed;
             rightForePower -= speed;
             rightBackPower -= speed;
-
 
         }//else
 

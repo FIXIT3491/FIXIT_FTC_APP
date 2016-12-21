@@ -125,9 +125,11 @@ public class FermionRed extends AutoOpMode {
         muon.stop();
 
         muon.absoluteIMUTurn(-90, 0.5);
+//
+//        muon.right(1);
+//        sleep(1800);
 
-        muon.right(1);
-        sleep(1800);
+        muon.track(90, 1500, 0.5);
 
         muon.absoluteIMUTurn(-90, 0.5);
         muon.stop();
