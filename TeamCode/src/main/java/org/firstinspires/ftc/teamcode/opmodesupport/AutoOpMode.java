@@ -20,11 +20,6 @@ import java.util.List;
 public abstract class AutoOpMode extends LinearOpMode {
 
     /**
-     * Number of milliseconds between each time the computer datalogs
-     */
-    int interval = 100;
-
-    /**
      * List of long numbers. Used for timers
      */
     private List<Long> startNanoTimes = new ArrayList<Long>();
@@ -50,7 +45,7 @@ public abstract class AutoOpMode extends LinearOpMode {
         } finally {
             stopOpMode();
             TaskHandler.removeAllTasks();
-        }
+        }//finally
 
     }
 

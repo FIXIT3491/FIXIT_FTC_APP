@@ -15,7 +15,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
-import org.firstinspires.ftc.teamcode.robots.Fermion;
 import org.firstinspires.ftc.teamcode.util.VortexUtils;
 
 /**
@@ -45,14 +44,14 @@ public class BeaconAnalysisTest extends AutoOpMode {
         }//while
 
         while (opModeIsActive()) {
-            int beaconConfig = VortexUtils.BEACON_NOT_VISIBLE;
-            while (beaconConfig == VortexUtils.BEACON_NOT_VISIBLE) {
+            int beaconConfig = VortexUtils.NOT_VISIBLE;
+            while (beaconConfig == VortexUtils.NOT_VISIBLE) {
                 beaconConfig = VortexUtils.getBeaconConfig(getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565), gears, locale.getCameraCalibration());
             }//while
 
             if (beaconConfig == VortexUtils.BEACON_RED_BLUE) {
                 Log.i("RED", "BLUE");
-            } else if (beaconConfig != VortexUtils.BEACON_NOT_VISIBLE) {
+            } else if (beaconConfig != VortexUtils.NOT_VISIBLE) {
                 Log.i("BLUE", "RED");
             } else {
                 Log.i("BEAC", "== -1");

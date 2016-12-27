@@ -31,7 +31,6 @@ public class TestMovePointOffWall extends AutoOpMode {
         params.vuforiaLicenseKey = RC.VUFORIA_LICENSE_KEY;
         params.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
 
-
         VuforiaLocalizer locale = ClassFactory.createVuforiaLocalizer(params);
         locale.setFrameQueueCapacity(1);
         Vuforia.setFrameFormat(PIXEL_FORMAT.RGB565, true);

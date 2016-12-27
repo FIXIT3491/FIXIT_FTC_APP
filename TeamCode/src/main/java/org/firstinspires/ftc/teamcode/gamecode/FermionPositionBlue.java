@@ -43,7 +43,7 @@ public class FermionPositionBlue extends AutoOpMode {
 
         beacons.activate();
         lepton.resetTargetAngle();
-//        lepton.addVeerCheckRunnable();
+        lepton.addVeerCheckRunnable();
 
         lepton.forward(0.5);
 
@@ -55,98 +55,57 @@ public class FermionPositionBlue extends AutoOpMode {
 
         lepton.stop();
 
-        VectorF trans = wheels.getPose().getTranslation();
-
-
         int config = VortexUtils.waitForBeaconConfig(
                 VortexUtils.getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
                 wheels, locale.getCameraCalibration(), 5000);
 
-        Log.i(TAG, "runOp: b");
-
-        trans = VortexUtils.navOffWall(trans, lepton.getIMUAngle()[0], new VectorF(540f, 0, 0));
-
-        double targetAngle = Math.atan2(trans.get(0), -trans.get(2));
-
-        lepton.track(Math.toDegrees(targetAngle), trans.magnitude(), 0.5);
-
-        lepton.absoluteIMUTurn(85, 0.5);
-
         if (config == VortexUtils.BEACON_BLUE_RED) {
-            lepton.track(90, 160, 0.35);
+            lepton.strafeToBeacon(wheels, 0, 0.5, true, lepton.getIMUAngle()[0], new VectorF(-70, 0, 540));
         } else {
-            lepton.track(90, 240, 0.35);
+            lepton.strafeToBeacon(wheels, 0, 0.5, true, lepton.getIMUAngle()[0], new VectorF(70, 0, 540));
         }//else
 
-        Log.i(TAG, "runOp: " + trans.toString());
-        Log.i(TAG, "runOp: " + config);
-//
-//        lepton.track(0, 540, 0.5);
-//        lepton.track(180, 540, 0.5);
+        lepton.absoluteIMUTurn(90, 0.5);
 
-        lepton.forward(0.35);
-        sleep((int) (1500 * 5 / 0.35));
+        lepton.forward(0.3);
+        sleep(2100);
+        lepton.stop();
 
         lepton.backward(0.5);
         sleep(1500);
         lepton.stop();
-//
-//
-//        Log.i(TAG, "runOp: " + config);
-//
-//        if (config == VortexUtils.BEACON_BLUE_RED) {
-//            lepton.track(-90, 609.6, 0.5);
-//        } else {
-//            lepton.track(-90, 509.6, 0.5);
-//        }//else
-//
-//        while (opModeIsActive() && legos.getPose() == null) {
-//            idle();
-//        }//while
 
+        Log.i(TAG, "runOp: " + config);
 
-////
-//        Log.i(TAG, "runOp: g" );
-////        lepton.stop();
-//
-//        config = VortexUtils.waitForBeaconConfig(
-//                    VortexUtils.getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
-//                    legos, locale.getCameraCalibration(), 5000);
-//
-//        Log.i(TAG, "runOp: " + config);
+        if (config == VortexUtils.BEACON_BLUE_RED) {
+            lepton.track(-90, 539.6, 0.5);
+        } else {
+            lepton.track(-90, 679.6, 0.5);
+        }//else
 
+        while (opModeIsActive() && legos.getPose() == null) {
+            idle();
+        }//while
 
+        config = VortexUtils.waitForBeaconConfig(
+                VortexUtils.getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
+                legos, locale.getCameraCalibration(), 5000);
+
+        if (config == VortexUtils.BEACON_BLUE_RED) {
+            lepton.strafeToBeacon(legos, 0, 0.5, true, lepton.getIMUAngle()[0], new VectorF(-70, 0, 540));
+        } else {
+            lepton.strafeToBeacon(legos, 0, 0.5, true, lepton.getIMUAngle()[0], new VectorF(70, 0, 540));
+        }//else
+
+        lepton.forward(0.3);
+        sleep(2100);
         lepton.stop();
-//
-//        trans = legos.getPose().getTranslation();
-//
-//        if (config == VortexUtils.BEACON_BLUE_RED) {
-//            trans = VortexUtils.navOffWall(trans, -lepton.imu.getAngularOrientation().firstAngle, new VectorF(-69.85f, 0, 500f));
-//        } else {
-//            trans = VortexUtils.navOffWall(trans, -lepton.imu.getAngularOrientation().firstAngle, new VectorF(69.85f, 0, 500f));
-//        }//else
-//
-//        targetAngle = Math.atan2(trans.get(0), -trans.get(2));
-//
-//        if (targetAngle < 0) {
-//            lepton.imuTurnL(-targetAngle, 0.5);
-//        } else {
-//            lepton.imuTurnR(targetAngle, 0.5);
-//        }//else
-//
-//        lepton.track(0, Math.hypot(trans.get(0), trans.get(2)), 0.5);
-//
-//        lepton.absoluteIMUTurn(90, 0.5);
-//
-//        lepton.track(0, 200, 0.2);
-//
-//        lepton.track(180, 200, 0.2);
-//
-//        lepton.imuTurnL(45, 0.5);
-//
-//        lepton.track(180, 1000, 0.5);
-//
-//        RC.setGlobalDouble("TeleBeginAngle", -lepton.imu.getAngularOrientation().firstAngle);
+
+        lepton.track(180, 500, 0.5);
+        lepton.imuTurnL(45, 0.5);
+        lepton.backward(0.5);
+        sleep(2000);
+        lepton.stop();
 
     }//runOp
-}
+}//FermionPositionBlue

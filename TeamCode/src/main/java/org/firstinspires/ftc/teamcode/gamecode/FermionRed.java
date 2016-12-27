@@ -72,7 +72,7 @@ public class FermionRed extends AutoOpMode {
             muon.imuTurnR(deg, 0.3);
         }
 
-        int config = VortexUtils.BEACON_NOT_VISIBLE;
+        int config = VortexUtils.NOT_VISIBLE;
         try{
             config = VortexUtils.waitForBeaconConfig(
                     getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
@@ -83,8 +83,6 @@ public class FermionRed extends AutoOpMode {
             telemetry.addData("Beacon", "could not not be found");
         }//catch
 
-
-        muon.strafeToBeacon(gears, 600, 0.3);
 
         muon.absoluteIMUTurn(-90, 0.5);
 
@@ -154,7 +152,7 @@ public class FermionRed extends AutoOpMode {
         sleep(600);
         muon.stop();
 
-        config = VortexUtils.BEACON_NOT_VISIBLE;
+        config = VortexUtils.NOT_VISIBLE;
         try{
             config = VortexUtils.waitForBeaconConfig(
                     getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),

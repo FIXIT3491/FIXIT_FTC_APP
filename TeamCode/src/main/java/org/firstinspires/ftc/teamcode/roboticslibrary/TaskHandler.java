@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -65,6 +66,16 @@ public final class TaskHandler {
 
         return futures.containsKey(name);
     }//removeTask
+
+    public static void removeAllTasksWith(String prefix) {
+
+        for (Map.Entry<String, Future> entry : futures.entrySet()) {
+            if (entry.getKey().startsWith(prefix)) {
+                entry.getValue().cancel(true);
+            }//if
+        }//for
+
+    }//removeAllTasksWith
 
     public static void removeAllTasks() {
         for (Map.Entry<String, Future> future : futures.entrySet()) {

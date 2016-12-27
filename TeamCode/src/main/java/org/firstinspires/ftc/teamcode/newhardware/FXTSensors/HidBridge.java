@@ -76,7 +76,7 @@ public abstract class HidBridge {
      *
      * @return true, if connection was successful
      */
-    public boolean OpenDevice() {
+    public boolean openDevice() {
         _usbManager = (UsbManager) _context.getSystemService(Context.USB_SERVICE);
 
         HashMap<String, UsbDevice> deviceList = _usbManager.getDeviceList();
@@ -93,7 +93,7 @@ public abstract class HidBridge {
                 _deviceName = device.getDeviceName();
                 break;
             }
-            Log("OpenDevice: " + device.getDeviceName());
+            Log("openDevice: " + device.getDeviceName());
         }
 
         if (_usbDevice == null) {
@@ -116,7 +116,7 @@ public abstract class HidBridge {
     /**
      * Closes the reading thread of the device.
      */
-    public void CloseTheDevice() {
+    public void closeTheDevice() {
         stopReadingThread();
     }
 
@@ -230,7 +230,7 @@ public abstract class HidBridge {
                 synchronized (_locker) {
                     try {
                         if (_usbDevice == null) {
-                            OpenDevice();
+                            openDevice();
                             Log("No device. Recheking in 10 sec...");
 
                             Sleep(10000);
@@ -241,7 +241,7 @@ public abstract class HidBridge {
                         readEp = readIntf.getEndpoint(0);
                         if (!_usbManager.getDeviceList().containsKey(_deviceName)) {
                             Log("Failed to connect to the device. Retrying to acquire it.");
-                            OpenDevice();
+                            openDevice();
                             if (!_usbManager.getDeviceList().containsKey(_deviceName)) {
                                 Log("No device. Recheking in 10 sec...");
 

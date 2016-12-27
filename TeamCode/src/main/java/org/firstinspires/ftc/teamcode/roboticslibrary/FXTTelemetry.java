@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public class FXTTelemetry {
 
-    private Telemetry telemetry;
+    public Telemetry telemetry;
     public HashMap<String, DataWriter> out = new HashMap<>();
     private List<FXTSensor> sensors = new ArrayList<FXTSensor>();
 

@@ -91,16 +91,8 @@ public class Motor implements FXTDevice {
     }//isBusy
 
     public boolean isFin() {
-        if (getM().getMode().equals(DcMotor.RunMode.RUN_TO_POSITION)) {
-            return Math.abs(getCurrentPosition() - getM().getTargetPosition()) < accuracy;
-        } else {
-            return targetTime == -1;
-        }//else
-    }//finished
-
-    public boolean isThere(){
         return Math.abs(getCurrentPosition() - getM().getTargetPosition()) < accuracy;
-    }
+    }//finished
 
     public DcMotor getM() {
         synchronized (m) {
@@ -116,7 +108,7 @@ public class Motor implements FXTDevice {
         }//synchronized
     }//setTarget
 
-    public void setAbsTarget(int tik) {
+    public void setAbsoluteTarget(int tik) {
         setTarget(tik - getCurrentPosition());
     }//setAbsTarget
 
@@ -145,7 +137,7 @@ public class Motor implements FXTDevice {
         } else if (Math.abs(power) < minSpeed && Math.abs(power) > 1E-10) {
             power = minSpeed * Math.signum(power);
         } else if(Math.abs(power) < 1E-10){
-            power = 0;
+            power = 0; //prevent round off error
         }//else
 
         synchronized (m) {
@@ -169,6 +161,15 @@ public class Motor implements FXTDevice {
         setPower(speed);
     }
 
+    public void completeRunToPosition(int tiks, double speed) {
+        runToPosition(tiks, speed);
+
+        while (isFin()) {
+            RC.l.idle();
+        }//while
+
+        stop();
+    }//completeRunToPosition
 
     //INHERITED METHODS
 

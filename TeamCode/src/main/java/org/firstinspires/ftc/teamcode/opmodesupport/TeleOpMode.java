@@ -67,7 +67,7 @@ public abstract class TeleOpMode extends OpMode {
     }
 
     /**
-     * Method that runs repeatedly. It updates the gamepads and datalogs any lines or sensors
+     * Method that runs repeatedly
      */
     @Override
     public void loop() {
@@ -143,14 +143,16 @@ public abstract class TeleOpMode extends OpMode {
      * Removes the timer at the specified index
      */
     public void removeTimer(int index) {
-        startNanoTimes.remove(index);
-    }
+        if (startNanoTimes.size() > index) {
+            startNanoTimes.remove(index);
+        }//if
+    }//removeTimer
 
     /**
      * Resets the first timer
      */
     public void clearTimer() {
-        startNanoTimes.set(0, System.nanoTime());
+        clearTimer(0);
     }
 
     /**
@@ -170,7 +172,7 @@ public abstract class TeleOpMode extends OpMode {
      * @return time since the first timer has been reset (or was created) in nanoseconds
      */
     public long getNanoSeconds() {
-        return System.nanoTime() - startNanoTimes.get(0);
+        return getNanoSeconds(0);
     }
 
     /**
@@ -277,18 +279,14 @@ public abstract class TeleOpMode extends OpMode {
      * Method to easily to play a beep with a defined frequency and duration
      *
      * @param frequency frequency of beep to play
-     * @param duration  how long to play the beep (in seconds)
+     * @param duration  how long to play the beep (in milliseconds)
      */
     public static void playSound(final int frequency, double duration) {
 
-        if (duration > 500)
-            duration /= 1000;
-        else if (duration > 50)
-            duration = 3;
+        duration /= 1000;
 
         final int sampleRate = 4000;
         final int numSamples = (int) (duration * sampleRate);
-
 
         new Thread() {
 

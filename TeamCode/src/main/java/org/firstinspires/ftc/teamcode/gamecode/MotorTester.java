@@ -16,13 +16,14 @@ public class MotorTester extends AutoOpMode {
     @Override
     public void runOp() {
         Fermion up = new Fermion(false);
+
         waitForStart();
+
         up.rightBack.setPower(0.3);
         sleep(1000);
         up.rightBack.setPower(-0.3);
         sleep(1000);
         up.rightBack.setPower(0);
-
 
         up.rightFore.setPower(0.3);
         sleep(1000);
@@ -41,7 +42,5 @@ public class MotorTester extends AutoOpMode {
         up.leftFore.setPower(-0.3);
         sleep(1000);
         up.leftFore.setPower(0);
-        
-
-    }
+    }//runOp
 }//MotorTester

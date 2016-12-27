@@ -70,7 +70,7 @@ public class FermionBlue extends AutoOpMode {
             muon.imuTurnR(deg, 0.3);
         }
 
-        int config = VortexUtils.BEACON_NOT_VISIBLE;
+        int config = VortexUtils.NOT_VISIBLE;
         try{
             config = VortexUtils.waitForBeaconConfig(
                     getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
@@ -82,7 +82,6 @@ public class FermionBlue extends AutoOpMode {
         }
 
 
-        muon.strafeToBeacon(wheels, 600, 0.3);
 
         muon.absoluteIMUTurn(90, 0.5);
 
@@ -157,7 +156,7 @@ public class FermionBlue extends AutoOpMode {
 
         muon.absoluteIMUTurn(90, 0.5);
 
-        config = VortexUtils.BEACON_NOT_VISIBLE;
+        config = VortexUtils.NOT_VISIBLE;
         try{
             config = VortexUtils.waitForBeaconConfig(
                     getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),

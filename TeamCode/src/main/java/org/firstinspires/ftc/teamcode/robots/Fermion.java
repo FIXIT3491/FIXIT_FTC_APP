@@ -11,13 +11,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.TrackBall;
+import org.firstinspires.ftc.teamcode.newhardware.LinearServo;
 import org.firstinspires.ftc.teamcode.newhardware.Motor;
-import org.firstinspires.ftc.teamcode.roboticslibrary.FXTCamera;
 import org.firstinspires.ftc.teamcode.roboticslibrary.TaskHandler;
 import org.firstinspires.ftc.teamcode.util.MathUtils;
 import org.firstinspires.ftc.teamcode.util.PID;
 import org.firstinspires.ftc.teamcode.util.VortexUtils;
-import org.opencv.core.Point;
 
 /**
  * Created by FIXIT on 16-10-07.
@@ -36,18 +35,18 @@ public class Fermion {
     public Motor leftBack;
     public Motor rightBack;
 
-    public Motor catapult;
-
-    private double leftForeRightBackStrafeSpeed = 0;
-    private double rightForeLeftBackStrafeSpeed = 0;
+    public LinearServo shooter1;
+    public LinearServo shooter2;
 
     public double targetAngle = 0;
-    public final static double TURNING_ACCURACY_DEG = 2;
+    private final static double TURNING_ACCURACY_DEG = 2;
+    private final static double MINIMUM_TURNING_SPEED = 0.1;
 
-    public boolean useVeerCheck = true;
     public boolean preservingStrafeSpeed = false;
-    public double minimumTrackingSpeed = 0.2;
-    public PID veerAlgorithm = new PID(PID.Type.PID, RC.globalDouble("VeerProportional"), RC.globalDouble("VeerDerivative"), RC.globalDouble("VeerIntegral"));
+    private boolean useVeerCheck = true;
+    private PID veerAlgorithm = new PID(PID.Type.PID, RC.globalDouble("VeerProportional"), RC.globalDouble("VeerDerivative"), RC.globalDouble("VeerIntegral"));
+    private final static double MINIMUM_TRACKING_SPEED = 0.2;
+    private final static double TRACKING_ACCURACY_TIKS = 50;
 
     public Fermion(boolean auto) {
         leftFore = new Motor("leftFore");
@@ -66,12 +65,13 @@ public class Fermion {
         rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightBack.minSpeed = 0;
 
-        catapult = new Motor("catapult");
-
         leftFore.setReverse(true);
         leftBack.setReverse(true);
 
-        mouse = new TrackBall("rightFore", "rightBack"); //doesn't work...
+        shooter1 = new LinearServo("shoot1");
+        shooter2 = new LinearServo("shoot2");
+
+        mouse = new TrackBall("rightFore", "rightBack");
         if (auto) {
             BNO055IMU.Parameters params = new BNO055IMU.Parameters();
             params.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
@@ -79,11 +79,13 @@ public class Fermion {
 
             imu = (AdafruitBNO055IMU) RC.h.get(BNO055IMU.class, "adafruit");
             imu.initialize(params);
-
         }//if
-    }//Alpha
+    }//Fermion
 
-    //methods for just usual mecanum wheel driving
+    /*
+    MECANUM DRIVING METHODS
+     */
+
     public void forward(double speed) {
 
         strafe(0, speed);
@@ -133,15 +135,11 @@ public class Fermion {
         rightBack.stop();
     }//stop
 
-    public void resetTargetAngle() {
-        this.targetAngle = MathUtils.cvtAngleToNewDomain(getIMUAngle()[0]);
-    }
-
     /*
     Allows robot to strafe in any direction, with 0° being the front of robot
                          0°
                          |
-                 -90° –     – 90°
+                 -90° –    – 90°
                          |
                        ±180°
      */
@@ -157,9 +155,6 @@ public class Fermion {
         leftForeRightBack *= multi;
         rightForeLeftBack *= multi;
 
-        leftForeRightBackStrafeSpeed = leftForeRightBack;
-        rightForeLeftBackStrafeSpeed = rightForeLeftBack;
-
         leftFore.setPower(leftForeRightBack);
         leftBack.setPower(rightForeLeftBack);
         rightFore.setPower(rightForeLeftBack);
@@ -170,26 +165,25 @@ public class Fermion {
     public void track(double degrees, double mm, double speed) {
 
         strafe(degrees, speed);
-
         mm *= 1440 / (4 * Math.PI * 25.4);
 
-        double distanceRemaining = 0;
-        Point begin = mouse.getEncTiks();
-        Point end = new Point(begin.x + mm * Math.sin(Math.toRadians(degrees)), begin.y + mm * Math.cos(Math.toRadians(degrees)));
+        double distanceRemaining;
+        TrackBall.Point begin = mouse.getEncTiks();
+        TrackBall.Point end = new TrackBall.Point(begin.x + mm * Math.sin(Math.toRadians(degrees)), begin.y + mm * Math.cos(Math.toRadians(degrees)));
 
         Log.i("DISTPID", "X: " + (end.x - begin.x) + ", Y: " + (end.y - begin.y));
 
         while (RC.l.opModeIsActive()) {
-            Point current = mouse.getEncTiks();
+            TrackBall.Point current = mouse.getEncTiks();
             distanceRemaining = Math.hypot(end.x - current.x, end.y - current.y);
 
             Log.i("Distance", distanceRemaining + "");
 
-            strafe(Math.toDegrees(Math.atan2(end.x - current.x, end.y - current.y)), ((speed - minimumTrackingSpeed) * (distanceRemaining / mm)) + minimumTrackingSpeed);
+            strafe(Math.toDegrees(Math.atan2(end.x - current.x, end.y - current.y)), ((speed - MINIMUM_TRACKING_SPEED) * (distanceRemaining / mm)) + MINIMUM_TRACKING_SPEED);
 
             Log.i("ANGLEPID", Math.atan2(end.x - current.x, end.y - current.y) + "");
 
-            if (Math.abs(distanceRemaining) < 100 * speed) {
+            if (Math.abs(distanceRemaining) < TRACKING_ACCURACY_TIKS) {
                 break;
             }//if
         }//while
@@ -212,13 +206,12 @@ public class Fermion {
             double currentAngle = MathUtils.cvtAngleToNewDomain(getIMUAngle()[0]);
             double angleToTurn = MathUtils.cvtAngleJumpToNewDomain(currentAngle - targetAngle);
 
-            turnL(angleToTurn / 180 * (speed - 0.1) + 0.1);
+            turnL(angleToTurn / 180 * (speed - MINIMUM_TURNING_SPEED) + MINIMUM_TURNING_SPEED);
 
             if (angleToTurn < TURNING_ACCURACY_DEG) {
                 break;
             }//if
         }//while
-
 
         stop();
         useVeerCheck = true;
@@ -226,10 +219,10 @@ public class Fermion {
 
     public void imuTurnR(double degrees, double speed) {
 
-        this.targetAngle = MathUtils.cvtAngleToNewDomain(targetAngle + degrees);
         if(degrees < TURNING_ACCURACY_DEG) return;
-
         turnR(speed);
+
+        this.targetAngle = MathUtils.cvtAngleToNewDomain(targetAngle + degrees);
 
         double beginAngle = MathUtils.cvtAngleToNewDomain(getIMUAngle()[0]);
         double targetAngle = MathUtils.cvtAngleToNewDomain(beginAngle + degrees);
@@ -239,7 +232,7 @@ public class Fermion {
             double currentAngle = MathUtils.cvtAngleToNewDomain(getIMUAngle()[0]);
             double angleToTurn = MathUtils.cvtAngleJumpToNewDomain(targetAngle - currentAngle);
 
-            turnR(angleToTurn / 180 * (speed - 0.1) + 0.1);
+            turnR(angleToTurn / 180 * (speed - MINIMUM_TURNING_SPEED) + MINIMUM_TURNING_SPEED);
 
             if (angleToTurn < TURNING_ACCURACY_DEG) {
                 break;
@@ -256,10 +249,10 @@ public class Fermion {
         double toTurn = MathUtils.cvtAngleJumpToNewDomain(degrees - currentAngle);
 
         if (toTurn < 0) {
-            imuTurnL(Math.abs(toTurn), speed);
+            imuTurnL(-toTurn, speed);
         } else {
-            imuTurnR(Math.abs(toTurn), speed);
-        }//if
+            imuTurnR(toTurn, speed);
+        }//else
     }//absoluteIMUTurn
 
     public double[] getIMUAngle() {
@@ -267,6 +260,10 @@ public class Fermion {
 
         return new double[] {-orient.firstAngle, -orient.secondAngle, -orient.thirdAngle};
     }//getIMUAngle
+
+    public void resetTargetAngle() {
+        this.targetAngle = MathUtils.cvtAngleToNewDomain(getIMUAngle()[0]);
+    }//resetTargetAngle
 
     public void addVeerCheckRunnable() {
         TaskHandler.addLoopedTask("veerCheck", new Runnable() {
@@ -278,9 +275,8 @@ public class Fermion {
     }//addVeerCheckRunnable
 
     //to be used via TaskHandler
-    //therefore, it's not a loop
     //essentially, we need to turn and strafe at the same time
-    //uses PID (PID hasn't been tested!)
+    //uses PID
     public void veerCheck() {
         if (useVeerCheck) {
             double currentAngle = MathUtils.cvtAngleToNewDomain(getIMUAngle()[0]);
@@ -292,16 +288,19 @@ public class Fermion {
             double strength = Math.signum(angleError) * Math.abs(veerAlgorithm.update(angleError));
 
             Log.i("PID Val", "" + strength);
+
             veer(strength, preservingStrafeSpeed);
         }//if
     }//veerCheck
 
-    //Changes the robot while letting it keep strafing
-    //veerCheck() and veer() have been separated
-    //because veer() is used in Tele-Op and Autonomous
+    //Changes the robot's angle while letting it keep strafing
     //if speed < 0, robot will veer left
     //if speed > 0, robot will veer right
+    //if preservingStrafeSpeed is true, then the robot's strafing speed won't be affected
+    //if preservingStrafeSpeed is false, then the robot might slow down to accomodate veering
     public void veer(double speed, boolean preservingStrafeSpeed) {
+
+        speed = Math.signum(speed) * Math.min(1, Math.abs(speed));
 
         double leftForePower = (leftFore.getPower() + rightBack.getPower()) / 2.0;
         double leftBackPower = (leftBack.getPower() + rightFore.getPower()) / 2.0;
@@ -324,15 +323,15 @@ public class Fermion {
         } else {
 
             double max = MathUtils.max(Math.abs(leftBackPower + speed), Math.abs(leftForePower + speed), Math.abs(rightBackPower - speed), Math.abs(rightForePower - speed));
-            double highestSpeed = MathUtils.max(Math.abs(leftBackPower), Math.abs(leftForePower), Math.abs(rightBackPower), Math.abs(rightForePower));
+            double maxOriginal = MathUtils.max(Math.abs(leftBackPower), Math.abs(leftForePower), Math.abs(rightBackPower), Math.abs(rightForePower));
 
             if (max > 1) {
-                double maxAllowed = 1 - (max - 1);
+                double maxAllowed = 1 - Math.abs(speed);
 
-                leftForePower *= maxAllowed / highestSpeed;
-                leftBackPower *= maxAllowed / highestSpeed;
-                rightForePower *= maxAllowed / highestSpeed;
-                rightBackPower *= maxAllowed / highestSpeed;
+                leftForePower *= maxAllowed / maxOriginal;
+                leftBackPower *= maxAllowed / maxOriginal;
+                rightForePower *= maxAllowed / maxOriginal;
+                rightBackPower *= maxAllowed / maxOriginal;
             }//if
 
             leftForePower += speed;
@@ -350,35 +349,56 @@ public class Fermion {
         rightBack.setPower(rightBackPower);
     }//veer
 
-    public void strafeToBeacon(VuforiaTrackableDefaultListener beacon, double targetDistance, double speed) {
+    public void strafeToBeacon(VuforiaTrackableDefaultListener beacon, double bufferDistance, double speed, boolean strafe) {
 
-        strafeToBeacon(beacon, targetDistance, speed, -0.1f, new VectorF(0, -0.1f, 0));
+        if (beacon.getPose() != null) {
+            VectorF trans = beacon.getPose().getTranslation();
 
-    }//strafeToBeacon
+            double angle = Math.toDegrees(Math.atan2(trans.get(0), -trans.get(2)));
 
-    //until we can get a omni-directional distance sensor, the robot must turn towards the beacon first
-    public void strafeToBeacon(VuforiaTrackableDefaultListener beacon, double targetDistance, double speed,
-                               double robotAngle, VectorF coordinate) {
+            if (strafe) {
+                track(angle, Math.hypot(trans.get(0), trans.get(2) - bufferDistance), speed);
+            } else {
+                if (angle < 0) {
+                    imuTurnL(-angle, speed);
+                } else {
+                    imuTurnR(angle, speed);
+                }//else
 
-        VectorF trans = beacon.getPose().getTranslation();
+                track(0, Math.hypot(trans.get(0), trans.get(2)) - bufferDistance, speed);
+            }//else
 
-        if (robotAngle != -0.1f) {
-            trans = VortexUtils.navOffWall(trans, robotAngle, coordinate);
-        }//if
-
-        double angle = Math.toDegrees(Math.atan2(trans.get(0), -trans.get(2)));
-
-        if (angle < 0) {
-            imuTurnL(-angle, speed);
         } else {
-            imuTurnR(angle, speed);
+            RC.t.addData("FERMION", "Strafe To Beacon failed: Beacon not visible");
         }//else
 
-        stop();
     }//strafeToBeacon
 
-    public void fireParticle() {
-        catapult.runToPosition(1120, 0.5); //spin one full revolution
-    }
+    public void strafeToBeacon(VuforiaTrackableDefaultListener beacon, double bufferDistance, double speed, boolean strafe,
+                               double robotAngle, VectorF coordinate) {
+
+        if (beacon.getPose() != null) {
+            VectorF trans = beacon.getPose().getTranslation();
+
+            trans = VortexUtils.navOffWall(trans, robotAngle, coordinate);
+
+            double angle = Math.toDegrees(Math.atan2(trans.get(0), -trans.get(2)));
+
+            if (strafe) {
+                track(angle, Math.hypot(trans.get(0), trans.get(2)) - bufferDistance, speed);
+            } else {
+                if (angle < 0) {
+                    imuTurnL(-angle, speed);
+                } else {
+                    imuTurnR(angle, speed);
+                }//else
+
+                track(0, Math.hypot(trans.get(0), trans.get(2) - bufferDistance), speed);
+            }//else
+
+        } else {
+            RC.t.addData("FERMION", "Strafe To Beacon failed: Beacon not visible");
+        }//else
+    }//strafeToBeacon
 
 }//Fermion

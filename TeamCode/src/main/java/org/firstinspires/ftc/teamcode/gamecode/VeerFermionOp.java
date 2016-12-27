@@ -15,23 +15,25 @@ public class VeerFermionOp extends TeleOpMode {
 
     @Override
     public void initialize() {
+//        top = new Fermion(true);
         tau = new Fermion(false);
+//        top.mouse.addAbsoluteCoordinateRunnable(top.imu);
+//        setDataLogFile("path.txt", true);
     }
 
     @Override
     public void loopOpMode() {
+//        dataLogData(top.mouse.absoluteFieldCoord.toString() + "\n");
 
-        double theta = Math.abs(Math.atan2(joy1.x1(), -joy1.y1()));
+        double theta = Math.atan2(joy1.x1(), joy1.y1());
 
-        if(joy1.x1() < 0) theta *= -1;
-
-        double speed = (joy1.rightBumper())?0.3:Math.hypot(joy1.y1() , joy1.x1());
+        double speed = (joy1.rightBumper())? 0.3 : Math.hypot(joy1.y1(), joy1.x1());
 
         tau.strafe(Math.toDegrees(MathUtils.roundToNearest(theta, Math.PI / 4, -Math.PI, Math.PI)), speed);
 
-        tau.veer(-Math.round(joy1.x2()) / 3.0, false);
+        tau.veer(Math.round(joy1.x2()) / 3.0, false);
 
         Log.i("Speeds", tau.leftBack.getPower() + ", " + tau.leftFore.getPower() + ", " + tau.rightBack.getPower() + ", " + tau.rightFore.getPower());
 
-    }
-}
+    }//loopOpMode
+}//VeerFermionOp

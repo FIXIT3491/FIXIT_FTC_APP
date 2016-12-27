@@ -8,7 +8,6 @@ import com.vuforia.CameraCalibration;
 import com.vuforia.Image;
 import com.vuforia.Matrix34F;
 import com.vuforia.Tool;
-import com.vuforia.Vec2F;
 import com.vuforia.Vec3F;
 
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
@@ -31,22 +30,53 @@ import java.util.Arrays;
  */
 public class VortexUtils {
 
-    public final static int BEACON_NOT_VISIBLE = 0;
+    public final static int NOT_VISIBLE = 0;
+
     public final static int BEACON_BLUE_RED = 1;
     public final static int BEACON_RED_BLUE = 2;
     public final static int BEACON_ALL_BLUE = 3;
     public final static int BEACON_NO_BLUE = 4;
 
+    public final static int OBJECT_BLUE = 1;
+    public final static int OBJECT_RED = 2;
+
     //hsv blue beacon range colours
     //DON'T CHANGE THESE NUMBERS
-    public final static Scalar blueLow = new Scalar(108, 0, 220);
-    public final static Scalar blueHigh = new Scalar(178, 255, 255);
+    public final static Scalar BEACON_BLUE_LOW = new Scalar(108, 0, 220);
+    public final static Scalar BEACON_BLUE_HIGH = new Scalar(178, 255, 255);
+    
+    public final static Scalar OTHER_BLUE_LOW = new Scalar(105, 120, 110);
+    public final static Scalar OTHER_BLUE_HIGH = new Scalar(185, 255, 255);
+    public final static Scalar OTHER_RED_LOW = new Scalar(222, 101, 192);
+    public final static Scalar OTHER_RED_HIGH = new Scalar(47, 251, 255);
+
+    public static Mat applyMask(Mat img, Scalar low, Scalar high) {
+
+        Mat mask = new Mat(img.size(), CvType.CV_8UC3);
+
+        if (high.val[0] < low.val[0]) {
+            Scalar lowMed = new Scalar(255, high.val[1], high.val[2]);
+            Scalar medHigh = new Scalar(0, low.val[1], low.val[2]);
+
+            Mat maskLow = new Mat(img.size(), CvType.CV_8UC3);
+            Mat maskHigh = new Mat(img.size(), CvType.CV_8UC3);
+
+            Core.inRange(img, low, lowMed, maskLow);
+            Core.inRange(img, medHigh, high, maskHigh);
+
+            Core.bitwise_or(maskLow, maskHigh, mask);
+        } else {
+            Core.inRange(img, low, high, mask);
+        }//else
+
+        return mask;
+    }
 
     public static int waitForBeaconConfig(Image img, VuforiaTrackableDefaultListener beacon, CameraCalibration camCal, long timeOut) {
 
-        int config = BEACON_NOT_VISIBLE;
+        int config = NOT_VISIBLE;
         long beginTime = System.currentTimeMillis();
-        while (config == BEACON_NOT_VISIBLE && System.currentTimeMillis() - beginTime < timeOut && RC.l.opModeIsActive()) {
+        while (config == NOT_VISIBLE && System.currentTimeMillis() - beginTime < timeOut && RC.l.opModeIsActive()) {
             config = getBeaconConfig(img, beacon, camCal);
             RC.l.idle();
         }//while
@@ -92,7 +122,6 @@ public class VortexUtils {
             width = (x + width > crop.cols())? crop.cols() - x : width;
             height = (y + height > crop.rows())? crop.rows() - y : height;
 
-
             //cropping bounding box out of camera image
             final Mat cropped = new Mat(crop, new Rect((int) x, (int) y, (int) width, (int) height));
 
@@ -103,7 +132,8 @@ public class VortexUtils {
             //if pixel is within acceptable blue-beacon-colour range, it's changed to white.
             //Otherwise, it's turned to black
             Mat mask = new Mat();
-            Core.inRange(cropped, VortexUtils.blueLow, VortexUtils.blueHigh, mask);
+
+            Core.inRange(cropped, BEACON_BLUE_LOW, BEACON_BLUE_HIGH, mask);
             Moments mmnts = Imgproc.moments(mask, true);
 
             //calculating centroid of the resulting binary mask via image moments
@@ -128,9 +158,63 @@ public class VortexUtils {
             }//else
         }//if
 
-        return VortexUtils.BEACON_NOT_VISIBLE;
+        return VortexUtils.NOT_VISIBLE;
     }//getBeaconConfig
 
+
+    public static int isBlueOrRed(Image img, VuforiaTrackableDefaultListener object, CameraCalibration camCal, VectorF sizeOfObject, int objectType) {
+
+        OpenGLMatrix pose = object.getPose();
+        if (pose != null && img != null && img.getPixels() != null) {
+
+            Bitmap bm = Bitmap.createBitmap(img.getWidth(), img.getHeight(), Bitmap.Config.RGB_565);
+            bm.copyPixelsFromBuffer(img.getPixels());
+
+            //turning the corner pixel coordinates into a proper bounding box
+            Mat analyse = OCVUtils.bitmapToMat(bm, CvType.CV_8UC3);
+
+            Matrix34F rawPose = new Matrix34F();
+            float[] poseData = Arrays.copyOfRange(pose.transposed().getData(), 0, 12);
+
+            rawPose.setData(poseData);
+
+            //calculating pixel coordinates of beacon corners
+            float[][] corners = new float[6][2];
+
+            corners[0] = Tool.projectPoint(camCal, rawPose, new Vec3F(sizeOfObject.get(0) / 2, sizeOfObject.get(1) / 2, sizeOfObject.get(2) / 2)).getData(); //upper left of beacon
+            corners[1] = Tool.projectPoint(camCal, rawPose, new Vec3F(-sizeOfObject.get(0) / 2, sizeOfObject.get(1) / 2, sizeOfObject.get(2) / 2)).getData(); //upper right of beacon
+            corners[2] = Tool.projectPoint(camCal, rawPose, new Vec3F(-sizeOfObject.get(0) / 2, -sizeOfObject.get(1) / 2, sizeOfObject.get(2) / 2)).getData(); //lower right of beacon
+            corners[3] = Tool.projectPoint(camCal, rawPose, new Vec3F(sizeOfObject.get(0) / 2, -sizeOfObject.get(1) / 2, -sizeOfObject.get(2) / 2)).getData(); //lower left of beacon
+            corners[4] = Tool.projectPoint(camCal, rawPose, new Vec3F(-sizeOfObject.get(0) / 2, sizeOfObject.get(1) / 2, -sizeOfObject.get(2) / 2)).getData(); //lower left of beacon
+            corners[5] = Tool.projectPoint(camCal, rawPose, new Vec3F(-sizeOfObject.get(0) / 2, -sizeOfObject.get(1) / 2, -sizeOfObject.get(2) / 2)).getData(); //lower left of beacon
+
+            double x = MathUtils.min(corners[0][0], corners[1][0], corners[2][0], corners[3][0], corners[4][0], corners[5][0]);
+            double y = MathUtils.min(corners[0][1], corners[1][1], corners[2][1], corners[3][1], corners[4][1], corners[5][1]);
+            double width = MathUtils.range(corners[0][0], corners[1][0], corners[2][0], corners[3][0], corners[4][0], corners[5][0]);
+            double height = MathUtils.range(corners[0][1], corners[1][1], corners[2][1], corners[3][1], corners[4][1], corners[5][1]);
+
+            x = Math.max(0, x);
+            y = Math.max(0, y);
+
+            width = (x + width > analyse.cols())? analyse.cols() - x : width;
+            height = (y + height > analyse.rows())? analyse.rows() - y : height;
+
+            Mat cropped = new Mat(analyse, new Rect((int) x, (int) y, (int) width, (int) height));
+
+            Mat maskBlue = applyMask(cropped, OTHER_BLUE_LOW, OTHER_BLUE_HIGH);
+
+            Mat maskRed = applyMask(cropped, OTHER_RED_LOW, OTHER_RED_HIGH);
+
+            if (Imgproc.moments(maskBlue).get_m00() > Imgproc.moments(maskRed).get_m00()) {
+                return OBJECT_BLUE;
+            } else {
+                return OBJECT_RED;
+            }//else
+
+        }//if
+
+        return NOT_VISIBLE;
+    }//isBlueOrRed
 
     @Nullable
     public static Image getImageFromFrame(VuforiaLocalizer.CloseableFrame frame, int format) {
@@ -150,19 +234,18 @@ public class VortexUtils {
     public static VectorF navOffWall(VectorF trans, double robotAngle, VectorF offWall){
         return new VectorF(
                 (float) (trans.get(0) - offWall.get(0) * Math.sin(Math.toRadians(robotAngle)) - offWall.get(2) * Math.cos(Math.toRadians(robotAngle))),
-                trans.get(1),
-                (float) (trans.get(2) + offWall.get(0) * Math.cos(Math.toRadians(robotAngle)) - offWall.get(2) * Math.sin(Math.toRadians(robotAngle)))
+                trans.get(1) + offWall.get(1),
+                (float) (-trans.get(2) + offWall.get(0) * Math.cos(Math.toRadians(robotAngle)) - offWall.get(2) * Math.sin(Math.toRadians(robotAngle)))
         );
     }
 
     public static VectorF navOffWall2(VectorF trans, double robotAngle, VectorF offWall){
-        double theta = Math.atan2(offWall.get(2), offWall.get(0)) + Math.toRadians(robotAngle);
-        double hypot = Math.hypot(trans.get(0), trans.get(2));
+        double theta = Math.toDegrees(Math.atan2(offWall.get(0), offWall.get(2)));
 
         return new VectorF(
-                (float) (trans.get(0) - hypot * Math.sin(theta)),
+                (float) (trans.get(0) - offWall.get(0) * Math.sin(Math.toRadians(robotAngle)) - offWall.get(2) * Math.cos(Math.toRadians(robotAngle))),
                 trans.get(1),
-                (float) (-trans.get(2) + hypot * Math.cos(theta))
+                (float) (-trans.get(2) + offWall.get(0) * Math.cos(Math.toRadians(robotAngle)) - offWall.get(2) * Math.sin(Math.toRadians(robotAngle)))
         );
     }
 }

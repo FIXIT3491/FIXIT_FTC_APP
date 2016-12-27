@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.util;
 
-import android.util.Log;
-
 import com.qualcomm.hardware.adafruit.BNO055IMU;
 
 /**
@@ -24,12 +22,12 @@ public class PID {
         switch (type) {
             case PID:
                 kProp = gains[0];
-                kDeriv = gains[1];
-                kIntegr = gains[2];
+                kIntegr = gains[1];
+                kDeriv = gains[2];
                 break;
             case ID:
-                kDeriv = gains[0];
-                kIntegr = gains[1];
+                kIntegr = gains[0];
+                kDeriv = gains[1];
                 break;
             case PI:
                 kProp = gains[0];
@@ -59,19 +57,33 @@ public class PID {
         ID,
         P,
         I,
-        D
+        D;
+
+        public boolean containsP() {
+            return this.equals(PID) || this.equals(PI) || this.equals(PD) || this.equals(P);
+        }
+
+        public boolean containsI() {
+            return this.equals(PID) || this.equals(PI) || this.equals(ID) || this.equals(I);
+        }
+
+        public boolean containsD() {
+            return this.equals(PID) || this.equals(ID) || this.equals(PD) || this.equals(D);
+        }
     }//Type
 
     //method to call every time a new error is calculated
     public double update(double error) {
 
-        integrStore += error;
+        if (algorithmType.containsI()) {
+            integrStore += error;
+        }//if
 
         double val = kProp * error + kIntegr * integrStore + kDeriv * (error - derivStore);
 
-        derivStore = error;
-
-        Log.i("PID Values", "Prop: " + (kProp * error) + ", Deriv: " + (kDeriv * (error - derivStore)) + ", Integr: " + kIntegr * integrStore);
+        if (algorithmType.containsD()) {
+            derivStore = error;
+        }//if
 
         return val;
     }
