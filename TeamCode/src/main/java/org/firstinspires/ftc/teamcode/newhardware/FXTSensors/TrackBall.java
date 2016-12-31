@@ -22,13 +22,13 @@ public class TrackBall {
         xEnc = RC.h.dcMotor.get(xAddr);
         yEnc = RC.h.dcMotor.get(yAddr);
 
-        lastTiks = new Point(xEnc.getCurrentPosition(), yEnc.getCurrentPosition());
+        lastTiks = new Point(xEnc.getCurrentPosition(), -yEnc.getCurrentPosition());
     }//TrackBall
 
     //switch encoder ports
     //and reverse the values
     public Point getEncTiks() {
-        return new Point(-xEnc.getCurrentPosition(), -yEnc.getCurrentPosition());
+        return new Point(xEnc.getCurrentPosition(), -yEnc.getCurrentPosition());
     }
 
     public void setAbsoluteCoord(Point coord) {

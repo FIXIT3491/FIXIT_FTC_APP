@@ -21,13 +21,11 @@ public class FermionOp extends LinearTeleOpMode {
     VuforiaTrackableDefaultListener gears;
     VuforiaTrackableDefaultListener tools;
 
-
     @Override
     public void initialize() {
         charm = new Fermion(false);
         TaskHandler.removeAllTasks();
     }
-
 
     @Override
     public void loopOpMode() {
@@ -47,12 +45,11 @@ public class FermionOp extends LinearTeleOpMode {
             if(joy1.x1() < 0) theta *= -1;
 
             double speed = (joy1.rightBumper())?0.3:1;
-            charm.strafe(Math.toDegrees(MathUtils.roundToNearest(theta, Math.PI / 4, -Math.PI, Math.PI)), speed);
+            charm.strafe(Math.toDegrees(MathUtils.roundToNearest(theta, Math.PI / 4, -Math.PI, Math.PI)), speed, true);
         }
 
-        if (joy1.rightTrigger()) {
-            charm.fireParticle();
-        }//if
+
+
 
         telemetry.addData("FL", charm.leftFore.returnCurrentState());
         telemetry.addData("FR", charm.rightFore.returnCurrentState());

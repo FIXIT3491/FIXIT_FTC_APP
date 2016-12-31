@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.robots;
 
+import android.support.annotation.IntDef;
 import android.util.Log;
 
 import com.qualcomm.hardware.adafruit.AdafruitBNO055IMU;
@@ -10,7 +11,9 @@ import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.teamcode.RC;
+import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.FXTOpticalDistanceSensor;
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.TrackBall;
+import org.firstinspires.ftc.teamcode.newhardware.FXTServo;
 import org.firstinspires.ftc.teamcode.newhardware.LinearServo;
 import org.firstinspires.ftc.teamcode.newhardware.Motor;
 import org.firstinspires.ftc.teamcode.roboticslibrary.TaskHandler;
@@ -34,9 +37,15 @@ public class Fermion {
     public Motor rightFore;
     public Motor leftBack;
     public Motor rightBack;
+    public Motor collector;
 
     public LinearServo shooter1;
     public LinearServo shooter2;
+
+    public FXTServo door;
+
+    public FXTOpticalDistanceSensor leftBeacon;
+    public FXTOpticalDistanceSensor rightBeacon;
 
     public double targetAngle = 0;
     private final static double TURNING_ACCURACY_DEG = 2;
@@ -45,8 +54,22 @@ public class Fermion {
     public boolean preservingStrafeSpeed = false;
     private boolean useVeerCheck = true;
     private PID veerAlgorithm = new PID(PID.Type.PID, RC.globalDouble("VeerProportional"), RC.globalDouble("VeerDerivative"), RC.globalDouble("VeerIntegral"));
-    private final static double MINIMUM_TRACKING_SPEED = 0.2;
-    private final static double TRACKING_ACCURACY_TIKS = 50;
+    private final static double MINIMUM_TRACKING_SPEED = 0.19;
+    private final static double TRACKING_ACCURACY_TIKS = 30;
+
+    public double commandedStrafeSpeedRightForeLeftBack = 0;
+    public double commandedStrafeSpeedRightBackLeftFore = 0;
+
+    public static int LOADED = 0;
+    public static int FIRING = 1;
+    public static int PRIMED = 2;
+    public static int RELOADING = 3;
+    public static int PRIMING = 4;
+    public static int FIRE = 5;
+    private long fireTime = 0;
+
+    public int shooterState = LOADED;
+    public int requestedShooterState = LOADED;
 
     public Fermion(boolean auto) {
         leftFore = new Motor("leftFore");
@@ -68,8 +91,20 @@ public class Fermion {
         leftFore.setReverse(true);
         leftBack.setReverse(true);
 
+        collector = new Motor("collector");
+
         shooter1 = new LinearServo("shoot1");
+        shooter1.setPosition(0.2);
         shooter2 = new LinearServo("shoot2");
+        shooter2.setPosition(0.2);
+
+
+        door = new FXTServo("door");
+        door.addPos("open", 0.53);
+        door.addPos("close", 0);
+        door.goToPos("close");
+
+
 
         mouse = new TrackBall("rightFore", "rightBack");
         if (auto) {
@@ -80,33 +115,44 @@ public class Fermion {
             imu = (AdafruitBNO055IMU) RC.h.get(BNO055IMU.class, "adafruit");
             imu.initialize(params);
         }//if
+
+        leftBeacon = new FXTOpticalDistanceSensor("leftBeacon");
+        rightBeacon = new FXTOpticalDistanceSensor("rightBeacon");
+
     }//Fermion
 
     /*
     MECANUM DRIVING METHODS
      */
 
+    public void usePlannedSpeeds() {
+        leftFore.usePlannedSpeed();
+        leftBack.usePlannedSpeed();
+        rightFore.usePlannedSpeed();
+        rightBack.usePlannedSpeed();
+    }//usePlannedSpeeds
+
     public void forward(double speed) {
 
-        strafe(0, speed);
+        strafe(0, speed, true);
 
     }//forward
 
     public void backward(double speed) {
 
-        strafe(180, speed);
+        strafe(180, speed, true);
 
     }//forward
 
     public void left(double speed) {
 
-        strafe(-90, speed);
+        strafe(-90, speed, true);
 
     }//left
 
     public void right(double speed) {
 
-        strafe(90, speed);
+        strafe(90, speed, true);
 
     }//right
 
@@ -129,6 +175,8 @@ public class Fermion {
     }//turnL
 
     public void stop() {
+        commandedStrafeSpeedRightBackLeftFore = 0;
+        commandedStrafeSpeedRightForeLeftBack = 0;
         leftFore.stop();
         rightFore.stop();
         leftBack.stop();
@@ -143,7 +191,7 @@ public class Fermion {
                          |
                        ±180°
      */
-    public void strafe(double degrees, double speed) {
+    public void strafe(double degrees, double speed, boolean setImmediately) {
         useVeerCheck = true;
 
         degrees += 45;
@@ -155,16 +203,27 @@ public class Fermion {
         leftForeRightBack *= multi;
         rightForeLeftBack *= multi;
 
-        leftFore.setPower(leftForeRightBack);
-        leftBack.setPower(rightForeLeftBack);
-        rightFore.setPower(rightForeLeftBack);
-        rightBack.setPower(leftForeRightBack);
+        if (!setImmediately) {
+            Log.i("!!!PlannedSpeeds", leftForeRightBack + ", " + rightForeLeftBack);
+            leftFore.setPlannedSpeed(leftForeRightBack);
+            leftBack.setPlannedSpeed(rightForeLeftBack);
+            rightFore.setPlannedSpeed(rightForeLeftBack);
+            rightBack.setPlannedSpeed(leftForeRightBack);
+        } else {
+            leftFore.setPower(leftForeRightBack);
+            leftBack.setPower(rightForeLeftBack);
+            rightFore.setPower(rightForeLeftBack);
+            rightBack.setPower(leftForeRightBack);
+        }//else
+
+        commandedStrafeSpeedRightBackLeftFore = leftForeRightBack;
+        commandedStrafeSpeedRightForeLeftBack = rightForeLeftBack;
 
     }//strafe
 
     public void track(double degrees, double mm, double speed) {
 
-        strafe(degrees, speed);
+        strafe(degrees, speed, true);
         mm *= 1440 / (4 * Math.PI * 25.4);
 
         double distanceRemaining;
@@ -177,9 +236,9 @@ public class Fermion {
             TrackBall.Point current = mouse.getEncTiks();
             distanceRemaining = Math.hypot(end.x - current.x, end.y - current.y);
 
-            Log.i("Distance", distanceRemaining + "");
+            Log.i("Distance", distanceRemaining + "; " + current.toString() + "; " + (((speed - MINIMUM_TRACKING_SPEED) * Math.pow(distanceRemaining / mm, 2)) + MINIMUM_TRACKING_SPEED));
 
-            strafe(Math.toDegrees(Math.atan2(end.x - current.x, end.y - current.y)), ((speed - MINIMUM_TRACKING_SPEED) * (distanceRemaining / mm)) + MINIMUM_TRACKING_SPEED);
+            strafe(Math.toDegrees(Math.atan2(end.x - current.x, end.y - current.y)), (((speed - MINIMUM_TRACKING_SPEED) * Math.pow(distanceRemaining / mm, 2)) + MINIMUM_TRACKING_SPEED), true);
 
             Log.i("ANGLEPID", Math.atan2(end.x - current.x, end.y - current.y) + "");
 
@@ -253,6 +312,7 @@ public class Fermion {
         } else {
             imuTurnR(toTurn, speed);
         }//else
+        setTargetAngle(degrees);
     }//absoluteIMUTurn
 
     public double[] getIMUAngle() {
@@ -264,6 +324,10 @@ public class Fermion {
     public void resetTargetAngle() {
         this.targetAngle = MathUtils.cvtAngleToNewDomain(getIMUAngle()[0]);
     }//resetTargetAngle
+
+    public void setTargetAngle(double targetAngle){
+        this.targetAngle = targetAngle;
+    }
 
     public void addVeerCheckRunnable() {
         TaskHandler.addLoopedTask("veerCheck", new Runnable() {
@@ -289,7 +353,7 @@ public class Fermion {
 
             Log.i("PID Val", "" + strength);
 
-            veer(strength, preservingStrafeSpeed);
+            veer(strength, preservingStrafeSpeed, true);
         }//if
     }//veerCheck
 
@@ -298,14 +362,26 @@ public class Fermion {
     //if speed > 0, robot will veer right
     //if preservingStrafeSpeed is true, then the robot's strafing speed won't be affected
     //if preservingStrafeSpeed is false, then the robot might slow down to accomodate veering
-    public void veer(double speed, boolean preservingStrafeSpeed) {
+    public void veer(double speed, boolean preservingStrafeSpeed, boolean setImmediately) {
 
         speed = Math.signum(speed) * Math.min(1, Math.abs(speed));
+//
+//        double leftForePower = (leftFore.getPower() + rightBack.getPower()) / 2.0;
+//        double leftBackPower = (leftBack.getPower() + rightFore.getPower()) / 2.0;
+//        double rightForePower = (leftBack.getPower() + rightFore.getPower()) / 2.0;
+//        double rightBackPower = (leftFore.getPower() + rightBack.getPower()) / 2.0;
 
-        double leftForePower = (leftFore.getPower() + rightBack.getPower()) / 2.0;
-        double leftBackPower = (leftBack.getPower() + rightFore.getPower()) / 2.0;
-        double rightForePower = (leftBack.getPower() + rightFore.getPower()) / 2.0;
-        double rightBackPower = (leftFore.getPower() + rightBack.getPower()) / 2.0;
+        double leftForePower = commandedStrafeSpeedRightBackLeftFore;
+        double leftBackPower = commandedStrafeSpeedRightForeLeftBack;
+        double rightForePower = commandedStrafeSpeedRightForeLeftBack;
+        double rightBackPower = commandedStrafeSpeedRightBackLeftFore;
+
+        if (!setImmediately) {
+            leftForePower = (leftFore.plannedSpeed + rightBack.plannedSpeed) / 2.0;
+            leftBackPower = (rightFore.plannedSpeed + leftBack.plannedSpeed) / 2.0;
+            rightForePower = (rightFore.plannedSpeed + leftBack.plannedSpeed) / 2.0;
+            rightBackPower = (leftFore.plannedSpeed + rightBack.plannedSpeed) / 2.0;
+        }
 
         if (preservingStrafeSpeed) {
 
@@ -343,10 +419,18 @@ public class Fermion {
 
         Log.i("Resulting Speeds", "LF: " + leftForePower + ", LB: " + leftBackPower + ", RF: " + rightForePower + ", RB: " + rightBackPower);
 
-        leftFore.setPower(leftForePower);
-        leftBack.setPower(leftBackPower);
-        rightFore.setPower(rightForePower);
-        rightBack.setPower(rightBackPower);
+        if (!setImmediately) {
+            leftFore.setPlannedSpeed(leftForePower);
+            leftBack.setPlannedSpeed(leftBackPower);
+            rightFore.setPlannedSpeed(rightForePower);
+            rightBack.setPlannedSpeed(rightBackPower);
+        } else {
+            leftFore.setPower(leftForePower);
+            leftBack.setPower(leftBackPower);
+            rightFore.setPower(rightForePower);
+            rightBack.setPower(rightBackPower);
+        }//else
+
     }//veer
 
     public void strafeToBeacon(VuforiaTrackableDefaultListener beacon, double bufferDistance, double speed, boolean strafe) {
@@ -380,9 +464,16 @@ public class Fermion {
         if (beacon.getPose() != null) {
             VectorF trans = beacon.getPose().getTranslation();
 
+            Log.i(TAG, "strafeToBeacon: " + trans);
+
             trans = VortexUtils.navOffWall(trans, robotAngle, coordinate);
 
-            double angle = Math.toDegrees(Math.atan2(trans.get(0), -trans.get(2)));
+            Log.i(TAG, "strafeToBeacon: " + trans);
+
+            double angle = Math.toDegrees(Math.atan2(trans.get(0), trans.get(2)));
+
+            Log.i(TAG, "strafeToBeacon: " + angle);
+
 
             if (strafe) {
                 track(angle, Math.hypot(trans.get(0), trans.get(2)) - bufferDistance, speed);
@@ -400,5 +491,95 @@ public class Fermion {
             RC.t.addData("FERMION", "Strafe To Beacon failed: Beacon not visible");
         }//else
     }//strafeToBeacon
+
+    public void setCollectorState(@CollectorStates int state){
+        switch (state){
+            case Robot.IN: collector.setPower(-1);
+                break;
+            case Robot.OUT: collector.setPower(1);
+                break;
+            case Robot.STOP: collector.stop();
+        }
+    }
+    @IntDef({Robot.IN, Robot.OUT, Robot.STOP})
+    public @interface CollectorStates{};
+
+    public double getLight(@LightSensors int config){
+        if(config == Robot.LEFT){
+            return leftBeacon.getValue();
+        } else {
+            return rightBeacon.getValue();
+        }
+    }
+
+    @IntDef({Robot.LEFT, Robot.RIGHT})
+    public @interface LightSensors{}
+
+
+    public void shoot(){
+        requestedShooterState = FIRE;
+    }
+
+    public void reload(){
+        requestedShooterState = LOADED;
+    }
+
+    public void prime(){
+        requestedShooterState = PRIMED;
+    }
+
+    protected void updateShooter(){
+        if(fireTime < System.currentTimeMillis()) {
+            if(shooterState == FIRING){
+                shooterState = FIRE;
+            } else if(shooterState == PRIMING){
+                shooterState = PRIMED;
+            } else if(shooterState == RELOADING){
+                shooterState = LOADED;
+            }
+
+            if (shooterState == LOADED) {
+                if (requestedShooterState == PRIMED) {
+                    shooter1.setPosition(0.45);
+                    shooter2.setPosition(0.45);
+                    fireTime = System.currentTimeMillis() + 1910;
+                    requestedShooterState = -1;
+                    shooterState = PRIMING;
+                } else if(requestedShooterState == FIRE){
+                    shooter1.setPosition(0.55);
+                    shooter2.setPosition(0.55);
+                    fireTime = System.currentTimeMillis() + 3900;
+                    shooterState = FIRING;
+                }
+            } else if(shooterState == PRIMED){
+                if(requestedShooterState == FIRE){
+                    shooter1.setPosition(0.7);
+                    shooter2.setPosition(0.7);
+                    fireTime = System.currentTimeMillis() + 1800;
+                    requestedShooterState = -1;
+                    shooterState = FIRING;
+                }
+            } else if(shooterState == FIRE){
+                shooter1.setPosition(0.2);
+                shooter2.setPosition(0.2);
+                fireTime = System.currentTimeMillis() + 3700;
+                requestedShooterState = -1;
+                shooterState = RELOADING;
+            } else if(requestedShooterState == LOADED){
+                shooter1.setPosition(0.2);
+                shooter2.setPosition(0.2);
+            }
+        }
+    }
+
+    public void startShooterControl(){
+        TaskHandler.addLoopedTask("Shooter", new Runnable(){
+            @Override
+            public void run() {
+                updateShooter();
+            }
+        }, 5);
+    }
+
 
 }//Fermion

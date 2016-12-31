@@ -107,6 +107,8 @@ public class FtcOpModeRegister implements OpModeRegister {
                 if (clazz.contains(pkgName)) {
                     Class opMode = Class.forName(clazz);
 
+                    Log.i("CLAZZ", clazz);
+
                     if (!opMode.getSimpleName().equals("") && !opMode.isAnnotationPresent(Disabled.class) && !opMode.isAnnotationPresent(Autonomous.class) && !opMode.isAnnotationPresent(TeleOp.class)) {
                         OpModeMeta meta;
 

@@ -80,6 +80,7 @@ public abstract class TeleOpMode extends OpMode {
 
     public abstract void loopOpMode();
 
+
     /**
      * Method that is run at the end of the opmode. It closes the datalogger in FXTTelemetry
      * @see FXTTelemetry
@@ -87,6 +88,7 @@ public abstract class TeleOpMode extends OpMode {
     @Override
     public void stop() {
         RC.t.close();
+        TaskHandler.removeAllTasks();
     }
 
     /**

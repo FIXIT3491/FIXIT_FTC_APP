@@ -1,48 +1,87 @@
 package org.firstinspires.ftc.teamcode.gamecode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.teamcode.RC;
+import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.FXTLightSensor;
+import org.firstinspires.ftc.teamcode.newhardware.FXTServo;
+import org.firstinspires.ftc.teamcode.newhardware.LinearServo;
+import org.firstinspires.ftc.teamcode.opmodesupport.LinearTeleOpMode;
+import org.firstinspires.ftc.teamcode.opmodesupport.TeleOpMode;
 
 /**
  * Created by User on 8/25/2015.
  */
-public class ServoOp extends OpMode {
+@TeleOp
+public class ServoOp extends LinearTeleOpMode {
+    FXTServo s;
+    FXTServo s2;
+    boolean manualMode = false;
+    
+    double pos = 0;
+    double pos2 = 0;
 
-    Servo gate;
-    double speed = 0.0;
-    boolean pressed = false;
-    boolean pressed2 = false;
     @Override
-    public void init() {
-        gate = hardwareMap.servo.get("test");
-        gate.setDirection(Servo.Direction.REVERSE);
+    public void initialize() {
+        s = new FXTServo("linear");
+        s2 = new FXTServo("linear2");
+        s.setPosition(0);
+        s2.setPosition(0);
+        clearTimer();
     }
 
     @Override
-    public void loop() {
-        if(gamepad1.a && !pressed){
-            speed += 0.1;
-            pressed = true;
-        } else if (!gamepad1.a) {
-            pressed = false;
+    public void loopOpMode() {
+        if(manualMode) {
+            if (joy1.leftBumper() && getMilliSeconds() > 300) {
+                pos += 0.01;
+                clearTimer();
+            } else if (joy1.leftTrigger() && getMilliSeconds() > 300) {
+                pos -= 0.01;
+                clearTimer();
+            }
+            RC.t.addData("Pos", pos);
+
+
+            if (joy1.rightBumper() && getMilliSeconds() > 300) {
+                pos2 += 0.01;
+                clearTimer();
+            } else if (joy1.rightTrigger() && getMilliSeconds() > 300) {
+                pos2 -= 0.01;
+                clearTimer();
+            }
+            s2.setPosition(pos2);
+            s.setPosition(pos2);
+        }else{
+            if (joy1.buttonA()) {
+                s.setPosition(0.7);
+                s2.setPosition(0.7);
+                sleep(1200);
+                s.setPosition(0.2);
+                s2.setPosition(0.2);
+                sleep(3400);
+                s.setPosition(0.65);
+                s2.setPosition(0.65);
+            }
+            if (joy1.buttonB()) {
+                s.setPosition(0.2);
+                s2.setPosition(0.2);
+            } else if (joy1.buttonX()) {
+                s.setPosition(0.75);
+                s2.setPosition(0.75);
+            }
+
+
         }
 
-        if(gamepad1.b && !pressed){
-            speed -= 0.1;
-            pressed2 = true;
-        } else if (!gamepad1.b) {
-            pressed2 = false;
-        }
+        if(joy1.buttonY()) manualMode = !manualMode;
 
-        if (speed >= 1.0){
-            gate.setDirection(Servo.Direction.FORWARD);
-            speed = 0.0;
-        }
+        RC.t.addData("pos1", s.getPosition() );
+        RC.t.addData("pos2", s2.getPosition());
+        RC.t.addData("Manual", manualMode );
 
-        if(speed < 0)
-        gate.setPosition(speed);
-        telemetry.addData("Pos", speed);
-        telemetry.addData("d", gate.getPosition());
-
+        
     }
 }

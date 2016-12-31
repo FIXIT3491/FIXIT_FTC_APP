@@ -27,7 +27,7 @@ import static org.firstinspires.ftc.teamcode.util.VortexUtils.getImageFromFrame;
  * Created by FIXIT on 16-10-21.
  */
 @Autonomous
-public class FermionRed extends AutoOpMode {
+public class FermionBlueShoot extends AutoOpMode {
 
     @Override
     public void runOp() throws InterruptedException {
@@ -42,28 +42,31 @@ public class FermionRed extends AutoOpMode {
         Vuforia.setFrameFormat(PIXEL_FORMAT.RGB565, true);
 
         VuforiaTrackables beacons = locale.loadTrackablesFromAsset("FTC_2016-17");
-        VuforiaTrackableDefaultListener gears = (VuforiaTrackableDefaultListener) beacons.get(3).getListener();
-        VuforiaTrackableDefaultListener tools = (VuforiaTrackableDefaultListener) beacons.get(1).getListener();
+        VuforiaTrackableDefaultListener wheels = (VuforiaTrackableDefaultListener) beacons.get(0).getListener();
+        VuforiaTrackableDefaultListener legos = (VuforiaTrackableDefaultListener) beacons.get(2).getListener();
 
-        RC.t.addData("OpMode", "initialized");
         waitForStart();
         beacons.activate();
         muon.addVeerCheckRunnable();
+        muon.resetTargetAngle();
 
-        muon.forward(0.3);
-        sleep(300);
+        muon.right(1);
+        sleep(1000);
         muon.stop();
 
-        muon.imuTurnL(50, 0.5);
+        //muon.fire
+        //muon.fire
+        sleep(2000);
+        muon.imuTurnL(210, 0.5);
 
         muon.forward(0.3);
 
-        while (gears.getPose() == null && opModeIsActive()) {
+        while (wheels.getPose() == null && opModeIsActive()) {
             idle();
         }//while
 
 
-        VectorF trans = gears.getPose().getTranslation();
+        VectorF trans = wheels.getPose().getTranslation();
 
         Log.i("ANGLE", "HELLO" + Math.toDegrees(Math.atan2(trans.get(0), -trans.get(2))));
 
@@ -78,7 +81,7 @@ public class FermionRed extends AutoOpMode {
         try{
             config = VortexUtils.waitForBeaconConfig(
                     getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
-                    gears, locale.getCameraCalibration(), 5000);
+                    wheels, locale.getCameraCalibration(), 5000);
             telemetry.addData("Beacon", config);
             Log.i(TAG, "runOp: " + config);
         } catch (Exception e){
@@ -87,14 +90,14 @@ public class FermionRed extends AutoOpMode {
 
         Log.i(TAG, "runOp: before");
         muon.forward(1);
-        sleep(500);
+        sleep(700);
         Log.i(TAG, "runOp: after");
 
-        muon.absoluteIMUTurn(-90, 0.5);
+        muon.absoluteIMUTurn(90, 0.5);
 
-        muon.right(0.2);
+        muon.left(0.2);
 
-        int sensor = (config == VortexUtils.BEACON_RED_BLUE)? Robot.LEFT : Robot.RIGHT;
+        int sensor = (config == VortexUtils.BEACON_BLUE_RED)? Robot.LEFT : Robot.RIGHT;
         while (opModeIsActive() && muon.getLight(sensor) < 0.2){
             Log.i("light", "" + muon.getLight(sensor));
         }
@@ -104,31 +107,29 @@ public class FermionRed extends AutoOpMode {
         sleep(500);
         muon.stop();
         muon.backward(0.5);
-        sleep(300);
+        sleep(500);
 
+
+        muon.absoluteIMUTurn(90, 0.5);
 
 
         //------------------------------Beacon 2--------------
 
-        muon.right(1);
+        muon.left(1);
         sleep(1000);
-        muon.right(0.2);
+        muon.left(0.2);
 
-        sensor = Robot.RIGHT;
+        sensor = Robot.LEFT;
         while (opModeIsActive() && muon.getLight(sensor) < 0.2){
             Log.i("light", "" + muon.getLight(sensor));
         }
         muon.stop();
-        sleep(100);
-
-        muon.absoluteIMUTurn(-90, 0.5);
-
+        muon.absoluteIMUTurn(90, 0.5);
         muon.stop();
-        RC.t.addData("Hi", "ya");
 
         long timeBack = 0;
         clearTimer();
-        while (tools.getPose() == null && opModeIsActive()) {
+        while (legos.getPose() == null && opModeIsActive()) {
             if(getMilliSeconds() > 1500){
                 Log.i(TAG, "runOp: " + "can't see");
                 muon.backward(0.3);
@@ -146,7 +147,7 @@ public class FermionRed extends AutoOpMode {
         try{
             config = VortexUtils.waitForBeaconConfig(
                     getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
-                    tools, locale.getCameraCalibration(), 5000);
+                    legos, locale.getCameraCalibration(), 5000);
             telemetry.addData("Beacon", config);
             Log.i(TAG, "runOp: " + config);
         } catch (Exception e){
@@ -156,12 +157,11 @@ public class FermionRed extends AutoOpMode {
         muon.forward(0.5);
         sleep(timeBack);
 
-
         if(config == VortexUtils.BEACON_RED_BLUE){
             muon.stop();
-            muon.right(0.2);
+            muon.left(0.2);
 
-            sensor = Robot.LEFT;
+            sensor = Robot.RIGHT;
             while (opModeIsActive() && muon.getLight(sensor) < 0.2){
                 Log.i("light", "" + muon.getLight(sensor));
             }

@@ -18,6 +18,7 @@ public class Motor implements FXTDevice {
 
     public double minSpeed = 0.09;
     public int accuracy = 20;
+    public double plannedSpeed = 0;
 
     /**
      * Constructors
@@ -183,5 +184,15 @@ public class Motor implements FXTDevice {
         }//if
 
     }//run
+
+
+
+    public void setPlannedSpeed(double plannedSpeed) {
+        this.plannedSpeed = plannedSpeed;
+    }//setPlannedSpeed
+
+    public void usePlannedSpeed() {
+        setPower(plannedSpeed);
+    }//usePlannedSpeed
 
 }//Motor

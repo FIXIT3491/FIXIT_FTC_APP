@@ -2,17 +2,21 @@ package org.firstinspires.ftc.teamcode.gamecode;
 
 import android.util.Log;
 
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
 import org.firstinspires.ftc.teamcode.opmodesupport.TeleOpMode;
 import org.firstinspires.ftc.teamcode.robots.Fermion;
+import org.firstinspires.ftc.teamcode.robots.Robot;
 import org.firstinspires.ftc.teamcode.util.MathUtils;
 
 /**
  * Created by FIXIT on 2016-12-23.
  */
-
+@TeleOp
 public class AbsoluteStrafeVeerOp extends TeleOpMode {
 
     Fermion top;
+    int collectorState = Robot.STOP;
 
     @Override
     public void initialize() {
@@ -22,16 +26,32 @@ public class AbsoluteStrafeVeerOp extends TeleOpMode {
     @Override
     public void loopOpMode() {
 
-        double theta = Math.atan2(joy1.x1(), joy1.y1());
+        double theta = Math.atan2(joy1.x1(), -joy1.y1());
 
-        theta = MathUtils.cvtAngleToNewDomain(theta - top.getIMUAngle()[0]);
+        theta = MathUtils.cvtAngleToNewDomain(theta - Math.toRadians(top.getIMUAngle()[0]));
 
         double speed = (joy1.rightBumper())? 0.3 : Math.hypot(joy1.y1(), joy1.x1());
 
-        top.strafe(Math.toDegrees(MathUtils.roundToNearest(theta, Math.PI / 4, -Math.PI, Math.PI)), speed);
+        top.strafe(Math.toDegrees(theta), speed, false);
 
-        top.veer(Math.round(joy1.x2()) / 3.0, false);
+        top.veer(joy1.x2() / 2.0, false, false);
 
+        top.usePlannedSpeeds();
+
+        if(collectorState == Robot.IN && (joy2.rightBumper())) {
+            collectorState = Robot.STOP;
+        } else if (joy2.rightBumper()) {
+            collectorState = Robot.IN;
+        }//else
+
+        top.setCollectorState(collectorState);
+
+        if (joy2.rightTrigger()) {
+            top.setCollectorState(Robot.OUT);
+        }//if
+        
+        Log.i("thetaPlanned", theta + "");
+        Log.i("PlannedSpeeds", top.leftFore.plannedSpeed + ", " + top.leftBack.plannedSpeed + ", " + top.rightBack.plannedSpeed + ", " + top.rightFore.plannedSpeed);
         Log.i("Speeds", top.leftBack.getPower() + ", " + top.leftFore.getPower() + ", " + top.rightBack.getPower() + ", " + top.rightFore.getPower());
     }//loopOpMode
 }//AbsoluteStrafeOp

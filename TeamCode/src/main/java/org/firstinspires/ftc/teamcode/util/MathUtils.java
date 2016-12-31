@@ -69,7 +69,7 @@ public class MathUtils {
         num -= lowBound;
         num = increment * Math.round(num / increment);
 
-        return num;
+        return num + lowBound;
     }
 
     public static boolean inRange(double num, double bound1, double bound2){

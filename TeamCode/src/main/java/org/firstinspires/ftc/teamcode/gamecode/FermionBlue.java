@@ -16,9 +16,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
+import org.firstinspires.ftc.teamcode.robots.Robot;
 import org.firstinspires.ftc.teamcode.util.MathUtils;
 import org.firstinspires.ftc.teamcode.robots.Fermion;
 import org.firstinspires.ftc.teamcode.util.VortexUtils;
+
+import static org.firstinspires.ftc.teamcode.util.VortexUtils.getImageFromFrame;
 
 /**
  * Created by FIXIT on 16-10-21.
@@ -81,47 +84,47 @@ public class FermionBlue extends AutoOpMode {
             telemetry.addData("Beacon", "could not not be found");
         }
 
-
+        Log.i(TAG, "runOp: before");
+        muon.forward(1);
+        sleep(500);
+        Log.i(TAG, "runOp: after");
 
         muon.absoluteIMUTurn(90, 0.5);
 
-        muon.left(0.13);
+        muon.left(0.2);
 
-        while (opModeIsActive() && (wheels.getPose() == null || wheels.getPose().getTranslation().get(0) < ((config == VortexUtils.BEACON_BLUE_RED)? -80 : 45))) {
-            if(wheels.getPose() == null){
-                Log.i(TAG, "HELLO null");
-            } else {
-                Log.i(TAG, "HELLO" + wheels.getPose().getTranslation().get(0));
-            }
-            idle();
-        }//while
-
-
-        Log.i(TAG, "HELLO FNIale" + wheels.getPose().getTranslation().get(0));
-
-        muon.forward(0.15);
-        sleep(1000);
+        int sensor = (config == VortexUtils.BEACON_BLUE_RED)? Robot.LEFT : Robot.RIGHT;
+        while (opModeIsActive() && muon.getLight(sensor) < 0.2){
+            Log.i("light", "" + muon.getLight(sensor));
+        }
         muon.stop();
-
         sleep(100);
-
-        muon.backward(0.2);
-        sleep(800);
+        muon.forward(0.5);
+        sleep(500);
         muon.stop();
+        muon.backward(0.5);
+        sleep(500);
+
 
         muon.absoluteIMUTurn(90, 0.5);
-//
-//        muon.left(1);
-//        sleep(1800);
 
-        muon.track(-90, 1500, 0.5);
 
+        //------------------------------Beacon 2--------------
+
+        muon.left(1);
+        sleep(1000);
+        muon.left(0.2);
+
+        sensor = Robot.LEFT;
+        while (opModeIsActive() && muon.getLight(sensor) < 0.2){
+            Log.i("light", "" + muon.getLight(sensor));
+        }
+        muon.stop();
         muon.absoluteIMUTurn(90, 0.5);
         muon.stop();
-
-        clearTimer();
 
         long timeBack = 0;
+        clearTimer();
         while (legos.getPose() == null && opModeIsActive()) {
             if(getMilliSeconds() > 1500){
                 Log.i(TAG, "runOp: " + "can't see");
@@ -135,26 +138,6 @@ public class FermionBlue extends AutoOpMode {
         }//while
 
 
-        Log.i(TAG, "runOp: " + "jolly good");
-
-        muon.left(0.13);
-
-        while (opModeIsActive() && (legos.getPose() == null || legos.getPose().getTranslation().get(0) < -200)) {
-            if(legos.getPose() == null){
-                Log.i(TAG, "HELLO null");
-            } else {
-                Log.i(TAG, "HELLO" + legos.getPose().getTranslation().get(0));
-            }
-            idle();
-        }//while
-
-        muon.stop();
-
-        muon.backward(0.3);
-        sleep(600);
-        muon.stop();
-
-        muon.absoluteIMUTurn(90, 0.5);
 
         config = VortexUtils.NOT_VISIBLE;
         try{
@@ -167,54 +150,28 @@ public class FermionBlue extends AutoOpMode {
             telemetry.addData("Beacon", "could not not be found");
         }
 
+        muon.forward(0.5);
+        sleep(timeBack);
+
+        if(config == VortexUtils.BEACON_RED_BLUE){
+            muon.stop();
+            muon.left(0.2);
+
+            sensor = Robot.RIGHT;
+            while (opModeIsActive() && muon.getLight(sensor) < 0.2){
+                Log.i("light", "" + muon.getLight(sensor));
+            }
+            muon.stop();
+            sleep(100);
+        }
+
+        muon.forward(0.3);
         sleep(1000);
-
-        while (opModeIsActive() && (legos.getPose() == null || !MathUtils.inRange(legos.getPose().getTranslation().get(0), ((config == VortexUtils.BEACON_BLUE_RED)? -80 : 45), ((config == VortexUtils.BEACON_BLUE_RED)? -60 : 65)))) {
-
-            if(legos.getPose() != null && legos.getPose().getTranslation().get(0) > ((config == VortexUtils.BEACON_BLUE_RED)? -60 : 65)){
-                muon.right(0.13);
-            } else {
-                muon.left(0.13);
-            }
-
-            if(legos.getPose() == null){
-                Log.i(TAG, "HELLO null");
-            } else {
-                Log.i(TAG, "HELLO" + legos.getPose().getTranslation().get(0));
-            }
-            idle();
-        }//while
-
-        Log.i(TAG, "HELLO FNIale" + legos.getPose().getTranslation().get(0));
-
-        muon.forward(0.2);
-        sleep(1800 + timeBack);
         muon.stop();
-
-        muon.backward(0.2);
-        sleep(1400);
+        muon.backward(0.5);
+        sleep(300);
         muon.stop();
-
-        RC.setGlobalDouble("TeleBeginAngle", muon.getIMUAngle()[0]);
 
     }//runOp
 
-
-    @Nullable
-    public static Image getImageFromFrame(VuforiaLocalizer.CloseableFrame frame, int format) {
-
-        long numImgs = frame.getNumImages();
-        for (int i = 0; i < numImgs; i++) {
-            if (frame.getImage(i).getFormat() == format) {
-                return frame.getImage(i);
-            }//if
-        }//for
-
-        return null;
-    }
-
-
-    public VectorF navOffWall(VectorF trans, double robotAngle, VectorF offWall){
-        return new VectorF((float) (trans.get(0) - offWall.get(0) * Math.sin(Math.toRadians(robotAngle)) - offWall.get(2) * Math.cos(Math.toRadians(robotAngle))), trans.get(1), (float) (trans.get(2) + offWall.get(0) * Math.cos(Math.toRadians(robotAngle)) - offWall.get(2) * Math.sin(Math.toRadians(robotAngle))));
-    }
 }
