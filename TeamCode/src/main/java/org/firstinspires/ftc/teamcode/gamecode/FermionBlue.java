@@ -100,7 +100,7 @@ public class FermionBlue extends AutoOpMode {
         muon.stop();
         sleep(100);
         muon.forward(0.5);
-        sleep(500);
+        sleep(700);
         muon.stop();
         muon.backward(0.5);
         sleep(500);
@@ -150,8 +150,9 @@ public class FermionBlue extends AutoOpMode {
             telemetry.addData("Beacon", "could not not be found");
         }
 
-        muon.forward(0.5);
-        sleep(timeBack);
+        while(opModeIsActive() && muon.ultra.getDistance() > 300){
+            muon.forward(0.2);
+        }
 
         if(config == VortexUtils.BEACON_RED_BLUE){
             muon.stop();

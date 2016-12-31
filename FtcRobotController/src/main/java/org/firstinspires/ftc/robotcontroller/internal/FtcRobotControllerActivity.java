@@ -650,6 +650,7 @@ public class FtcRobotControllerActivity extends Activity {
     GlobalValuesActivity.add("VeerProportional", 0.7 / 90);
     GlobalValuesActivity.add("VeerDerivative", /*(0.5 / 90) / 10*/0);
     GlobalValuesActivity.add("VeerIntegral", /*(0.1 / 90) / 1000)*/0);
+    GlobalValuesActivity.add("2Balls", true);
   }
 
 }

@@ -25,17 +25,13 @@ public class VeerFermionOp extends TeleOpMode {
 
     @Override
     public void initialize() {
-//        top = new Fermion(true);
         tau = new Fermion(false);
-//        top.mouse.addAbsoluteCoordinateRunnable(top.imu);
-//        setDataLogFile("path.txt", true);
         tau.startShooterControl();
         tau.prime();
     }
 
     @Override
     public void loopOpMode() {
-//        dataLogData(top.mouse.absoluteFieldCoord.toString() + "\n");
 
         double theta = Math.atan2(-joy1.x1(), joy1.y1());
 
@@ -46,21 +42,24 @@ public class VeerFermionOp extends TeleOpMode {
 
         tau.veer(Math.round(joy1.x2()) / 2.0, false, false);
 
-        if(collectorState == Robot.IN && (joy2.rightBumper())) {
+        if(collectorState == Robot.IN && (joy2.rightBumper()) && getMilliSeconds() > 500) {
             collectorState = Robot.STOP;
-        } else if (joy2.rightBumper()) {
+            clearTimer();
+        } else if (joy2.rightBumper() && getMilliSeconds() > 500) {
             collectorState = Robot.IN;
+            clearTimer();
         }//else
 
-        tau.setCollectorState(collectorState);
 
         if (joy2.rightTrigger()) {
             tau.setCollectorState(Robot.OUT);
-        }//if
+        } else {
+            tau.setCollectorState(collectorState);
+        }
 
         if(joy2.buttonA()){
             tau.shoot();
-        } else if(joy2.buttonB()){
+        } else if(joy2.buttonX()){
             tau.prime();
         }
 

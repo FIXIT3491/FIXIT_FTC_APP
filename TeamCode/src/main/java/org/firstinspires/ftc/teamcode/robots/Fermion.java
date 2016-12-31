@@ -11,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.teamcode.RC;
+import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.FXTAnalogUltrasonicSensor;
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.FXTOpticalDistanceSensor;
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.TrackBall;
 import org.firstinspires.ftc.teamcode.newhardware.FXTServo;
@@ -31,6 +32,7 @@ public class Fermion {
     //position/orientation sensors
     public AdafruitBNO055IMU imu;
     public TrackBall mouse;
+    public FXTAnalogUltrasonicSensor ultra;
 
     //drive motors
     public Motor leftFore;
@@ -50,6 +52,7 @@ public class Fermion {
     public double targetAngle = 0;
     private final static double TURNING_ACCURACY_DEG = 2;
     private final static double MINIMUM_TURNING_SPEED = 0.1;
+    public static double LIGHT_THRESHOLD = 0.3;
 
     public boolean preservingStrafeSpeed = false;
     private boolean useVeerCheck = true;
@@ -61,11 +64,11 @@ public class Fermion {
     public double commandedStrafeSpeedRightBackLeftFore = 0;
 
     public static int LOADED = 0;
-    public static int FIRING = 1;
-    public static int PRIMED = 2;
-    public static int RELOADING = 3;
-    public static int PRIMING = 4;
-    public static int FIRE = 5;
+    public static int RELOADING = 1;
+    public static int FIRE = 2;
+    public static int FIRING = 3;
+    public static int PRIMED = 4;
+    public static int PRIMING = 5;
     private long fireTime = 0;
 
     public int shooterState = LOADED;
@@ -92,6 +95,7 @@ public class Fermion {
         leftBack.setReverse(true);
 
         collector = new Motor("collector");
+        collector.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         shooter1 = new LinearServo("shoot1");
         shooter1.setPosition(0.2);
@@ -118,6 +122,8 @@ public class Fermion {
 
         leftBeacon = new FXTOpticalDistanceSensor("leftBeacon");
         rightBeacon = new FXTOpticalDistanceSensor("rightBeacon");
+
+        ultra = new FXTAnalogUltrasonicSensor("ultra");
 
     }//Fermion
 
@@ -532,10 +538,13 @@ public class Fermion {
         if(fireTime < System.currentTimeMillis()) {
             if(shooterState == FIRING){
                 shooterState = FIRE;
+                return;
             } else if(shooterState == PRIMING){
                 shooterState = PRIMED;
+                return;
             } else if(shooterState == RELOADING){
                 shooterState = LOADED;
+                return;
             }
 
             if (shooterState == LOADED) {
@@ -548,30 +557,35 @@ public class Fermion {
                 } else if(requestedShooterState == FIRE){
                     shooter1.setPosition(0.55);
                     shooter2.setPosition(0.55);
-                    fireTime = System.currentTimeMillis() + 3900;
+                    fireTime = System.currentTimeMillis() + 4000;
                     shooterState = FIRING;
+                } else {
+                    shooter1.setPosition(0.2);
+                    shooter2.setPosition(0.2);
                 }
             } else if(shooterState == PRIMED){
                 if(requestedShooterState == FIRE){
                     shooter1.setPosition(0.7);
                     shooter2.setPosition(0.7);
-                    fireTime = System.currentTimeMillis() + 1800;
+                    fireTime = System.currentTimeMillis() + 2000;
                     requestedShooterState = -1;
                     shooterState = FIRING;
                 }
             } else if(shooterState == FIRE){
-                shooter1.setPosition(0.2);
-                shooter2.setPosition(0.2);
-                fireTime = System.currentTimeMillis() + 3700;
+                shooter1.setPosition(0.12);
+                shooter2.setPosition(0.12);
+                fireTime = System.currentTimeMillis() + 4100;
                 requestedShooterState = -1;
                 shooterState = RELOADING;
-            } else if(requestedShooterState == LOADED){
-                shooter1.setPosition(0.2);
-                shooter2.setPosition(0.2);
             }
         }
     }
 
+    public void waitForState(int state){
+        while (RC.l.opModeIsActive() && shooterState != state ){
+            RC.l.idle();
+        }
+    }
     public void startShooterControl(){
         TaskHandler.addLoopedTask("Shooter", new Runnable(){
             @Override

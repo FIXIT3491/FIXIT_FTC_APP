@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.gamecode;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.vuforia.PIXEL_FORMAT;
@@ -26,17 +27,22 @@ import org.firstinspires.ftc.teamcode.robots.*;
  * Created by Windows on 2016-12-30.
  */
 @Autonomous
-public class LightTest extends TeleOpMode {
-     FXTAnalogUltrasonicSensor us;
+public class LightTest extends AutoOpMode {
+
 
     @Override
-    public void initialize() {
-        us =new FXTAnalogUltrasonicSensor("ultra");
-    }
+    public void runOp() throws InterruptedException {
+        Fermion muon = new Fermion(false);
+        waitForStart();
+        while(opModeIsActive()) {
+            while (opModeIsActive() && muon.ultra.getDistance() < 100) {
+                muon.backward(0.2);
+            }
+            while (opModeIsActive() && muon.ultra.getDistance() > 457) {
+                muon.forward(0.2);
+            }
+            muon.stop();
 
-    @Override
-    public void loopOpMode() {
-        RC.t.addData("Distance", us.getValue());
-
+        }
     }
 }//LightTest

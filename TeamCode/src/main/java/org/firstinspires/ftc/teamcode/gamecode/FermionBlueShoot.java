@@ -8,6 +8,7 @@ import com.vuforia.Image;
 import com.vuforia.PIXEL_FORMAT;
 import com.vuforia.Vuforia;
 
+import org.firstinspires.ftc.robotcontroller.internal.GlobalValuesActivity;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
@@ -45,19 +46,32 @@ public class FermionBlueShoot extends AutoOpMode {
         VuforiaTrackableDefaultListener wheels = (VuforiaTrackableDefaultListener) beacons.get(0).getListener();
         VuforiaTrackableDefaultListener legos = (VuforiaTrackableDefaultListener) beacons.get(2).getListener();
 
+        muon.startShooterControl();
+        muon.prime();
         waitForStart();
         beacons.activate();
         muon.addVeerCheckRunnable();
         muon.resetTargetAngle();
 
         muon.right(1);
-        sleep(1000);
+        sleep(1200);
         muon.stop();
+        muon.shoot();
 
-        //muon.fire
-        //muon.fire
-        sleep(2000);
-        muon.imuTurnL(210, 0.5);
+        if(RC.globalBool("2Balls")){
+            muon.waitForState(Fermion.LOADED);
+            muon.door.goToPos("open");
+            muon.collector.setPower(-0.25);
+            muon.shoot();
+            sleep(1000);
+            muon.door.goToPos("close");
+            muon.setCollectorState(Robot.STOP);
+        }
+
+        muon.waitForState(Fermion.FIRE);
+
+
+        muon.imuTurnL(195, 0.5);
 
         muon.forward(0.3);
 
@@ -90,21 +104,30 @@ public class FermionBlueShoot extends AutoOpMode {
 
         Log.i(TAG, "runOp: before");
         muon.forward(1);
-        sleep(700);
+        sleep(600);
         Log.i(TAG, "runOp: after");
 
         muon.absoluteIMUTurn(90, 0.5);
 
+        while (opModeIsActive() && muon.ultra.getDistance() < 100){
+            muon.backward(0.2);
+        }
+        while(opModeIsActive() && muon.ultra.getDistance() > 457){
+            muon.forward(0.2);
+        }
+
+        muon.stop();
+
         muon.left(0.2);
 
         int sensor = (config == VortexUtils.BEACON_BLUE_RED)? Robot.LEFT : Robot.RIGHT;
-        while (opModeIsActive() && muon.getLight(sensor) < 0.2){
+        while (opModeIsActive() && muon.getLight(sensor) < muon.LIGHT_THRESHOLD){
             Log.i("light", "" + muon.getLight(sensor));
         }
         muon.stop();
         sleep(100);
         muon.forward(0.5);
-        sleep(500);
+        sleep(700);
         muon.stop();
         muon.backward(0.5);
         sleep(500);
@@ -116,11 +139,19 @@ public class FermionBlueShoot extends AutoOpMode {
         //------------------------------Beacon 2--------------
 
         muon.left(1);
-        sleep(1000);
+        sleep(1500);
+
+        while (opModeIsActive() && muon.ultra.getDistance() < 50){
+            muon.backward(0.2);
+        }
+        while(opModeIsActive() && muon.ultra.getDistance() > 457){
+            muon.forward(0.2);
+        }
+
         muon.left(0.2);
 
         sensor = Robot.LEFT;
-        while (opModeIsActive() && muon.getLight(sensor) < 0.2){
+        while (opModeIsActive() && muon.getLight(sensor) < muon.LIGHT_THRESHOLD){
             Log.i("light", "" + muon.getLight(sensor));
         }
         muon.stop();
@@ -130,7 +161,7 @@ public class FermionBlueShoot extends AutoOpMode {
         long timeBack = 0;
         clearTimer();
         while (legos.getPose() == null && opModeIsActive()) {
-            if(getMilliSeconds() > 1500){
+            if(getMilliSeconds() > 1000){
                 Log.i(TAG, "runOp: " + "can't see");
                 muon.backward(0.3);
                 sleep(300);
@@ -154,15 +185,16 @@ public class FermionBlueShoot extends AutoOpMode {
             telemetry.addData("Beacon", "could not not be found");
         }
 
-        muon.forward(0.5);
-        sleep(timeBack);
+        while(opModeIsActive() && muon.ultra.getDistance() > 300){
+            muon.forward(0.2);
+        }
 
         if(config == VortexUtils.BEACON_RED_BLUE){
             muon.stop();
             muon.left(0.2);
 
             sensor = Robot.RIGHT;
-            while (opModeIsActive() && muon.getLight(sensor) < 0.2){
+            while (opModeIsActive() && muon.getLight(sensor) < muon.LIGHT_THRESHOLD){
                 Log.i("light", "" + muon.getLight(sensor));
             }
             muon.stop();
