@@ -28,7 +28,7 @@ import static org.firstinspires.ftc.teamcode.util.VortexUtils.getImageFromFrame;
  * Created by FIXIT on 16-10-21.
  */
 @Autonomous
-public class FermionBlueShoot extends AutoOpMode {
+public class FermionBlueShot extends AutoOpMode {
 
     @Override
     public void runOp() throws InterruptedException {
