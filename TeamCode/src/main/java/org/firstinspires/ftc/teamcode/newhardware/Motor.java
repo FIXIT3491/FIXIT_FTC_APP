@@ -18,6 +18,7 @@ public class Motor implements FXTDevice {
 
     public double minSpeed = 0.09;
     public int accuracy = 20;
+    public double plannedSpeed = 0;
 
     /**
      * Constructors
@@ -91,16 +92,8 @@ public class Motor implements FXTDevice {
     }//isBusy
 
     public boolean isFin() {
-        if (getM().getMode().equals(DcMotor.RunMode.RUN_TO_POSITION)) {
-            return Math.abs(getCurrentPosition() - getM().getTargetPosition()) < accuracy;
-        } else {
-            return targetTime == -1;
-        }//else
-    }//finished
-
-    public boolean isThere(){
         return Math.abs(getCurrentPosition() - getM().getTargetPosition()) < accuracy;
-    }
+    }//finished
 
     public DcMotor getM() {
         synchronized (m) {
@@ -116,7 +109,7 @@ public class Motor implements FXTDevice {
         }//synchronized
     }//setTarget
 
-    public void setAbsTarget(int tik) {
+    public void setAbsoluteTarget(int tik) {
         setTarget(tik - getCurrentPosition());
     }//setAbsTarget
 
@@ -145,8 +138,8 @@ public class Motor implements FXTDevice {
         } else if (Math.abs(power) < minSpeed && Math.abs(power) > 1E-10) {
             power = minSpeed * Math.signum(power);
         } else if(Math.abs(power) < 1E-10){
-            power = 0;
-        }
+            power = 0; //prevent round off error
+        }//else
 
         synchronized (m) {
             m.setPower(power);
@@ -162,15 +155,22 @@ public class Motor implements FXTDevice {
     }//returnCurrentState
 
     public void runToPosition(int tiks, double speed){
-        DcMotor.RunMode initial = m.getMode();
-//        if(!initial.equals(DcMotor.RunMode.RUN_TO_POSITION)){
-//            m.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        }
+
+        m.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         m.setTargetPosition(m.getCurrentPosition() + tiks);
         setPower(speed);
     }
 
+    public void completeRunToPosition(int tiks, double speed) {
+        runToPosition(tiks, speed);
+
+        while (isFin()) {
+            RC.l.idle();
+        }//while
+
+        stop();
+    }//completeRunToPosition
 
     //INHERITED METHODS
 
@@ -184,5 +184,15 @@ public class Motor implements FXTDevice {
         }//if
 
     }//run
+
+
+
+    public void setPlannedSpeed(double plannedSpeed) {
+        this.plannedSpeed = plannedSpeed;
+    }//setPlannedSpeed
+
+    public void usePlannedSpeed() {
+        setPower(plannedSpeed);
+    }//usePlannedSpeed
 
 }//Motor

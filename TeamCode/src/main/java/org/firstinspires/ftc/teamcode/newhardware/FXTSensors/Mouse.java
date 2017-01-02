@@ -28,7 +28,7 @@ public abstract class Mouse extends HidBridge {
 
     public Mouse(int vid, int pid) {
         super(RC.c(), pid, vid);
-        super.OpenDevice();
+        super.openDevice();
         super.startReadingThread();
     }
 

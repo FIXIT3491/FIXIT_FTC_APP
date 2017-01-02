@@ -60,3 +60,8 @@ Lily Configuration File Set-Up:
         Port 1: Motor ("driveL")
         Port 2: Motor ("driveR")
     Port 4
+
+----------------------------------------------------
+
+Fermion Configuration File Set-Up:
+

@@ -68,7 +68,7 @@ public class BeaconPress extends AutoOpMode {
 //        strange.stop();
 
 //        strange.absoluteIMUTurn(0, 0.1);
-        int config = VortexUtils.BEACON_NOT_VISIBLE;
+        int config = VortexUtils.NOT_VISIBLE;
         try{
             config = VortexUtils.waitForBeaconConfig(
                     getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565),
@@ -82,9 +82,9 @@ public class BeaconPress extends AutoOpMode {
         telemetry.update();
 
         if (config == VortexUtils.BEACON_BLUE_RED) {
-            strange.strafeToBeacon(gears, 10, 0.1, 0, new VectorF(40, -0.1f, -0.1f));
+//            strange.strafeToBeacon(gears, 10, 0.1, 0, new VectorF(40, -0.1f, -0.1f));
         } else {
-            strange.strafeToBeacon(gears, 10, 0.1, 0, new VectorF(-60, -0.1f, -0.1f));
+//            strange.strafeToBeacon(gears, 10, 0.1, 0, new VectorF(-60, -0.1f, -0.1f));
         }//else
 
         strange.forward(0.4);

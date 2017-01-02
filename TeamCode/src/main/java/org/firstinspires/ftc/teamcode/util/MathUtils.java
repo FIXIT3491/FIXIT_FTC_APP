@@ -15,7 +15,33 @@ public class MathUtils {
         }//for
 
         return max;
-    }
+    }//max
+
+    public static double min(double... values) {
+        double min = 0;
+
+        for (int i = 0; i < values.length; i++) {
+            if (min > values[i]) {
+                min = values[i];
+            }//if
+        }//for
+
+        return min;
+    }//min
+
+    public static double range(double... values) {
+        double max = 0;
+
+        for (int i = 0; i < values.length; i++) {
+            for (int j = i + 1; j < values.length; j++) {
+                if (max < Math.abs(values[i] - values[j])) {
+                    max = Math.abs(values[i] - values[j]);
+                }//if
+            }//for
+        }//for
+
+        return max;
+    }//max
 
     public static int getQuadrant(double x, double y){
         if(x >= 0){
@@ -26,6 +52,7 @@ public class MathUtils {
             else return 3;
         }
     }
+
 
     public static double roundToNearest(double num, double increment, double lowBound, double upBound){
         for (int i = 0; lowBound + i * increment <= upBound; ) {
@@ -42,7 +69,7 @@ public class MathUtils {
         num -= lowBound;
         num = increment * Math.round(num / increment);
 
-        return num;
+        return num + lowBound;
     }
 
     public static boolean inRange(double num, double bound1, double bound2){

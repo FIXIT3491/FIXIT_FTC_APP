@@ -16,9 +16,13 @@ public class DriveAcross extends AutoOpMode {
         final Fermion up = new Fermion(true);
 
         waitForStart();
+        up.addVeerCheckRunnable();
 
-        sleep(10000);
+//        up.strafe(0, 0.5, true);
+//        while (opModeIsActive()){
+//            idle();
+//        }
 
-        up.track(0,1600,0.7);
+        up.track(30,1277,0.7);
     }
 }

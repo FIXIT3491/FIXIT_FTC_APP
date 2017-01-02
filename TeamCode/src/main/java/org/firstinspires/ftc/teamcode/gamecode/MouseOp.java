@@ -35,6 +35,6 @@ public class MouseOp extends TeleOpMode {
     @Override
     public void stop() {
         super.stop();
-        m.CloseTheDevice();
+        m.closeTheDevice();
     }
 }
