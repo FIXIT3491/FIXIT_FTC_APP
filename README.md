@@ -22,7 +22,6 @@ For technical questions regarding the SDK, please visit the FTC Technology forum
 
   http://ftcforum.usfirst.org/forumdisplay.php?156-FTC-Technology
 
-
 **************************************************************************************
 
 Version 2.4 (released on 16.11.13)
@@ -161,7 +160,6 @@ Version 2.00 (released on 16.08.19)
 Release 16.07.08
 
  * For the ftc_app project, the gradle files have been modified to support Android Studio 2.1.x.
-
 
 
 **************************************************************************************
@@ -303,6 +301,7 @@ Release 15.11.04.001
  * Updated javadoc documentation.
  * Updated release .apk files for Robot Controller and Driver Station apps.
 
+<<<<<<< HEAD
 T. Eng
 November 5, 2015
  
@@ -318,6 +317,23 @@ Release 15.10.06.002
 T. Eng
 October 6, 2015
 
+=======
+T. Eng
+November 5, 2015
+ 
+**************************************************************************************
+
+Release 15.10.06.002
+
+ * Added support for Legacy Matrix 9.6V motor/servo controller.
+ * Cleaned up build.gradle file.
+ * Minor UI and bug fixes for driver station and robot controller apps.
+ * Throws error if Ultrasonic sensor (NXT) is not configured for legacy module port 4 or 5.
+
+T. Eng
+October 6, 2015
+
+>>>>>>> upstream/master
 **************************************************************************************
 
 In this latest version of the FTC SDK (20150803_001) the following changes should be noted:
