@@ -8,7 +8,11 @@ The FTC Driver Station app is available through Google Play.
 To use this SDK, download/clone the entire project to your local computer.
 Use Android Studio to import the folder  ("Import project (Eclipse ADT, Gradle, etc.)").
 
-Documentation for the FTC SDK are included with this repository.  There is a subfolder called "doc" which contains several subfolders:
+The Javadoc reference documentation for the FTC SDK is now available online.  Visit the following URL to view the FTC SDK documentation as a live website:
+
+http://ftctechnh.github.io/ftc_app/doc/javadoc/index.html
+
+Documentation for the FTC SDK is also included with this repository.  There is a subfolder called "doc" which contains several subfolders:
 
  * The folder "apk" contains the .apk files for the FTC Driver Station and FTC Robot Controller apps.
  * The folder "javadoc" contains the JavaDoc user documentation for the FTC SDK.
@@ -18,10 +22,42 @@ For technical questions regarding the SDK, please visit the FTC Technology forum
 
   http://ftcforum.usfirst.org/forumdisplay.php?156-FTC-Technology
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
+
+**************************************************************************************
+
+Version 2.4 (released on 16.11.13)
+  * Fix to avoid crashing for nonexistent resources.
+  * Blocks Programming mode changes:
+     - Added blocks to support OpenGLMatrix, MatrixF, and VectorF.
+     - Added blocks to support AngleUnit, AxesOrder, AxesReference, CameraDirection, CameraMonitorFeedback, DistanceUnit, and TempUnit.
+     - Added blocks to support Acceleration.
+     - Added blocks to support LinearOpMode.getRuntime.
+     - Added blocks to support MagneticFlux and Position.
+     - Fixed typos.
+     - Made blocks for ElapsedTime more consistent with other objects.
+     - Added blocks to support Quaternion, Velocity, Orientation, AngularVelocity.
+     - Added blocks to support VuforiaTrackables, VuforiaTrackable, VuforiaLocalizer, VuforiaTrackableDefaultListener.
+     - Fixed a few blocks.
+     - Added type checking to new blocks.
+     - Updated to latest blockly.
+     - Added default variable blocks to navigation and matrix blocks.
+     - Fixed toolbox entry for openGLMatrix_rotation_withAxesArgs.
+     - When user downloads Blocks-generated op mode, only the .blk file is downloaded.
+     - When user uploads Blocks-generated op mode (.blk file), Javascript code is auto generated.
+     - Added DbgLog support.
+     - Added logging when a blocks file is read/written.
+     - Fixed bug to properly render blocks even if missing devices from configuration file.
+     - Added support for additional characters (not just alphanumeric) for the block file names (for download and upload).
+     - Added support for OpMode flavor (“Autonomous” or “TeleOp”) and group.
+  * Changes to Samples to prevent tutorial issues.
+  * Incorporated suggested changes from public pull 216 (“Replace .. paths”).
+  * Remove Servo Glitches when robot stopped.
+  * if user hits “Cancels” when editing a configuration file, clears the unsaved changes and reverts to original unmodified configuration.
+  * Added log info to help diagnose why the Robot Controller app was terminated (for example, by watch dog function).
+  * Added ability to transfer log from the controller.
+  * Fixed inconsistency for AngularVelocity
+  * Limit unbounded growth of data for telemetry.  If user does not call telemetry.update() for LinearOpMode in a timely manner, data added for telemetry might get lost if size limit is exceeded.
+
 **************************************************************************************
 
 Version 2.35 (released on 16.10.06)
@@ -52,7 +88,6 @@ Version 2.30 (released on 16.10.05)
   * Cleaned up device names in sample op modes to be consistent with Pushbot guide.
   * Fix to allow use of IrSeekerSensorV3.
 
->>>>>>> upstream/master
 **************************************************************************************
 
 Version 2.20 (released on 16.09.08)
@@ -128,10 +163,6 @@ Release 16.07.08
  * For the ftc_app project, the gradle files have been modified to support Android Studio 2.1.x.
 
 
-<<<<<<< HEAD
->>>>>>> upstream/master
-=======
->>>>>>> upstream/master
 
 **************************************************************************************
 
@@ -272,7 +303,6 @@ Release 15.11.04.001
  * Updated javadoc documentation.
  * Updated release .apk files for Robot Controller and Driver Station apps.
 
-<<<<<<< HEAD
 T. Eng
 November 5, 2015
  
@@ -288,23 +318,6 @@ Release 15.10.06.002
 T. Eng
 October 6, 2015
 
-=======
-T. Eng
-November 5, 2015
- 
-**************************************************************************************
-
-Release 15.10.06.002
-
- * Added support for Legacy Matrix 9.6V motor/servo controller.
- * Cleaned up build.gradle file.
- * Minor UI and bug fixes for driver station and robot controller apps.
- * Throws error if Ultrasonic sensor (NXT) is not configured for legacy module port 4 or 5.
-
-T. Eng
-October 6, 2015
-
->>>>>>> upstream/master
 **************************************************************************************
 
 In this latest version of the FTC SDK (20150803_001) the following changes should be noted:
