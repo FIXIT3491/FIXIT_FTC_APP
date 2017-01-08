@@ -21,7 +21,7 @@ public class VeerFermionOp extends TeleOpMode {
     Fermion tau;
     int collectorState = Robot.STOP;
 
-    double lF, lB, rF, rB = 0;
+    double driveDirection = 1;
 
     @Override
     public void initialize() {
@@ -33,14 +33,14 @@ public class VeerFermionOp extends TeleOpMode {
     @Override
     public void loopOpMode() {
 
-        double theta = Math.atan2(-joy1.x1(), joy1.y1());
+        double theta = Math.atan2(-driveDirection * joy1.x1(), driveDirection * joy1.y1());
 
         Log.i("Speeds=!", "" + Math.toDegrees(theta));
-        double speed = (joy1.rightBumper())? 0.3 : Math.hypot(joy1.y1(), joy1.x1());
+        double speed = ((joy1.rightBumper())? 0.3 : 1.0) * Math.hypot(joy1.y1(), joy1.x1());
 
         tau.strafe(Math.toDegrees(theta), speed, false);
 
-        tau.veer(Math.round(joy1.x2()) / 2.0, false, false);
+        tau.veer(joy1.x2() / 2.0, false, false);
 
         if(collectorState == Robot.IN && (joy2.rightBumper()) && getMilliSeconds() > 500) {
             collectorState = Robot.STOP;
@@ -69,81 +69,23 @@ public class VeerFermionOp extends TeleOpMode {
             tau.door.goToPos("close");
         }
 
+        if (joy1.leftBumper() && getMilliSeconds(1) > 500) {
+            clearTimer(1);
+            driveDirection *= -1;
+        }//if
 
         tau.usePlannedSpeeds();
 
+        if(tau.seesBall()){
+            clearTimer(2);
+        }
+        RC.t.addData("Ball in Collector", tau.seesBall());
+
+        if(getMilliSeconds(2) < 100){
+            RC.t.addData("Ball in Collector", true);
+        }
+
     }//loopOpMode
 
-
-    public void veer(double speed, boolean preservingStrafeSpeed) {
-
-        speed = Math.signum(speed) * Math.min(1, Math.abs(speed));
-
-        double leftForePower = (lF + rB) / 2.0;
-        double leftBackPower = (lB + rF) / 2.0;
-        double rightForePower = (lB + rF) / 2.0;
-        double rightBackPower = (lF + rB) / 2.0;
-
-        if (preservingStrafeSpeed) {
-
-            double maxCutOff = Math.max(Math.max(Math.abs(leftBackPower + speed), Math.abs(leftForePower + speed)), Math.max(Math.abs(rightBackPower - speed), Math.abs(rightForePower - speed)));
-            maxCutOff -= 1;
-
-            if (maxCutOff > 0) {
-                speed -= maxCutOff;
-            }//if
-
-            leftForePower += speed;
-            leftBackPower += speed;
-            rightForePower -= speed;
-            rightBackPower -= speed;
-        } else {
-
-            double max = MathUtils.max(Math.abs(leftBackPower + speed), Math.abs(leftForePower + speed), Math.abs(rightBackPower - speed), Math.abs(rightForePower - speed));
-            double maxOriginal = MathUtils.max(Math.abs(leftBackPower), Math.abs(leftForePower), Math.abs(rightBackPower), Math.abs(rightForePower));
-
-            if (max > 1) {
-                double maxAllowed = 1 - Math.abs(speed);
-
-                leftForePower *= maxAllowed / maxOriginal;
-                leftBackPower *= maxAllowed / maxOriginal;
-                rightForePower *= maxAllowed / maxOriginal;
-                rightBackPower *= maxAllowed / maxOriginal;
-            }//if
-
-            leftForePower += speed;
-            leftBackPower += speed;
-            rightForePower -= speed;
-            rightBackPower -= speed;
-
-        }//else
-
-        Log.i("Resulting Speeds", "LF: " + leftForePower + ", LB: " + leftBackPower + ", RF: " + rightForePower + ", RB: " + rightBackPower);
-
-        lF = leftForePower;
-        lB = leftBackPower;
-        rF = rightForePower;
-        rB = rightBackPower;
-    }//veer
-
-
-    public void strafe(double degrees, double speed) {
-
-        degrees += 45;
-
-        double leftForeRightBack = Math.sin(Math.toRadians(degrees));
-        double rightForeLeftBack = Math.cos(Math.toRadians(degrees));
-
-        double multi = speed / Math.max(Math.abs(leftForeRightBack), Math.abs(rightForeLeftBack));
-        leftForeRightBack *= multi;
-        rightForeLeftBack *= multi;
-
-        lF = leftForeRightBack;
-        rB = leftForeRightBack;
-
-        rF = rightForeLeftBack;
-        lB = rightForeLeftBack;
-
-    }//strafe
 
 }//VeerFermionOp

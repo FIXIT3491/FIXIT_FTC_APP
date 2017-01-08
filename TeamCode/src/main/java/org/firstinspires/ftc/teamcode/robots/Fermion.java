@@ -48,6 +48,7 @@ public class Fermion {
 
     public FXTOpticalDistanceSensor leftBeacon;
     public FXTOpticalDistanceSensor rightBeacon;
+    public FXTOpticalDistanceSensor ball;
 
     public double targetAngle = 0;
     private final static double TURNING_ACCURACY_DEG = 2;
@@ -122,7 +123,7 @@ public class Fermion {
 
         leftBeacon = new FXTOpticalDistanceSensor("leftBeacon");
         rightBeacon = new FXTOpticalDistanceSensor("rightBeacon");
-
+        ball = new FXTOpticalDistanceSensor("ball");
         ultra = new FXTAnalogUltrasonicSensor("ultra");
 
     }//Fermion
@@ -520,6 +521,10 @@ public class Fermion {
 
     @IntDef({Robot.LEFT, Robot.RIGHT})
     public @interface LightSensors{}
+
+    public boolean seesBall(){
+        return ball.getValue() > 0.05;
+    }
 
 
     public void shoot(){
