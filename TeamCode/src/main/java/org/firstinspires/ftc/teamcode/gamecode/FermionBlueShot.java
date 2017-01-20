@@ -54,26 +54,28 @@ public class FermionBlueShot extends AutoOpMode {
         muon.resetTargetAngle();
 
         muon.right(1);
-        sleep(1200);
+        sleep(1100);
         muon.stop();
         muon.shoot();
 
         if(RC.globalBool("2Balls")){
             muon.waitForState(Fermion.LOADED);
             muon.door.goToPos("open");
-            muon.collector.setPower(-0.25);
+            muon.collector.setPower(-1);
             muon.shoot();
             sleep(1000);
             muon.door.goToPos("close");
             muon.setCollectorState(Robot.STOP);
-        }
+        }//if
 
         muon.waitForState(Fermion.FIRE);
 
 
         muon.imuTurnL(195, 0.5);
 
-        muon.forward(0.3);
+        muon.forward(0.2);
+        sleep(1000);
+        muon.forward(0.09);
 
         while (wheels.getPose() == null && opModeIsActive()) {
             idle();

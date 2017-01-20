@@ -11,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.teamcode.RC;
+import org.firstinspires.ftc.teamcode.newhardware.FXTLED;
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.FXTAnalogUltrasonicSensor;
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.FXTOpticalDistanceSensor;
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.TrackBall;
@@ -49,6 +50,9 @@ public class Fermion {
     public FXTOpticalDistanceSensor leftBeacon;
     public FXTOpticalDistanceSensor rightBeacon;
     public FXTOpticalDistanceSensor ball;
+
+    public FXTLED bumperFront;
+    public FXTLED collectorFront;
 
     public double targetAngle = 0;
     private final static double TURNING_ACCURACY_DEG = 2;
@@ -125,6 +129,13 @@ public class Fermion {
         rightBeacon = new FXTOpticalDistanceSensor("rightBeacon");
         ball = new FXTOpticalDistanceSensor("ball");
         ultra = new FXTAnalogUltrasonicSensor("ultra");
+
+
+        collectorFront = new FXTLED("collectorLED");
+        collectorFront.extinguish();
+
+        bumperFront = new FXTLED("bumperLED");
+        bumperFront.illuminate();
 
     }//Fermion
 
@@ -526,6 +537,10 @@ public class Fermion {
         return ball.getValue() > 0.05;
     }
 
+    public void switchLights(){
+        bumperFront.switchState();
+        collectorFront.switchState();
+    }
 
     public void shoot(){
         requestedShooterState = FIRE;
@@ -560,9 +575,9 @@ public class Fermion {
                     requestedShooterState = -1;
                     shooterState = PRIMING;
                 } else if(requestedShooterState == FIRE){
-                    shooter1.setPosition(0.55);
-                    shooter2.setPosition(0.55);
-                    fireTime = System.currentTimeMillis() + 4000;
+                    shooter1.setPosition(0.6);
+                    shooter2.setPosition(0.6);
+                    fireTime = System.currentTimeMillis() + 4200;
                     shooterState = FIRING;
                 } else {
                     shooter1.setPosition(0.2);
@@ -570,16 +585,16 @@ public class Fermion {
                 }
             } else if(shooterState == PRIMED){
                 if(requestedShooterState == FIRE){
-                    shooter1.setPosition(0.7);
-                    shooter2.setPosition(0.7);
-                    fireTime = System.currentTimeMillis() + 2000;
+                    shooter1.setPosition(0.8);
+                    shooter2.setPosition(0.8);
+                    fireTime = System.currentTimeMillis() + 2200;
                     requestedShooterState = -1;
                     shooterState = FIRING;
                 }
             } else if(shooterState == FIRE){
                 shooter1.setPosition(0.12);
                 shooter2.setPosition(0.12);
-                fireTime = System.currentTimeMillis() + 4100;
+                fireTime = System.currentTimeMillis() + 4300;
                 requestedShooterState = -1;
                 shooterState = RELOADING;
             }

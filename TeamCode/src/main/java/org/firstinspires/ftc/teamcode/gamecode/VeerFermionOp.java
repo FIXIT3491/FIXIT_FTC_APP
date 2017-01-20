@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.gamecode;
 
+import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -16,15 +18,17 @@ import org.firstinspires.ftc.teamcode.util.MathUtils;
  * Created by Windows on 2016-12-04.
  */
 @TeleOp
-public class VeerFermionOp extends TeleOpMode {
+public class VeerFermionOp extends TeleOpMode implements TextToSpeech.OnInitListener {
 
     Fermion tau;
     int collectorState = Robot.STOP;
+    TextToSpeech tts;
 
     double driveDirection = 1;
 
     @Override
     public void initialize() {
+        tts = new TextToSpeech(RC.c(), this);
         tau = new Fermion(false);
         tau.startShooterControl();
         tau.prime();
@@ -72,7 +76,12 @@ public class VeerFermionOp extends TeleOpMode {
         if (joy1.leftBumper() && getMilliSeconds(1) > 500) {
             clearTimer(1);
             driveDirection *= -1;
+            tau.switchLights();
         }//if
+
+        if(joy2.buttonY() && !tts.isSpeaking()){
+            tts.speak("Hello, my name is Fermion", TextToSpeech.QUEUE_ADD, null);
+        }
 
         tau.usePlannedSpeeds();
 
@@ -88,4 +97,9 @@ public class VeerFermionOp extends TeleOpMode {
     }//loopOpMode
 
 
+    @Override
+    public void onInit(int status) {
+        RC.t.addData("Ready to talk", "!");
+
+    }
 }//VeerFermionOp
