@@ -32,7 +32,7 @@ public class FXTAnalogUltrasonicSensor extends FXTSensor {
     }
 
     @Override
-    public double getValue() {
+    public double returnValue() {
         return getDistance();
     }
 }

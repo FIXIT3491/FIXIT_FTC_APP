@@ -55,11 +55,39 @@ public class PathUtils {
         return angle;
     }
 
-    public static interface ParameteredRunnable {
+    public interface ParameteredRunnable {
 
-        public Object run(Object param);
+        Object run(Object param);
 
     }
 
+    //dists begins with sensor on right side of robot...
+    public int[] processUltraDists (int[] dists, double robotWidth, double robotHeight) {
+
+        int angleJump = 360 / dists.length;
+
+        for (int i = 0; i  < dists.length / 4; i++) {
+
+            int idx = i % dists.length / 4;
+            int sensor = i / (dists.length / 4);
+
+            double xFromSensor = dists[i] * Math.sin(Math.toRadians(idx * angleJump));
+            double yFromSensor = dists[i] * Math.cos(Math.toRadians(idx * angleJump));
+
+            if (sensor == 0) {
+                xFromSensor += robotWidth / 2;
+                yFromSensor -= robotHeight / 2;
+            } else if (sensor == 1) {
+                xFromSensor = 0;
+            }
+
+        }
+
+        for (int i = 0; i < dists.length / 4; i++) {
+
+        }
+
+        return null;
+    }
 
 }

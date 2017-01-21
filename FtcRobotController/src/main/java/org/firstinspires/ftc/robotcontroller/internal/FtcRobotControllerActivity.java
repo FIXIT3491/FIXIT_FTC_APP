@@ -47,6 +47,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -98,9 +99,17 @@ import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -658,13 +667,49 @@ public class FtcRobotControllerActivity extends Activity {
   }
 
   public static void initializeGlobals() {
+    HashMap<String, Object> values = new HashMap<>();
+
+    try {
+
+        BufferedReader globalsRead = new BufferedReader(new FileReader(
+                AppUtil.getInstance().getApplication().getExternalFilesDir(null).getAbsolutePath() + "/globals.txt"));
+
+        String toAdd = globalsRead.readLine();
+        while (toAdd != null) {
+            String[] data = toAdd.split(",;");
+
+            String key = data[1];
+            Object val = null;
+            if (data[0].equals("d")) {
+                val = Double.parseDouble(data[2]);
+            } else if (data[0].equals("b")) {
+                val = Boolean.parseBoolean(data[2]);
+            } else {
+                val = data[2];
+            }//else
+
+            values.put(key, val);
+
+            toAdd = globalsRead.readLine();
+        }//while
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }//catch
+
     GlobalValuesActivity.add("RedAlliance", true);
     GlobalValuesActivity.add("TeleBeginAngle", 0);
     GlobalValuesActivity.add("EncoderDistance", 500);
     GlobalValuesActivity.add("VeerProportional", 0.7 / 90);
-    GlobalValuesActivity.add("VeerDerivative", /*(0.5 / 90) / 10*/0);
-    GlobalValuesActivity.add("VeerIntegral", /*(0.1 / 90) / 1000)*/0);
-    GlobalValuesActivity.add("2Balls", false);
+    GlobalValuesActivity.add("VeerDerivative", (0.5 / 90) / 10);
+    GlobalValuesActivity.add("VeerIntegral", (0.1 / 90) / 1000);
+    GlobalValuesActivity.add("2Balls", true);
+
+    for (Map.Entry<String, Object> entry : values.entrySet()) {
+        Log.i(entry.getKey(), entry.getValue().toString());
+        GlobalValuesActivity.add(entry.getKey(), entry.getValue());
+    }//for
+
   }
 
 }

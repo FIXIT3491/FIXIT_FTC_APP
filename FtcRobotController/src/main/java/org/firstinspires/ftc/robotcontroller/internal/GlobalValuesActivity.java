@@ -22,6 +22,11 @@ import android.widget.ToggleButton;
 
 import com.qualcomm.ftcrobotcontroller.R;
 
+import org.firstinspires.ftc.robotcore.internal.AppUtil;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -148,19 +153,36 @@ public class GlobalValuesActivity extends Activity {
                 @Override
                 public void onClick(View v) {
 
-                    for (int i = 1; i < totalIds; i += 2) {
-                        String key = (String) ((TextView) findViewById(i - 1)).getText();
-                        View input = findViewById(i);
+                    try {
+                        FileOutputStream globalsWrite = new FileOutputStream(new File(
+                                AppUtil.getInstance().getActivity().getExternalFilesDir(null).getAbsolutePath() + "/globals.txt"));
 
-                        if (input instanceof EditText && ((EditText) input).getInputType() == (InputType.TYPE_CLASS_NUMBER)) {
-                            globals.put(key, new Double(Double.parseDouble(((EditText) input).getText().toString())));
-                        } else if (input instanceof EditText) {
-                            globals.put(key, ((EditText) input).getText().toString());
-                        } else {
-                            globals.put(key, new Boolean(((ToggleButton) input).isChecked()));
-                        }//else
+                        for (int i = 1; i < totalIds; i += 2) {
+                            String key = (String) ((TextView) findViewById(i - 1)).getText();
+                            View input = findViewById(i);
 
-                    }//for
+                            if (input instanceof EditText && ((EditText) input).getInputType() == (InputType.TYPE_CLASS_NUMBER)) {
+                                double val = Double.parseDouble(((EditText) input).getText().toString());
+
+                                globals.put(key, new Double(val));
+                                globalsWrite.write(("d,;" + key + ",;" + val + "\n").getBytes());
+                            } else if (input instanceof EditText) {
+                                globals.put(key, ((EditText) input).getText().toString());
+                                globalsWrite.write(("s,;" + key + ",;" + ((EditText) input).getText().toString() + "\n").getBytes());
+                            } else {
+                                boolean val = ((ToggleButton) input).isChecked();
+                                globals.put(key, new Boolean(val));
+
+                                globalsWrite.write(("b,;" + key + ",;" + val + "\n").getBytes());
+                            }//else
+
+                        }//for
+
+                        globalsWrite.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }//catch
+
 
                     startActivity(new Intent(GlobalValuesActivity.this, FtcRobotControllerActivity.class));
                 }//onClick
@@ -195,14 +217,13 @@ public class GlobalValuesActivity extends Activity {
         globals.put(key, new Double(val));
     }//add
 
-    public static void add(String key, String val) {
-        globals.put(key, val);
-    }//add
-
     public static void add(String key, boolean val) {
         globals.put(key, val);
     }//add
 
+    public static void add(String key, Object val) {
+        globals.put(key, val);
+    }//add
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
