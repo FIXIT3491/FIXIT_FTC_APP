@@ -22,7 +22,7 @@ import org.firstinspires.ftc.teamcode.util.VortexUtils;
 /**
  * Created by Windows on 2016-11-06.
  */
-@Autonomous
+
 public class BeaconPress extends AutoOpMode {
 
     @Override

@@ -58,7 +58,7 @@ public class FermionRedShot extends AutoOpMode {
         muon.stop();
         muon.shoot();
 
-        if(RC.globalBool("2Balls")){
+        if(RC.globalDouble("NumBalls") == 2){
             muon.waitForState(Fermion.LOADED);
             muon.door.goToPos("open");
             muon.collector.setPower(-1);
