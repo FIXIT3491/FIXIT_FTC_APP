@@ -101,6 +101,7 @@ public class Fermion {
 
         collector = new Motor("collector");
         collector.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        collector.setReverse(true);
 
         shooter1 = new LinearServo("shoot1");
         shooter1.setPosition(0.2);
@@ -131,11 +132,11 @@ public class Fermion {
         ultra = new FXTAnalogUltrasonicSensor("ultra");
 
 
-        collectorFront = new FXTLED("collectorLED");
-        collectorFront.extinguish();
-
-        bumperFront = new FXTLED("bumperLED");
-        bumperFront.illuminate();
+//        collectorFront = new FXTLED("collectorLED");
+//        collectorFront.extinguish();
+//
+//        bumperFront = new FXTLED("bumperLED");
+//        bumperFront.illuminate();
 
     }//Fermion
 

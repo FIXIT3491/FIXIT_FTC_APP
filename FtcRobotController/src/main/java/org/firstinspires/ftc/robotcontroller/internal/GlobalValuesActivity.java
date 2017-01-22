@@ -214,7 +214,7 @@ public class GlobalValuesActivity extends Activity {
     }//onCreate
 
     public static void add(String key, double val) {
-        globals.put(key, new Double(val));
+        globals.put(key, val);
     }//add
 
     public static void add(String key, boolean val) {
@@ -245,5 +245,17 @@ public class GlobalValuesActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private static class Value {
+        boolean inDashboard = false;
+        String name = "";
+        Object value;
+
+        public Value(Object obj, String name, boolean display){
+            value = obj;
+            this.name = name;
+            inDashboard = display;
+        }
     }
 }

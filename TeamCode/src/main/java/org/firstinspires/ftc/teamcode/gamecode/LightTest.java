@@ -35,13 +35,10 @@ public class LightTest extends AutoOpMode {
         Fermion muon = new Fermion(false);
         waitForStart();
         while(opModeIsActive()) {
-            while (opModeIsActive() && muon.ultra.getDistance() < 100) {
-                muon.backward(0.2);
-            }
-            while (opModeIsActive() && muon.ultra.getDistance() > 457) {
-                muon.forward(0.2);
-            }
-            muon.stop();
+            RC.t.addData("Left", muon.getLight(Robot.LEFT));
+            RC.t.addData("RIght", muon.getLight(Robot.RIGHT));
+            RC.t.addData("Ultra", muon.ultra.getDistance());
+            telemetry.update();
 
         }
     }

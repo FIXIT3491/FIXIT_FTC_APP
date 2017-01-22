@@ -118,7 +118,7 @@ public class FermionBlueShot extends AutoOpMode {
         while (opModeIsActive() && muon.ultra.getDistance() < 100){
             muon.backward(0.2);
         }
-        while(opModeIsActive() && muon.ultra.getDistance() > 457){
+        while(opModeIsActive() && muon.ultra.getDistance() > 151){
             muon.forward(0.2);
         }
 

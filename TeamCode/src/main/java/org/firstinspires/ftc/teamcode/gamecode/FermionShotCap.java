@@ -19,13 +19,16 @@ public class FermionShotCap extends AutoOpMode {
 
             RC.t.addData("asdgasdfasdf");
             muon.startShooterControl();
+            muon.addVeerCheckRunnable();
             muon.prime();
             waitForStart();
+            muon.resetTargetAngle();
 
-            sleep(10 * 1000);
+
+//            sleep(10 * 1000);
 
             muon.right(1);
-            sleep(1100);
+            sleep(1800);
             muon.stop();
             muon.shoot();
 
@@ -41,13 +44,19 @@ public class FermionShotCap extends AutoOpMode {
 
             muon.waitForState(Fermion.FIRE);
 
-            muon.right(1);
-            sleep(1000);
+            muon.imuTurnL(45, 0.6);
+
+            muon.backward(1);
+            sleep(2400);
             muon.stop();
 
-            muon.right(0.4);
-            sleep(500);
-            muon.stop();
+
+            //getting capball
+//            muon.imuTurnR(90, 0.6);
+//
+//            muon.forward(1);
+//            sleep(1750);
+//            muon.stop();
 
         }//runOp
 }

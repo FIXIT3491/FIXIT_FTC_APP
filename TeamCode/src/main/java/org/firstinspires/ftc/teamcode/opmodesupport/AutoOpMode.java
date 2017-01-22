@@ -55,6 +55,11 @@ public abstract class AutoOpMode extends LinearOpMode {
 
     }
 
+    protected void initDashboard(){
+
+    }
+
+
     public static void delay(int millis) {
         try {
             Thread.sleep(millis);
