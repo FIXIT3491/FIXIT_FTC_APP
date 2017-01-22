@@ -60,7 +60,7 @@ public class FermionBlueShot extends AutoOpMode {
         muon.stop();
         muon.shoot();
 
-        if(RC.globalBool("2Balls")){
+        if(RC.globalDouble("NumBalls") == 2){
             muon.waitForState(Fermion.LOADED);
             muon.door.goToPos("open");
             muon.collector.setPower(-1);
@@ -118,7 +118,7 @@ public class FermionBlueShot extends AutoOpMode {
         while (opModeIsActive() && muon.ultra.getDistance() < 100){
             muon.backward(0.2);
         }
-        while(opModeIsActive() && muon.ultra.getDistance() > 457){
+        while(opModeIsActive() && muon.ultra.getDistance() > 151){
             muon.forward(0.2);
         }
 

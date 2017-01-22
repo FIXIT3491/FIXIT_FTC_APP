@@ -20,7 +20,6 @@ import org.firstinspires.ftc.teamcode.robots.Fermion;
 /**
  * Created by Owner on 8/31/2015.
  */
-@Autonomous
 public class AdafruitCheck extends LinearTeleOpMode {
 
     Fermion f;

@@ -13,7 +13,6 @@ import org.firstinspires.ftc.teamcode.roboticslibrary.FXTCamera;
 /**
  * Created by FIXIT on 16-10-18.
  */
-@Autonomous
 public class CamOp extends TeleOpMode{
 
     FXTCamera cam;

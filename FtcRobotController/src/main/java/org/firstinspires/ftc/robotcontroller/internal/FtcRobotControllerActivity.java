@@ -686,7 +686,10 @@ public class FtcRobotControllerActivity extends Activity {
     GlobalValuesActivity.add("VeerProportional", 0.7 / 90);
     GlobalValuesActivity.add("VeerDerivative", (0.5 / 90) / 10);
     GlobalValuesActivity.add("VeerIntegral", (0.1 / 90) / 1000);
-    GlobalValuesActivity.add("2Balls", true);
+    GlobalValuesActivity.addDashboard("WaitTime", 10000);
+    GlobalValuesActivity.addDashboard("NumBalls", 1);
+    GlobalValuesActivity.addDashboard("Cap-ball", true);
+    GlobalValuesActivity.addDashboard("Ramp",false);
 
     for (Map.Entry<String, Object> entry : values.entrySet()) {
         Log.i(entry.getKey(), entry.getValue().toString());

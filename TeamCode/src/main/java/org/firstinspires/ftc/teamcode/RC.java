@@ -47,7 +47,7 @@ public class RC {
     }//setOpMode
 
     public static boolean globalBool(String key) {
-        return ((Boolean) GlobalValuesActivity.globals.get(key)).booleanValue();
+        return ((Boolean)GlobalValuesActivity.globals.get(key));
     }//globalBool
 
     public static String globalString(String key) {
@@ -55,8 +55,18 @@ public class RC {
     }//globalString
 
     public static double globalDouble(String key) {
-        return ((Double) GlobalValuesActivity.globals.get(key)).doubleValue();
+        return ((Double) GlobalValuesActivity.globals.get(key));
     }//globalDouble
+
+    public static Object global(String key){
+        return GlobalValuesActivity.globals.get(key);
+    }
+
+    public static String [] autoDashKeys(){
+        String [] keys = new String[ GlobalValuesActivity.autoKeys.size()];
+        GlobalValuesActivity.autoKeys.toArray(keys);
+        return keys;
+    }
 
     public static void setGlobalBool(String key, boolean val) {
         GlobalValuesActivity.add(key, val);
