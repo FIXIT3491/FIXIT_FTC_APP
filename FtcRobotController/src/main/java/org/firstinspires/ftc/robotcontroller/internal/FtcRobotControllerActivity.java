@@ -74,7 +74,6 @@ import com.qualcomm.ftccommon.FtcRobotControllerSettingsActivity;
 import com.qualcomm.ftccommon.LaunchActivityConstantsList;
 import com.qualcomm.ftccommon.ProgrammingModeController;
 import com.qualcomm.ftccommon.Restarter;
-import org.firstinspires.ftc.ftccommon.external.SoundPlayingRobotMonitor;
 import com.qualcomm.ftccommon.UpdateUI;
 import com.qualcomm.ftccommon.configuration.EditParameters;
 import com.qualcomm.ftccommon.configuration.FtcLoadFileActivity;
@@ -93,6 +92,7 @@ import com.qualcomm.robotcore.wifi.NetworkConnectionFactory;
 import com.qualcomm.robotcore.wifi.NetworkType;
 import com.qualcomm.robotcore.wifi.WifiDirectAssistant;
 
+import org.firstinspires.ftc.ftccommon.external.SoundPlayingRobotMonitor;
 import org.firstinspires.ftc.robotcore.internal.AppUtil;
 import org.firstinspires.inspection.RcInspectionActivity;
 import org.opencv.android.BaseLoaderCallback;
@@ -120,7 +120,6 @@ public class FtcRobotControllerActivity extends Activity {
   public static final String TAG = "RCActivity";
 
   private static final int REQUEST_CONFIG_WIFI_CHANNEL = 1;
-  private static final boolean USE_DEVICE_EMULATION = false;
   private static final int NUM_GAMEPADS = 2;
 
   public static final String NETWORK_TYPE_FILENAME = "ftc-network-type.txt";
@@ -298,22 +297,6 @@ public class FtcRobotControllerActivity extends Activity {
     wifiLock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "");
 
     hittingMenuButtonBrightensScreen();
-
-    if (USE_DEVICE_EMULATION) { HardwareFactory.enableDeviceEmulation(); }
-
-    if (!OpenCVLoader.initDebug()) {
-      RobotLog.d("OpenCV", "Internal OpenCV library not found. Using OpenCV Manager for initialization");
-      OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_0_0, this, mOpenCVCallBack);
-    } else {
-      RobotLog.d("OpenCV", "OpenCV library found inside package. Using it!");
-      mOpenCVCallBack.onManagerConnected(LoaderCallbackInterface.SUCCESS);
-    }//else
-
-    initOpMode = (Button) findViewById(R.id.initOpMode);
-    runOpMode = (Button) findViewById(R.id.runOpMode);
-    stopOpMode = (Button) findViewById(R.id.stopOpMode);
-    runOpMode.setEnabled(false);
-    stopOpMode.setEnabled(false);
 
     wifiLock.acquire();
     callback.networkConnectionUpdate(WifiDirectAssistant.Event.DISCONNECTED);
