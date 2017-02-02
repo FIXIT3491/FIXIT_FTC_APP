@@ -28,11 +28,11 @@ public class FXTAnalogUltrasonicSensor extends FXTSensor {
     }
 
     public double getDistance(){
-        return ultra.getVoltage() * 3096 / ultra.getMaxVoltage();
+        return ultra.getVoltage() * 3072 / ultra.getMaxVoltage();
     }
 
     @Override
-    public double getValue() {
+    public double returnValue() {
         return getDistance();
     }
 }

@@ -127,4 +127,8 @@ public class FXTCamera implements TextureView.SurfaceTextureListener {
 
     }//onSurfaceTextureUpdated
 
+    public Bitmap getImage(){
+        return lastTakenBit;
+    }
+
 }//FXTCamera

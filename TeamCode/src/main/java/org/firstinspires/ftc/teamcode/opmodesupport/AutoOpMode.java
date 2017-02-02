@@ -41,6 +41,7 @@ public abstract class AutoOpMode extends LinearOpMode {
         addTimer();
 
         try {
+            initDashboard();
             runOp();
         } finally {
             stopOpMode();
@@ -54,6 +55,21 @@ public abstract class AutoOpMode extends LinearOpMode {
     public void stopOpMode(){
 
     }
+
+    protected void initDashboard(){
+        String [] keys = RC.autoDashKeys();
+        for (int i = 0; i < keys.length; i++){
+            Object value = RC.global(keys[i]);
+            if(value instanceof Double){
+                RC.t.addData(keys[i], ((Double) value).doubleValue());
+            } else if(value instanceof Boolean){
+                RC.t.addData(keys[i], ((Boolean) value).booleanValue());
+            } else if(value instanceof String){
+                RC.t.addData(keys[i], (String)value);
+            }
+        }
+    }
+
 
     public static void delay(int millis) {
         try {

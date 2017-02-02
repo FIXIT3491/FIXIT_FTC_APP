@@ -84,6 +84,52 @@ public class VortexUtils {
         return config;
     }
 
+    public static int getBeaconConfig(Bitmap bm) {
+
+
+        if (bm != null) {
+
+
+            //turning the corner pixel coordinates into a proper bounding box
+            Mat image = OCVUtils.bitmapToMat(bm, CvType.CV_8UC3);
+
+            //filtering out non-beacon-blue colours in HSV colour space
+            Imgproc.cvtColor(image, image, Imgproc.COLOR_RGB2HSV_FULL);
+
+            //get filtered mask
+            //if pixel is within acceptable blue-beacon-colour range, it's changed to white.
+            //Otherwise, it's turned to black
+            Mat mask = new Mat();
+
+            Core.inRange(image, BEACON_BLUE_LOW, BEACON_BLUE_HIGH, mask);
+            Moments mmnts = Imgproc.moments(mask, true);
+
+            //calculating centroid of the resulting binary mask via image moments
+            Log.i("CentroidX", "" + ((mmnts.get_m10() / mmnts.get_m00())));
+            Log.i("CentroidY", "" + ((mmnts.get_m01() / mmnts.get_m00())));
+
+            //checking if blue either takes up the majority of the image (which means the beacon is all blue)
+            //or if there's barely any blue in the image (which means the beacon is all red or off)
+//            if (mmnts.get_m00() / mask.total() > 0.8) {
+//                return VortexUtils.BEACON_ALL_BLUE;
+//            } else if (mmnts.get_m00() / mask.total() < 0.1) {
+//                return VortexUtils.BEACON_NO_BLUE;
+//            }//elseif
+
+            //Note: for some reason, we end up with a image that is rotated 90 degrees
+            //if centroid is in the bottom half of the image, the blue beacon is on the left
+            //if the centroid is in the top half, the blue beacon is on the right
+            if ((mmnts.get_m01() / mmnts.get_m00()) < image.rows() / 2) {
+                return VortexUtils.BEACON_RED_BLUE;
+            } else {
+                return VortexUtils.BEACON_BLUE_RED;
+            }//else
+        }//if
+
+        return VortexUtils.NOT_VISIBLE;
+    }//getBeaconConfig
+
+
     public static int getBeaconConfig(Image img, VuforiaTrackableDefaultListener beacon, CameraCalibration camCal) {
 
         OpenGLMatrix pose = beacon.getRawPose();

@@ -4,6 +4,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.vuforia.CameraDevice;
 import com.vuforia.Image;
 import com.vuforia.PIXEL_FORMAT;
 import com.vuforia.Vuforia;
@@ -55,12 +56,13 @@ public class FermionBlue extends AutoOpMode {
 
         muon.imuTurnR(50, 0.5);
 
-        muon.forward(0.3);
+        muon.forward(0.2);
+        sleep(1000);
+        muon.forward(0.09);
 
         while (wheels.getPose() == null && opModeIsActive()) {
             idle();
         }//while
-
 
         VectorF trans = wheels.getPose().getTranslation();
 

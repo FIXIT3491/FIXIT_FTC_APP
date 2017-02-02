@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -38,6 +39,10 @@ public final class TaskHandler {
 
     public static void addLoopedTask(String name, Runnable task, int delay) {
         addTask(name, loop(task, delay));
+    }
+
+    public static void addCountedTask(String name, Runnable task, int count){
+        addTask(name, count(task, count));
     }
 
     public static void addDelayedTask(String name, final Runnable task, final int delay) {
@@ -113,6 +118,17 @@ public final class TaskHandler {
         };
 
     }//loop
+
+    private static Runnable count(final Runnable r, final int count){
+        return new Runnable() {
+            @Override
+            public void run() {
+                for(int i = 0; i < count; i++){
+                    r.run();
+                }
+            }
+        };
+    }
 
     public static class MultiRunnable implements Runnable {
 

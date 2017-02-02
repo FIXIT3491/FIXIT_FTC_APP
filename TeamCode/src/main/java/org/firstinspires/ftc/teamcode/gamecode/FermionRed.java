@@ -56,7 +56,9 @@ public class FermionRed extends AutoOpMode {
 
         muon.imuTurnL(50, 0.5);
 
-        muon.forward(0.3);
+        muon.forward(0.2);
+        sleep(1000);
+        muon.forward(0.09);
 
         while (gears.getPose() == null && opModeIsActive()) {
             idle();

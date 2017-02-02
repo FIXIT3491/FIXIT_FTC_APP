@@ -11,7 +11,6 @@ import org.firstinspires.ftc.teamcode.robots.Fermion;
 /**
  * Created by Windows on 2016-12-31.
  */
-@TeleOp
 public class CollectorTester extends TeleOpMode {
     double speed = 0;
     Fermion electron;

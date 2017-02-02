@@ -37,7 +37,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.net.wifi.WifiManager;
@@ -45,6 +47,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -71,7 +74,6 @@ import com.qualcomm.ftccommon.FtcRobotControllerSettingsActivity;
 import com.qualcomm.ftccommon.LaunchActivityConstantsList;
 import com.qualcomm.ftccommon.ProgrammingModeController;
 import com.qualcomm.ftccommon.Restarter;
-import org.firstinspires.ftc.ftccommon.external.SoundPlayingRobotMonitor;
 import com.qualcomm.ftccommon.UpdateUI;
 import com.qualcomm.ftccommon.configuration.EditParameters;
 import com.qualcomm.ftccommon.configuration.FtcLoadFileActivity;
@@ -90,15 +92,24 @@ import com.qualcomm.robotcore.wifi.NetworkConnectionFactory;
 import com.qualcomm.robotcore.wifi.NetworkType;
 import com.qualcomm.robotcore.wifi.WifiDirectAssistant;
 
+import org.firstinspires.ftc.ftccommon.external.SoundPlayingRobotMonitor;
 import org.firstinspires.ftc.robotcore.internal.AppUtil;
 import org.firstinspires.inspection.RcInspectionActivity;
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -109,7 +120,6 @@ public class FtcRobotControllerActivity extends Activity {
   public static final String TAG = "RCActivity";
 
   private static final int REQUEST_CONFIG_WIFI_CHANNEL = 1;
-  private static final boolean USE_DEVICE_EMULATION = false;
   private static final int NUM_GAMEPADS = 2;
 
   public static final String NETWORK_TYPE_FILENAME = "ftc-network-type.txt";
@@ -288,24 +298,9 @@ public class FtcRobotControllerActivity extends Activity {
 
     hittingMenuButtonBrightensScreen();
 
-    if (USE_DEVICE_EMULATION) { HardwareFactory.enableDeviceEmulation(); }
-
-    if (!OpenCVLoader.initDebug()) {
-      RobotLog.d("OpenCV", "Internal OpenCV library not found. Using OpenCV Manager for initialization");
-      OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_0_0, this, mOpenCVCallBack);
-    } else {
-      RobotLog.d("OpenCV", "OpenCV library found inside package. Using it!");
-      mOpenCVCallBack.onManagerConnected(LoaderCallbackInterface.SUCCESS);
-    }//else
-
-    initOpMode = (Button) findViewById(R.id.initOpMode);
-    runOpMode = (Button) findViewById(R.id.runOpMode);
-    stopOpMode = (Button) findViewById(R.id.stopOpMode);
-    runOpMode.setEnabled(false);
-    stopOpMode.setEnabled(false);
-
     wifiLock.acquire();
     callback.networkConnectionUpdate(WifiDirectAssistant.Event.DISCONNECTED);
+    readNetworkType(NETWORK_TYPE_FILENAME);
     bindToService();
 
     try {
@@ -365,7 +360,6 @@ public class FtcRobotControllerActivity extends Activity {
   protected void onResume() {
     super.onResume();
     RobotLog.vv(TAG, "onResume()");
-    readNetworkType(NETWORK_TYPE_FILENAME);
   }
 
   @Override
@@ -431,6 +425,12 @@ public class FtcRobotControllerActivity extends Activity {
     String fileContents = readFile(networkTypeFile);
     networkType = NetworkConnectionFactory.getTypeFromString(fileContents);
     programmingModeController.setCurrentNetworkType(networkType);
+
+    // update the preferences
+    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+    SharedPreferences.Editor editor = preferences.edit();
+    editor.putString(NetworkConnectionFactory.NETWORK_CONNECTION_TYPE, networkType.toString());
+    editor.commit();
   }
 
   private String readFile(File file) {
@@ -603,7 +603,13 @@ public class FtcRobotControllerActivity extends Activity {
     cfgFileMgr.changeBackground(R.color.opaque_dark_fixit_green, R.id.idActiveConfigHeader);
     
     HardwareFactory hardwareFactory = new HardwareFactory(context);
-    hardwareFactory.setXmlPullParser(file.getXml());
+    try {
+      hardwareFactory.setXmlPullParser(file.getXml());
+    } catch (Resources.NotFoundException e) {
+      file = RobotConfigFile.noConfig(cfgFileMgr);
+      hardwareFactory.setXmlPullParser(file.getXml());
+      cfgFileMgr.setActiveConfigAndUpdateUI(false, file);
+    }
     factory = hardwareFactory;
 
     eventLoop = new FtcEventLoop(factory, createOpModeRegister(), callback, this, programmingModeController);
@@ -644,13 +650,52 @@ public class FtcRobotControllerActivity extends Activity {
   }
 
   public static void initializeGlobals() {
+    HashMap<String, Object> values = new HashMap<>();
+
+    try {
+
+        BufferedReader globalsRead = new BufferedReader(new FileReader(
+                AppUtil.getInstance().getApplication().getExternalFilesDir(null).getAbsolutePath() + "/globals.txt"));
+
+        String toAdd = globalsRead.readLine();
+        while (toAdd != null) {
+            String[] data = toAdd.split(",;");
+
+            String key = data[1];
+            Object val = null;
+            if (data[0].equals("d")) {
+                val = Double.parseDouble(data[2]);
+            } else if (data[0].equals("b")) {
+                val = Boolean.parseBoolean(data[2]);
+            } else {
+                val = data[2];
+            }//else
+
+            values.put(key, val);
+
+            toAdd = globalsRead.readLine();
+        }//while
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }//catch
+
     GlobalValuesActivity.add("RedAlliance", true);
     GlobalValuesActivity.add("TeleBeginAngle", 0);
     GlobalValuesActivity.add("EncoderDistance", 500);
     GlobalValuesActivity.add("VeerProportional", 0.7 / 90);
-    GlobalValuesActivity.add("VeerDerivative", /*(0.5 / 90) / 10*/0);
-    GlobalValuesActivity.add("VeerIntegral", /*(0.1 / 90) / 1000)*/0);
-    GlobalValuesActivity.add("2Balls", true);
+    GlobalValuesActivity.add("VeerDerivative", (0.5 / 90) / 10);
+    GlobalValuesActivity.add("VeerIntegral", (0.1 / 90) / 1000);
+    GlobalValuesActivity.addDashboard("WaitTime", 10000);
+    GlobalValuesActivity.addDashboard("NumBalls", 1);
+    GlobalValuesActivity.addDashboard("Cap-ball", true);
+    GlobalValuesActivity.addDashboard("Ramp",false);
+
+    for (Map.Entry<String, Object> entry : values.entrySet()) {
+        Log.i(entry.getKey(), entry.getValue().toString());
+        GlobalValuesActivity.add(entry.getKey(), entry.getValue());
+    }//for
+
   }
 
 }
