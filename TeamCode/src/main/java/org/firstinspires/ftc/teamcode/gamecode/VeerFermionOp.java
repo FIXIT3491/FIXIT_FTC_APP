@@ -76,7 +76,7 @@ public class VeerFermionOp extends TeleOpMode implements TextToSpeech.OnInitList
         if (joy1.leftBumper() && getMilliSeconds(1) > 500) {
             clearTimer(1);
             driveDirection *= -1;
-            tau.switchLights();
+            //tau.switchLights();
         }//if
 
         if(joy2.buttonY() && !tts.isSpeaking()){
