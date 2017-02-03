@@ -308,6 +308,15 @@ public class FtcRobotControllerActivity extends Activity {
     } catch (IOException e) {
       e.printStackTrace();
     }//catch
+
+    if (!OpenCVLoader.initDebug()) {
+      RobotLog.d("OpenCV", "Internal OpenCV library not found. Using OpenCV Manager for initialization");
+      OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_0_0, this, mOpenCVCallBack);
+    } else {
+      RobotLog.d("OpenCV", "OpenCV library found inside package. Using it!");
+      mOpenCVCallBack.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+    }//else
+
   }
 
   public void initOpMode(View v) {

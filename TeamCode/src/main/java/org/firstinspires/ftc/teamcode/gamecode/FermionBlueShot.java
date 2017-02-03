@@ -46,8 +46,6 @@ public class FermionBlueShot extends AutoOpMode {
         VuforiaTrackableDefaultListener wheels = (VuforiaTrackableDefaultListener) beacons.get(0).getListener();
         VuforiaTrackableDefaultListener legos = (VuforiaTrackableDefaultListener) beacons.get(2).getListener();
 
-        wheels.getPose().getTranslation().getData();
-
         muon.startShooterControl();
         muon.prime();
         waitForStart();
@@ -59,25 +57,13 @@ public class FermionBlueShot extends AutoOpMode {
         sleep(1100);
         muon.stop();
         muon.shoot();
-
-        if(RC.globalDouble("NumBalls") == 2){
-            muon.waitForState(Fermion.LOADED);
-            muon.door.goToPos("open");
-            muon.collector.setPower(-1);
-            muon.shoot();
-            sleep(1000);
-            muon.door.goToPos("close");
-            muon.setCollectorState(Robot.STOP);
-        }//if
-
         muon.waitForState(Fermion.FIRE);
 
 
-        muon.imuTurnL(195, 0.5);
+        muon.imuTurnR(160, 0.6);
 
         muon.forward(0.2);
         sleep(1000);
-        muon.forward(0.09);
 
         while (wheels.getPose() == null && opModeIsActive()) {
             idle();
@@ -113,18 +99,18 @@ public class FermionBlueShot extends AutoOpMode {
         sleep(600);
         Log.i(TAG, "runOp: after");
 
-        muon.absoluteIMUTurn(90, 0.5);
+        muon.absoluteIMUTurn(90, 0.6);
 
-        while (opModeIsActive() && muon.ultra.getDistance() < 100){
+        while (opModeIsActive() && muon.ultra.getDistance() < 50){
             muon.backward(0.2);
         }
-        while(opModeIsActive() && muon.ultra.getDistance() > 151){
+        while(opModeIsActive() && muon.ultra.getDistance() > 457){
             muon.forward(0.2);
         }
 
         muon.stop();
 
-        muon.left(0.2);
+        muon.left(0.3);
 
         int sensor = (config == VortexUtils.BEACON_BLUE_RED)? Robot.LEFT : Robot.RIGHT;
         while (opModeIsActive() && muon.getLight(sensor) < muon.LIGHT_THRESHOLD){
@@ -145,7 +131,7 @@ public class FermionBlueShot extends AutoOpMode {
         //------------------------------Beacon 2--------------
 
         muon.left(1);
-        sleep(1500);
+        sleep(1200);
 
         while (opModeIsActive() && muon.ultra.getDistance() < 50){
             muon.backward(0.2);
@@ -154,7 +140,7 @@ public class FermionBlueShot extends AutoOpMode {
             muon.forward(0.2);
         }
 
-        muon.left(0.2);
+        muon.left(0.3);
 
         sensor = Robot.LEFT;
         while (opModeIsActive() && muon.getLight(sensor) < muon.LIGHT_THRESHOLD){
@@ -164,21 +150,14 @@ public class FermionBlueShot extends AutoOpMode {
         muon.absoluteIMUTurn(90, 0.5);
         muon.stop();
 
-        long timeBack = 0;
-        clearTimer();
-        while (legos.getPose() == null && opModeIsActive()) {
-            if(getMilliSeconds() > 1000){
-                Log.i(TAG, "runOp: " + "can't see");
-                muon.backward(0.3);
-                sleep(300);
-                timeBack += 300;
-                muon.stop();
-                clearTimer();
-            }
-            idle();
+        while (opModeIsActive() && muon.ultra.getDistance() < 500) {
+            muon.backward(1);
         }//while
+        muon.stop();
 
-
+        while (legos.getPose() == null && opModeIsActive()){
+            idle();
+        }
 
         config = VortexUtils.NOT_VISIBLE;
         try{
@@ -197,7 +176,7 @@ public class FermionBlueShot extends AutoOpMode {
 
         if(config == VortexUtils.BEACON_RED_BLUE){
             muon.stop();
-            muon.left(0.2);
+            muon.left(0.3);
 
             sensor = Robot.RIGHT;
             while (opModeIsActive() && muon.getLight(sensor) < muon.LIGHT_THRESHOLD){
@@ -213,6 +192,14 @@ public class FermionBlueShot extends AutoOpMode {
         muon.backward(0.5);
         sleep(300);
         muon.stop();
+
+
+        if(RC.globalBool("Cap-ball")){
+            muon.imuTurnL(45, 0.7);
+            muon.backward(1);
+            sleep(2000);
+            muon.stop();
+        }
 
     }//runOp
 

@@ -49,7 +49,7 @@ public class FermionShotRed extends AutoOpMode {
             muon.imuTurnR(45, 0.6);
 
             muon.forward(1);
-            sleep(2400);
+            sleep(2600);
             muon.stop();
         }
 

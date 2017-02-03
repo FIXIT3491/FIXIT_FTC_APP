@@ -54,11 +54,9 @@ public class FermionBlue extends AutoOpMode {
         sleep(300);
         muon.stop();
 
-        muon.imuTurnR(50, 0.5);
+        muon.imuTurnR(50, 0.6);
 
         muon.forward(0.2);
-        sleep(1000);
-        muon.forward(0.09);
 
         while (wheels.getPose() == null && opModeIsActive()) {
             idle();
@@ -91,9 +89,9 @@ public class FermionBlue extends AutoOpMode {
         sleep(500);
         Log.i(TAG, "runOp: after");
 
-        muon.absoluteIMUTurn(90, 0.5);
+        muon.absoluteIMUTurn(90, 0.6);
 
-        muon.left(0.2);
+        muon.left(0.3);
 
         int sensor = (config == VortexUtils.BEACON_BLUE_RED)? Robot.LEFT : Robot.RIGHT;
         while (opModeIsActive() && muon.getLight(sensor) < 0.2){
@@ -114,8 +112,8 @@ public class FermionBlue extends AutoOpMode {
         //------------------------------Beacon 2--------------
 
         muon.left(1);
-        sleep(1000);
-        muon.left(0.2);
+        sleep(1200);
+        muon.left(0.3);
 
         sensor = Robot.LEFT;
         while (opModeIsActive() && muon.getLight(sensor) < 0.2){
@@ -127,17 +125,14 @@ public class FermionBlue extends AutoOpMode {
 
         long timeBack = 0;
         clearTimer();
-        while (legos.getPose() == null && opModeIsActive()) {
-            if(getMilliSeconds() > 1500){
-                Log.i(TAG, "runOp: " + "can't see");
-                muon.backward(0.3);
-                sleep(300);
-                timeBack += 300;
-                muon.stop();
-                clearTimer();
-            }
-            idle();
+        while (opModeIsActive() && muon.ultra.getDistance() < 500) {
+            muon.backward(1);
         }//while
+        muon.stop();
+
+        while (legos.getPose() == null && opModeIsActive()){
+            idle();
+        }
 
 
 
@@ -158,7 +153,7 @@ public class FermionBlue extends AutoOpMode {
 
         if(config == VortexUtils.BEACON_RED_BLUE){
             muon.stop();
-            muon.left(0.2);
+            muon.left(0.3);
 
             sensor = Robot.RIGHT;
             while (opModeIsActive() && muon.getLight(sensor) < 0.2){
@@ -174,6 +169,14 @@ public class FermionBlue extends AutoOpMode {
         muon.backward(0.5);
         sleep(300);
         muon.stop();
+
+
+        if(RC.globalBool("Cap-ball")){
+            muon.imuTurnL(45, 0.7);
+            muon.backward(1);
+            sleep(2000);
+            muon.stop();
+        }
 
     }//runOp
 

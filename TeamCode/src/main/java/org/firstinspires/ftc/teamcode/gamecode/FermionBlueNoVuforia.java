@@ -4,6 +4,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.vuforia.Image;
 import com.vuforia.PIXEL_FORMAT;
 import com.vuforia.Vuforia;
@@ -27,6 +28,7 @@ import static org.firstinspires.ftc.teamcode.util.VortexUtils.getImageFromFrame;
  * Created by FIXIT on 16-10-21.
  */
 @Autonomous
+@Disabled
 public class FermionBlueNoVuforia extends AutoOpMode {
 
     @Override

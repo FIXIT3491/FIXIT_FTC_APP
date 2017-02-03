@@ -23,7 +23,7 @@ import org.firstinspires.ftc.teamcode.util.VortexUtils;
  */
 
 @Autonomous
-public class FermionBlueNoVuf extends AutoOpMode {
+public class FermionRedNoVuf extends AutoOpMode {
     Fermion top;
 
     @Override
@@ -40,16 +40,24 @@ public class FermionBlueNoVuf extends AutoOpMode {
 
         top.forward(0.5);
 
-        while(opModeIsActive() && top.getLight(Robot.RIGHT) < Fermion.LIGHT_THRESHOLD){
+        while(opModeIsActive() && top.getLight(Robot.LEFT) < Fermion.LIGHT_THRESHOLD){
             idle();
-            Log.i(TAG, "runOp: " + top.getLight(Robot.RIGHT));
+            Log.i(TAG, "runOp: " + top.getLight(Robot.LEFT));
         }
 
         top.stop();
 
-        top.absoluteSingleIMUTurn(45, 1);
-        top.absoluteIMUTurn(90, 1);
+        top.absoluteSingleIMUTurn(-45, 1);
+        top.absoluteIMUTurn(-90, 1);
 
+        top.stop();
+
+        top.left(0.3);
+
+        while(opModeIsActive() && top.getLight(Robot.RIGHT) < Fermion.LIGHT_THRESHOLD){
+            idle();
+            Log.i(TAG, "runOp: " + top.getLight(Robot.RIGHT));
+        }
         top.stop();
 
         top.right(0.3);
@@ -59,6 +67,7 @@ public class FermionBlueNoVuf extends AutoOpMode {
             Log.i(TAG, "runOp: " + top.getLight(Robot.LEFT));
         }
         top.stop();
+
 
 
         while (opModeIsActive() && top.ultra.getDistance() < 300) {
@@ -74,7 +83,7 @@ public class FermionBlueNoVuf extends AutoOpMode {
         Log.i(TAG, "runOp: " + config);
 
         int sensor = 0;
-        if(config == VortexUtils.BEACON_RED_BLUE){
+        if(config == VortexUtils.BEACON_BLUE_RED){
             top.left(0.3);
 
             sensor = Robot.RIGHT;
@@ -83,12 +92,10 @@ public class FermionBlueNoVuf extends AutoOpMode {
             }
             top.stop();
             sleep(100);
-            top.forward(0.3);
-            sleep(200);
         }
 
         top.forward(0.3);
-        sleep(700);
+        sleep(1000);
         top.backward(1);
         sleep(500);
         top.stop();

@@ -56,12 +56,12 @@ public class Fermion {
 
     public double targetAngle = 0;
     private final static double TURNING_ACCURACY_DEG = 2;
-    private final static double MINIMUM_TURNING_SPEED = 0.1;
+    private final static double MINIMUM_TURNING_SPEED = 0.13;
     public static double LIGHT_THRESHOLD = 0.3;
 
     public boolean preservingStrafeSpeed = false;
     private boolean useVeerCheck = true;
-    private PID veerAlgorithm = new PID(PID.Type.PID, RC.globalDouble("VeerProportional"), RC.globalDouble("VeerDerivative"), RC.globalDouble("VeerIntegral"));
+    private PID veerAlgorithm = new PID(PID.Type.PID, RC.globalDouble("VeerProportional"),0, 0 /*RC.globalDouble("VeerDerivative"), RC.globalDouble("VeerIntegral")*/);
     private final static double MINIMUM_TRACKING_SPEED = 0.19;
     private final static double TRACKING_ACCURACY_TIKS = 30;
 
@@ -193,6 +193,18 @@ public class Fermion {
         rightBack.setPower(-speed);
     }//turnL
 
+    public void turnSingleR(double speed){
+        useVeerCheck = false;
+        leftFore.setPower(speed);
+        leftBack.setPower(speed);
+    }
+
+    public void turnSingleL(double speed){
+        useVeerCheck = false;
+        rightFore.setPower(speed);
+        rightBack.setPower(speed);
+    }
+
     public void stop() {
         commandedStrafeSpeedRightBackLeftFore = 0;
         commandedStrafeSpeedRightForeLeftBack = 0;
@@ -321,6 +333,58 @@ public class Fermion {
         useVeerCheck = true;
     }//imuTurnR
 
+    public void singleTurnR(double degrees, double speed) {
+
+        if(degrees < TURNING_ACCURACY_DEG) return;
+        turnSingleR(speed);
+
+        this.targetAngle = MathUtils.cvtAngleToNewDomain(targetAngle + degrees);
+
+        double beginAngle = MathUtils.cvtAngleToNewDomain(getIMUAngle()[0]);
+        double targetAngle = MathUtils.cvtAngleToNewDomain(beginAngle + degrees);
+
+        while (RC.l.opModeIsActive()) {
+
+            double currentAngle = MathUtils.cvtAngleToNewDomain(getIMUAngle()[0]);
+            double angleToTurn = MathUtils.cvtAngleJumpToNewDomain(targetAngle - currentAngle);
+
+            turnSingleR(angleToTurn / 180 * (speed - MINIMUM_TURNING_SPEED) + MINIMUM_TURNING_SPEED);
+
+            if (angleToTurn < TURNING_ACCURACY_DEG) {
+                break;
+            }//if
+        }//while
+
+        stop();
+        useVeerCheck = true;
+    }//imuTurnR
+
+    public void singleTurnL(double degrees, double speed) {
+
+        if(degrees < TURNING_ACCURACY_DEG) return;
+        turnSingleL(speed);
+
+        this.targetAngle = MathUtils.cvtAngleToNewDomain(targetAngle + degrees);
+
+        double beginAngle = MathUtils.cvtAngleToNewDomain(getIMUAngle()[0]);
+        double targetAngle = MathUtils.cvtAngleToNewDomain(beginAngle + degrees);
+
+        while (RC.l.opModeIsActive()) {
+
+            double currentAngle = MathUtils.cvtAngleToNewDomain(getIMUAngle()[0]);
+            double angleToTurn = MathUtils.cvtAngleJumpToNewDomain(targetAngle - currentAngle);
+
+            turnSingleR(angleToTurn / 180 * (speed - MINIMUM_TURNING_SPEED) + MINIMUM_TURNING_SPEED);
+
+            if (angleToTurn < TURNING_ACCURACY_DEG) {
+                break;
+            }//if
+        }//while
+
+        stop();
+        useVeerCheck = true;
+    }//imuTurnR
+
     public void absoluteIMUTurn(double degrees, double speed) {
         double currentAngle = MathUtils.cvtAngleToNewDomain(getIMUAngle()[0]);
 
@@ -330,6 +394,19 @@ public class Fermion {
             imuTurnL(-toTurn, speed);
         } else {
             imuTurnR(toTurn, speed);
+        }//else
+        setTargetAngle(degrees);
+    }//absoluteIMUTurn
+
+    public void absoluteSingleIMUTurn(double degrees, double speed) {
+        double currentAngle = MathUtils.cvtAngleToNewDomain(getIMUAngle()[0]);
+
+        double toTurn = MathUtils.cvtAngleJumpToNewDomain(degrees - currentAngle);
+
+        if (toTurn < 0) {
+            singleTurnL(-toTurn, speed);
+        } else {
+            singleTurnR(toTurn, speed);
         }//else
         setTargetAngle(degrees);
     }//absoluteIMUTurn
