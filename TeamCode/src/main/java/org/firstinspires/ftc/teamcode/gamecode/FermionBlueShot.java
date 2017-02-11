@@ -46,6 +46,7 @@ public class FermionBlueShot extends AutoOpMode {
         VuforiaTrackableDefaultListener wheels = (VuforiaTrackableDefaultListener) beacons.get(0).getListener();
         VuforiaTrackableDefaultListener legos = (VuforiaTrackableDefaultListener) beacons.get(2).getListener();
 
+        double voltage = muon.getBatteryVoltage();
         muon.startShooterControl();
         muon.prime();
         waitForStart();
@@ -54,7 +55,11 @@ public class FermionBlueShot extends AutoOpMode {
         muon.resetTargetAngle();
 
         muon.right(1);
-        sleep(1100);
+        if(voltage > 13.5){
+            sleep(900);
+        } else {
+            sleep(1100);
+        }
         muon.stop();
         muon.shoot();
         muon.waitForState(Fermion.FIRE);

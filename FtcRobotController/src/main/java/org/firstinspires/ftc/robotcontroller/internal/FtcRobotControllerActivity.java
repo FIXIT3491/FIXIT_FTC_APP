@@ -317,6 +317,10 @@ public class FtcRobotControllerActivity extends Activity {
       mOpenCVCallBack.onManagerConnected(LoaderCallbackInterface.SUCCESS);
     }//else
 
+    initOpMode = (Button) findViewById(R.id.initOpMode);
+    runOpMode = (Button) findViewById(R.id.runOpMode);
+    stopOpMode = (Button) findViewById(R.id.stopOpMode);
+
   }
 
   public void initOpMode(View v) {

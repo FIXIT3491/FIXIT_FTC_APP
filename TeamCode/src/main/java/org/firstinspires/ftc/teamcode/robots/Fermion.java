@@ -620,6 +620,10 @@ public class Fermion {
         collectorFront.switchState();
     }
 
+    public double getBatteryVoltage(){
+        return RC.h.voltageSensor.get("Motor Controller 1").getVoltage();
+    }
+
     public void shoot(){
         requestedShooterState = FIRE;
     }

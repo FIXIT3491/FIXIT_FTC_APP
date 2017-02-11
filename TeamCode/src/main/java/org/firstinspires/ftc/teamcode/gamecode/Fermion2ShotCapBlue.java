@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.robots.Robot;
  * Created by Windows on 2017-01-15.
  */
 @Autonomous
-public class FermionShotBlue extends AutoOpMode {
+public class Fermion2ShotCapBlue extends AutoOpMode {
 
         @Override
         public void runOp() throws InterruptedException {

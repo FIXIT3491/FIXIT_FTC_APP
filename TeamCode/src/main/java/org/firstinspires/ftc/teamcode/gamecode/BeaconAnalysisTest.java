@@ -4,6 +4,8 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.vuforia.CameraDevice;
+import com.vuforia.CameraField;
 import com.vuforia.Image;
 import com.vuforia.PIXEL_FORMAT;
 import com.vuforia.Vuforia;
@@ -35,6 +37,9 @@ public class BeaconAnalysisTest extends AutoOpMode {
 
         VuforiaTrackables beacons = locale.loadTrackablesFromAsset("FTC_2016-17");
         VuforiaTrackableDefaultListener gears = (VuforiaTrackableDefaultListener) beacons.get(3).getListener();
+
+        Log.i("WORKED", "" + CameraDevice.getInstance().setField("exposure-compensation", 12));
+
 
         waitForStart();
         beacons.activate();

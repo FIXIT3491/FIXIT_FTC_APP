@@ -45,6 +45,7 @@ public class FermionRedShot extends AutoOpMode {
         VuforiaTrackableDefaultListener gears = (VuforiaTrackableDefaultListener) beacons.get(3).getListener();
         VuforiaTrackableDefaultListener tools = (VuforiaTrackableDefaultListener) beacons.get(1).getListener();
 
+        double voltage = muon.getBatteryVoltage();
         RC.t.addData("OpMode", "initialized");
         muon.startShooterControl();
         muon.prime();
@@ -54,7 +55,11 @@ public class FermionRedShot extends AutoOpMode {
         muon.resetTargetAngle();
 
         muon.right(1);
-        sleep(1100);
+        if(voltage > 13.5){
+            sleep(900);
+        } else {
+            sleep(1100);
+        }
         muon.stop();
         muon.shoot();
         muon.waitForState(Fermion.FIRE);
