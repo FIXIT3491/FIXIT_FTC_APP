@@ -35,8 +35,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
   <item
       android:id="@+id/action_driver"
-      android:orderInCategory="96"
+      android:orderInCategory="95"
       android:title="Driver Station"/>
+
+  <item
+      android:id="@+id/action_dservice_connect"
+      android:orderInCategory="96"
+      android:title="Audible Telemetry"/>
+
   <item
       android:id="@+id/action_globals"
       android:orderInCategory="97"

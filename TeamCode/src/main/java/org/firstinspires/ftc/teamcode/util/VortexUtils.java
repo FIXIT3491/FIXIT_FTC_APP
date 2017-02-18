@@ -208,10 +208,10 @@ public class VortexUtils {
     }//getBeaconConfig
 
 
-    public static int isBlueOrRed(Image img, VuforiaTrackableDefaultListener object, CameraCalibration camCal, VectorF sizeOfObject, int objectType) {
 
-        OpenGLMatrix pose = object.getPose();
-        if (pose != null && img != null && img.getPixels() != null) {
+    public static int isBlueOrRed(Image img) {
+
+        if (img != null && img.getPixels() != null) {
 
             Bitmap bm = Bitmap.createBitmap(img.getWidth(), img.getHeight(), Bitmap.Config.RGB_565);
             bm.copyPixelsFromBuffer(img.getPixels());
@@ -219,37 +219,9 @@ public class VortexUtils {
             //turning the corner pixel coordinates into a proper bounding box
             Mat analyse = OCVUtils.bitmapToMat(bm, CvType.CV_8UC3);
 
-            Matrix34F rawPose = new Matrix34F();
-            float[] poseData = Arrays.copyOfRange(pose.transposed().getData(), 0, 12);
+            Mat maskBlue = applyMask(analyse.clone(), OTHER_BLUE_LOW, OTHER_BLUE_HIGH);
 
-            rawPose.setData(poseData);
-
-            //calculating pixel coordinates of beacon corners
-            float[][] corners = new float[6][2];
-
-            corners[0] = Tool.projectPoint(camCal, rawPose, new Vec3F(sizeOfObject.get(0) / 2, sizeOfObject.get(1) / 2, sizeOfObject.get(2) / 2)).getData(); //upper left of beacon
-            corners[1] = Tool.projectPoint(camCal, rawPose, new Vec3F(-sizeOfObject.get(0) / 2, sizeOfObject.get(1) / 2, sizeOfObject.get(2) / 2)).getData(); //upper right of beacon
-            corners[2] = Tool.projectPoint(camCal, rawPose, new Vec3F(-sizeOfObject.get(0) / 2, -sizeOfObject.get(1) / 2, sizeOfObject.get(2) / 2)).getData(); //lower right of beacon
-            corners[3] = Tool.projectPoint(camCal, rawPose, new Vec3F(sizeOfObject.get(0) / 2, -sizeOfObject.get(1) / 2, -sizeOfObject.get(2) / 2)).getData(); //lower left of beacon
-            corners[4] = Tool.projectPoint(camCal, rawPose, new Vec3F(-sizeOfObject.get(0) / 2, sizeOfObject.get(1) / 2, -sizeOfObject.get(2) / 2)).getData(); //lower left of beacon
-            corners[5] = Tool.projectPoint(camCal, rawPose, new Vec3F(-sizeOfObject.get(0) / 2, -sizeOfObject.get(1) / 2, -sizeOfObject.get(2) / 2)).getData(); //lower left of beacon
-
-            double x = MathUtils.min(corners[0][0], corners[1][0], corners[2][0], corners[3][0], corners[4][0], corners[5][0]);
-            double y = MathUtils.min(corners[0][1], corners[1][1], corners[2][1], corners[3][1], corners[4][1], corners[5][1]);
-            double width = MathUtils.range(corners[0][0], corners[1][0], corners[2][0], corners[3][0], corners[4][0], corners[5][0]);
-            double height = MathUtils.range(corners[0][1], corners[1][1], corners[2][1], corners[3][1], corners[4][1], corners[5][1]);
-
-            x = Math.max(0, x);
-            y = Math.max(0, y);
-
-            width = (x + width > analyse.cols())? analyse.cols() - x : width;
-            height = (y + height > analyse.rows())? analyse.rows() - y : height;
-
-            Mat cropped = new Mat(analyse, new Rect((int) x, (int) y, (int) width, (int) height));
-
-            Mat maskBlue = applyMask(cropped, OTHER_BLUE_LOW, OTHER_BLUE_HIGH);
-
-            Mat maskRed = applyMask(cropped, OTHER_RED_LOW, OTHER_RED_HIGH);
+            Mat maskRed = applyMask(analyse.clone(), OTHER_RED_LOW, OTHER_RED_HIGH);
 
             if (Imgproc.moments(maskBlue).get_m00() > Imgproc.moments(maskRed).get_m00()) {
                 return OBJECT_BLUE;

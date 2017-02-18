@@ -41,11 +41,13 @@ public class Fermion {
     public Motor leftBack;
     public Motor rightBack;
     public Motor collector;
+    public Motor lifter;
 
     public LinearServo shooter1;
     public LinearServo shooter2;
 
     public FXTServo door;
+    public FXTServo capRelease;
 
     public FXTOpticalDistanceSensor leftBeacon;
     public FXTOpticalDistanceSensor rightBeacon;
@@ -61,7 +63,7 @@ public class Fermion {
 
     public boolean preservingStrafeSpeed = false;
     private boolean useVeerCheck = true;
-    private PID veerAlgorithm = new PID(PID.Type.PID, RC.globalDouble("VeerProportional"),0, 0 /*RC.globalDouble("VeerDerivative"), RC.globalDouble("VeerIntegral")*/);
+    private PID veerAlgorithm = new PID(PID.Type.PID, RC.globalDouble("VeerProportional"), 0, 0 /*RC.globalDouble("VeerDerivative"), RC.globalDouble("VeerIntegral")*/);
     private final static double MINIMUM_TRACKING_SPEED = 0.19;
     private final static double TRACKING_ACCURACY_TIKS = 30;
 
@@ -75,6 +77,7 @@ public class Fermion {
     public static int PRIMED = 4;
     public static int PRIMING = 5;
     private long fireTime = 0;
+
 
     public int shooterState = LOADED;
     public int requestedShooterState = LOADED;
@@ -103,6 +106,9 @@ public class Fermion {
         collector.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         collector.setReverse(true);
 
+        lifter = new Motor("lifter");
+        collector.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         shooter1 = new LinearServo("shoot1");
         shooter1.setPosition(0.2);
         shooter2 = new LinearServo("shoot2");
@@ -114,7 +120,10 @@ public class Fermion {
         door.addPos("close", 0);
         door.goToPos("close");
 
-
+        capRelease = new FXTServo("capRelease");
+        capRelease.addPos("stored", 1);
+        capRelease.addPos("released", 0.6);
+        capRelease.goToPos("stored");
 
         mouse = new TrackBall("rightFore", "rightBack");
         if (auto) {
@@ -696,6 +705,17 @@ public class Fermion {
             }
         }, 5);
     }
+
+
+    public void liftCapBall () {
+        lifter.setPower(-1);
+    }
+
+    public void lowerCapBall () {
+        lifter.setPower(1);
+    }
+
+
 
 
 }//Fermion

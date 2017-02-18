@@ -43,6 +43,9 @@ import android.content.res.Resources;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.net.wifi.WifiManager;
+import android.net.wifi.p2p.WifiP2pDevice;
+import android.net.wifi.p2p.WifiP2pDeviceList;
+import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -54,6 +57,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -88,25 +92,31 @@ import com.qualcomm.robotcore.util.Dimmer;
 import com.qualcomm.robotcore.util.ImmersiveMode;
 import com.qualcomm.robotcore.util.ReadWriteFile;
 import com.qualcomm.robotcore.util.RobotLog;
+import com.qualcomm.robotcore.wifi.NetworkConnection;
 import com.qualcomm.robotcore.wifi.NetworkConnectionFactory;
 import com.qualcomm.robotcore.wifi.NetworkType;
 import com.qualcomm.robotcore.wifi.WifiDirectAssistant;
 
 import org.firstinspires.ftc.ftccommon.external.SoundPlayingRobotMonitor;
 import org.firstinspires.ftc.robotcore.internal.AppUtil;
+import org.firstinspires.ftc.robotcore.internal.network.CallbackResult;
 import org.firstinspires.inspection.RcInspectionActivity;
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -160,6 +170,7 @@ public class FtcRobotControllerActivity extends Activity {
   protected Button initOpMode;
   protected Button runOpMode;
   protected Button stopOpMode;
+  protected TextView audTelStatus;
 
   protected class RobotRestarter implements Restarter {
 
@@ -320,6 +331,7 @@ public class FtcRobotControllerActivity extends Activity {
     initOpMode = (Button) findViewById(R.id.initOpMode);
     runOpMode = (Button) findViewById(R.id.runOpMode);
     stopOpMode = (Button) findViewById(R.id.stopOpMode);
+    audTelStatus = (TextView) findViewById(R.id.audTelStatus);
 
   }
 
@@ -527,6 +539,15 @@ public class FtcRobotControllerActivity extends Activity {
       startActivity(intent);
       return true;
     }
+    else if (id == R.id.action_dservice_connect) {
+      if (FtcControllerUtils.isSocketClosed()) {
+        FtcControllerUtils.startDriverServiceInteraction();
+        audTelStatus.setText("Audible Telemetry Open");
+      } else {
+        FtcControllerUtils.endDriverServiceInteraction();
+        audTelStatus.setText("Audible Telemetry Closed");
+      }//else
+    }
     else if (id == R.id.action_driver) {
 
       final RelativeLayout driverStation = (RelativeLayout) findViewById(R.id.driverstation);
@@ -614,7 +635,7 @@ public class FtcRobotControllerActivity extends Activity {
     HardwareFactory factory;
     RobotConfigFile file = cfgFileMgr.getActiveConfigAndUpdateUI();
     cfgFileMgr.changeBackground(R.color.opaque_dark_fixit_green, R.id.idActiveConfigHeader);
-    
+
     HardwareFactory hardwareFactory = new HardwareFactory(context);
     try {
       hardwareFactory.setXmlPullParser(file.getXml());
@@ -661,6 +682,7 @@ public class FtcRobotControllerActivity extends Activity {
       });
     }
   }
+
 
   public static void initializeGlobals() {
     HashMap<String, Object> values = new HashMap<>();

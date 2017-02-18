@@ -22,6 +22,7 @@ import org.firstinspires.ftc.teamcode.util.MathUtils;
 import org.firstinspires.ftc.teamcode.robots.Fermion;
 import org.firstinspires.ftc.teamcode.util.VortexUtils;
 
+import static org.firstinspires.ftc.teamcode.util.VortexUtils.BEACON_BLUE_RED;
 import static org.firstinspires.ftc.teamcode.util.VortexUtils.getImageFromFrame;
 
 /**
@@ -82,7 +83,13 @@ public class FermionBlue extends AutoOpMode {
             Log.i(TAG, "runOp: " + config);
         } catch (Exception e){
             telemetry.addData("Beacon", "could not not be found");
-        }
+        }//catch
+
+        if (config == VortexUtils.BEACON_BLUE_RED) {
+            RC.t.speakString("Left");
+        } else {
+            RC.t.speakString("Right");
+        }//else
 
         Log.i(TAG, "runOp: before");
         muon.forward(1);
@@ -134,8 +141,6 @@ public class FermionBlue extends AutoOpMode {
             idle();
         }
 
-
-
         config = VortexUtils.NOT_VISIBLE;
         try{
             config = VortexUtils.waitForBeaconConfig(
@@ -145,7 +150,13 @@ public class FermionBlue extends AutoOpMode {
             Log.i(TAG, "runOp: " + config);
         } catch (Exception e){
             telemetry.addData("Beacon", "could not not be found");
-        }
+        }//catch
+
+        if (config == VortexUtils.BEACON_BLUE_RED) {
+            RC.t.speakString("Left");
+        } else {
+            RC.t.speakString("Right");
+        }//else
 
         while(opModeIsActive() && muon.ultra.getDistance() > 300){
             muon.forward(0.2);

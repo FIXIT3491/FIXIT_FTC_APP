@@ -81,7 +81,6 @@ public class RC {
     }//globalDouble
 
 
-
     public static Context c() {
         return AppUtil.getInstance().getActivity();
     }//context

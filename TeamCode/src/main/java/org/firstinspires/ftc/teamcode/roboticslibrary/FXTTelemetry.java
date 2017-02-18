@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.roboticslibrary;
 
 import android.util.Log;
 
+import org.firstinspires.ftc.robotcontroller.internal.FtcControllerUtils;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.FXTSensor;
 
@@ -19,6 +20,7 @@ public class FXTTelemetry {
     public Telemetry telemetry;
     public HashMap<String, DataWriter> out = new HashMap<>();
     private List<FXTSensor> sensors = new ArrayList<FXTSensor>();
+    private HashMap<Long, Long> speakTimes = new HashMap<>();
 
     public void setTelemetry (Telemetry telem) {
         this.telemetry = telem;
@@ -57,6 +59,42 @@ public class FXTTelemetry {
 
         }//if
     }//close
+
+    /*
+    AUDIBLE TELEMETRY
+     */
+
+    public void speakString(String msg) {
+        FtcControllerUtils.speak(msg);
+    }//speakString
+
+    public void speakString(String msg, long id) {
+
+        if (speakTimes.containsKey(id) && System.currentTimeMillis() - speakTimes.get(id) > 1000) {
+            speakString(msg);
+        }//if
+
+        speakTimes.put(id, System.currentTimeMillis());
+    }//speakString
+
+    public void beep(int freq, int duration) {
+        FtcControllerUtils.speak("beep(" + freq + ", " + duration + ")");
+    }//beep
+
+    public void clearAllAudioCommands() {
+        FtcControllerUtils.clearAllSpeakCommands();
+    }//clearAllAudioCommands
+
+    public void waitUntilSpeakQueueIsEmpty() throws InterruptedException {
+        while (!FtcControllerUtils.isSpeakQueueEmpty()) {
+            Thread.sleep(100);
+            Log.i("FDS", "SDFS");
+        }//while
+    }//waitUntilSpeakQueueIsEmpty
+
+    public void stopSpeaking() {
+        FtcControllerUtils.stopSpeaking();
+    }//stopSpeaking
 
     //methods to quickly telemetry something
     public void addData(String data) {
@@ -194,5 +232,5 @@ public class FXTTelemetry {
 
     public void dataLog(String fileName) {
         //User-defined method
-    }
+    }//dataLog
 }

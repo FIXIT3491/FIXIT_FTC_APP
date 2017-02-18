@@ -46,6 +46,7 @@ public abstract class AutoOpMode extends LinearOpMode {
         } finally {
             stopOpMode();
             TaskHandler.removeAllTasks();
+            RC.t.stopSpeaking();
         }//finally
 
     }

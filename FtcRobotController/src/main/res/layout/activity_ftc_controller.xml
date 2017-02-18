@@ -177,13 +177,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       android:textStyle="bold"
       android:visibility="invisible" />
 
-      <RelativeLayout
+
+    <RelativeLayout
           android:layout_width="match_parent"
           android:layout_height="300dp"
           android:visibility="invisible"
           android:id="@+id/driverstation"
-          android:layout_below="@+id/textOpMode"
-          android:layout_alignParentStart="true">
+        android:layout_below="@+id/textOpMode"
+        android:layout_alignParentStart="true">
 
         <Spinner
             android:layout_width="match_parent"
@@ -225,7 +226,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             android:layout_alignParentTop="true"
             android:layout_toEndOf="@+id/runOpMode" />
 
-      </RelativeLayout>
+      <TextView
+          android:text="Audible Telemetry Closed"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:id="@+id/audTelStatus"
+          android:layout_alignParentTop="true"
+          android:layout_alignParentStart="true" />
+
+
+    </RelativeLayout>
 
   </RelativeLayout>
 

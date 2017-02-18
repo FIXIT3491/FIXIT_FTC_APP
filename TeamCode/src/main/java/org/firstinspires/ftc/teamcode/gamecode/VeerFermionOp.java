@@ -26,6 +26,10 @@ public class VeerFermionOp extends TeleOpMode implements TextToSpeech.OnInitList
 
     double driveDirection = 1;
 
+    long ballCollectId = 28347289352L;
+
+    boolean released = false;
+
     @Override
     public void initialize() {
         tts = new TextToSpeech(RC.c(), this);
@@ -67,7 +71,7 @@ public class VeerFermionOp extends TeleOpMode implements TextToSpeech.OnInitList
             tau.prime();
         }
 
-        if(joy2.leftBumper()){
+        if(-joy2.y1() < -0.15){
             tau.door.goToPos("open");
         } else {
             tau.door.goToPos("close");
@@ -85,13 +89,29 @@ public class VeerFermionOp extends TeleOpMode implements TextToSpeech.OnInitList
 
         tau.usePlannedSpeeds();
 
-        if(tau.seesBall()){
-            clearTimer(2);
-        }
+        if (tau.seesBall()) {
+            RC.t.speakString("Ball Collected!", ballCollectId);
+        }//if
+
         RC.t.addData("Ball in Collector", tau.seesBall());
 
-        if(getMilliSeconds(2) < 100){
-            RC.t.addData("Ball in Collector", true);
+        if (joy2.buttonB() && !released && getMilliSeconds(2) > 500) {
+            tau.capRelease.goToPos("released");
+            released = true;
+            clearTimer(2);
+        }
+        else if (joy2.buttonB() && released && getMilliSeconds(2) > 500) {
+            tau.capRelease.goToPos("stored");
+            released = false;
+            clearTimer(2);
+        }
+
+        if (joy2.leftBumper() && released) {
+            tau.liftCapBall();
+        } else if (joy2.leftTrigger() && released) {
+            tau.lowerCapBall();
+        } else {
+            tau.lifter.stop();
         }
 
     }//loopOpMode
