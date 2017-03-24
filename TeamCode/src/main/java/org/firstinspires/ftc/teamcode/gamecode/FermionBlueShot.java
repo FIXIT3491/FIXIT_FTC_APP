@@ -49,6 +49,7 @@ public class FermionBlueShot extends AutoOpMode {
         double voltage = muon.getBatteryVoltage();
         muon.startShooterControl();
         muon.prime();
+
         waitForStart();
         beacons.activate();
         muon.addVeerCheckRunnable();
@@ -64,7 +65,6 @@ public class FermionBlueShot extends AutoOpMode {
         muon.shoot();
         muon.waitForState(Fermion.FIRE);
 
-
         muon.imuTurnR(160, 0.6);
 
         muon.forward(0.2);
@@ -73,7 +73,6 @@ public class FermionBlueShot extends AutoOpMode {
         while (wheels.getPose() == null && opModeIsActive()) {
             idle();
         }//while
-
 
         VectorF trans = wheels.getPose().getTranslation();
 

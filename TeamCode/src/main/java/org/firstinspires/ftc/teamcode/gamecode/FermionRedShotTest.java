@@ -65,29 +65,40 @@ public class FermionRedShotTest extends AutoOpMode {
 
         muon.forward(0.2);
 
+        clearTimer(1);
+
         while (gears.getPose() == null && opModeIsActive()) {
             idle();
+            if(getMilliSeconds(1) > 4000) break;
         }//while
 
-        VectorF trans = gears.getPose().getTranslation();
+        if(getMilliSeconds(1) < 4000) {
+            VectorF trans = gears.getPose().getTranslation();
 
-        Log.i("ANGLE", "HELLO" + Math.toDegrees(Math.atan2(trans.get(0), -trans.get(2))));
+            Log.i("ANGLE", "HELLO" + Math.toDegrees(Math.atan2(trans.get(0), -trans.get(2))));
 
-        double deg = Math.toDegrees(Math.atan2(trans.get(0), -trans.get(2)));
-        if(deg < 0){
-            muon.imuTurnL(-deg, 0.3);
+            double deg = Math.toDegrees(Math.atan2(trans.get(0), -trans.get(2)));
+            if (deg < 0) {
+                muon.imuTurnL(-deg, 0.3);
+            } else {
+                muon.imuTurnR(deg, 0.3);
+            }//else
+
+            Log.i(TAG, "runOp: before");
+            muon.forward(1);
+
+            sleep(600);
+            muon.stop();
+
+            Log.i(TAG, "runOp: after");
         } else {
-            muon.imuTurnR(deg, 0.3);
-        }//else
-
-        Log.i(TAG, "runOp: before");
-        muon.forward(1);
-        sleep(600);
-        Log.i(TAG, "runOp: after");
+            muon.backward(1);
+            sleep(300);
+        }
 
         muon.absoluteIMUTurn(-90, 0.5);
 
-        while (opModeIsActive() && muon.ultra.getDistance() < 50){
+        while (opModeIsActive() && muon.ultra.getDistance() < 100){
             muon.backward(0.2);
         }
 

@@ -68,26 +68,33 @@ public class FermionBlueShotTest extends AutoOpMode {
         muon.forward(0.2);
         sleep(1000);
 
+        clearTimer(1);
         while (wheels.getPose() == null && opModeIsActive()) {
             idle();
+            if(getMilliSeconds(1) > 4000) break;
         }//while
 
-        VectorF trans = wheels.getPose().getTranslation();
+        if(getMilliSeconds(1) < 4000) {
+            VectorF trans = wheels.getPose().getTranslation();
 
-        Log.i("ANGLE", "HELLO" + Math.toDegrees(Math.atan2(trans.get(0), -trans.get(2))));
+            Log.i("ANGLE", "HELLO" + Math.toDegrees(Math.atan2(trans.get(0), -trans.get(2))));
 
-        double deg = Math.toDegrees(Math.atan2(trans.get(0), -trans.get(2)));
-        if(deg < 0){
-            muon.imuTurnL(-deg, 0.3);
+            double deg = Math.toDegrees(Math.atan2(trans.get(0), -trans.get(2)));
+            if (deg < 0) {
+                muon.imuTurnL(-deg, 0.3);
+            } else {
+                muon.imuTurnR(deg, 0.3);
+            }//else
+
+            muon.forward(1);
+            sleep(600);
+
+            muon.stop();
+            Log.i(TAG, "runOp: after");
         } else {
-            muon.imuTurnR(deg, 0.3);
-        }//else
-
-
-        Log.i(TAG, "runOp: before");
-        muon.forward(1);
-        sleep(600);
-        Log.i(TAG, "runOp: after");
+            muon.backward(1);
+            sleep(300);
+        }
 
         muon.absoluteIMUTurn(90, 0.6);
 
@@ -153,21 +160,24 @@ public class FermionBlueShotTest extends AutoOpMode {
         sleep(500);
         muon.stop();
 
-
         muon.absoluteIMUTurn(90, 0.5);
 
 
         //------------------------------Beacon 2--------------
 
         muon.left(1);
-        sleep(1200);
-
-        while (opModeIsActive() && muon.ultra.getDistance() < 50){
-            muon.backward(0.2);
-        }
-        while(opModeIsActive() && muon.ultra.getDistance() > 457){
-            muon.forward(0.2);
-        }
+        clearTimer(2);
+        while (opModeIsActive() && getMilliSeconds(2) < 1600) {
+            Log.i("ULTRA", muon.ultra.getDistance() + "");
+            if (muon.ultra.getDistance() < 100) {
+                muon.strafe(-135, 1, true);
+            } else if (muon.ultra.getDistance() > 457) {
+                muon.strafe(-45, 1, true);
+            } else {
+                muon.left(1);
+            }//else
+        }//while
+        muon.stop();
 
         muon.left(0.3);
 

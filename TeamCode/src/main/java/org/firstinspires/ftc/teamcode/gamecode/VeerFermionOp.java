@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.gamecode;
 
+import android.media.Image;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
@@ -10,8 +11,10 @@ import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.FXTLightSensor;
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.FXTOpticalDistanceSensor;
 import org.firstinspires.ftc.teamcode.opmodesupport.TeleOpMode;
+import org.firstinspires.ftc.teamcode.roboticslibrary.FXTCamera;
 import org.firstinspires.ftc.teamcode.robots.Fermion;
 import org.firstinspires.ftc.teamcode.robots.Robot;
+import org.firstinspires.ftc.teamcode.util.CircleDetector;
 import org.firstinspires.ftc.teamcode.util.MathUtils;
 
 /**
@@ -29,13 +32,32 @@ public class VeerFermionOp extends TeleOpMode implements TextToSpeech.OnInitList
     long ballCollectId = 28347289352L;
 
     boolean released = false;
+    FXTCamera cammy;
+
+    int minExpo = 0;
+    int maxExpo = 0;
 
     @Override
     public void initialize() {
         tts = new TextToSpeech(RC.c(), this);
         tau = new Fermion(false);
+        cammy = new FXTCamera(FXTCamera.FACING_BACKWARD, true);
+        minExpo = cammy.getBaseCamera().getParameters().getMinExposureCompensation();
+        maxExpo = cammy.getBaseCamera().getParameters().getMaxExposureCompensation();
+
         tau.startShooterControl();
         tau.prime();
+        clearTimer(3);
+        clearTimer(4);
+        cammy.setExposure(-12);
+    }
+
+    public void init_loop() {
+        if (getMilliSeconds(4) > 1000) {
+            cammy.setExposure(12);
+            Log.i("fsdf", "fsdfs");
+            Log.i(cammy.getBaseCamera().getParameters().getExposureCompensation() + "", cammy.getBaseCamera().getParameters().getExposureCompensationStep() + "");
+        }
     }
 
     @Override
@@ -114,12 +136,29 @@ public class VeerFermionOp extends TeleOpMode implements TextToSpeech.OnInitList
             tau.lifter.stop();
         }
 
+        if(getMilliSeconds(3) > 1000){
+
+//            cammy.saveFrame("Image" + RC.runNum++ );
+//            double[] info = CircleDetector.findBestCircle(cammy.getImage());
+
+
+//            double distInFront = 90 - (info[1] * 76 / 1920.833153) * ;
+//            double angleH = (info[0] * 76 / 1920.833153);
+
+//            cammy.saveFrame("Image" + RC.runNum++);
+//            RC.t.addData("Saved", "Image" + RC.runNum++);
+//            clearTimer(3);
+        }
+
     }//loopOpMode
+
+    public void stop(){
+        cammy.destroy();
+    }
 
 
     @Override
     public void onInit(int status) {
         RC.t.addData("Ready to talk", "!");
-
     }
 }//VeerFermionOp

@@ -331,7 +331,6 @@ public class FtcRobotControllerActivity extends Activity {
     initOpMode = (Button) findViewById(R.id.initOpMode);
     runOpMode = (Button) findViewById(R.id.runOpMode);
     stopOpMode = (Button) findViewById(R.id.stopOpMode);
-    audTelStatus = (TextView) findViewById(R.id.audTelStatus);
 
   }
 
@@ -370,7 +369,7 @@ public class FtcRobotControllerActivity extends Activity {
     updateUIAndRequestRobotSetup();
 
     cfgFileMgr.getActiveConfigAndUpdateUI();
-    cfgFileMgr.changeBackground(R.color.opaque_dark_fixit_green, R.id.idActiveConfigHeader);
+    cfgFileMgr.changeBackground(0xFF539E2E, R.id.idActiveConfigHeader);
 
     entireScreenLayout.setOnTouchListener(new View.OnTouchListener() {
       @Override
@@ -539,15 +538,6 @@ public class FtcRobotControllerActivity extends Activity {
       startActivity(intent);
       return true;
     }
-    else if (id == R.id.action_dservice_connect) {
-      if (FtcControllerUtils.isSocketClosed()) {
-        FtcControllerUtils.startDriverServiceInteraction();
-        audTelStatus.setText("Audible Telemetry Open");
-      } else {
-        FtcControllerUtils.endDriverServiceInteraction();
-        audTelStatus.setText("Audible Telemetry Closed");
-      }//else
-    }
     else if (id == R.id.action_driver) {
 
       final RelativeLayout driverStation = (RelativeLayout) findViewById(R.id.driverstation);
@@ -565,7 +555,7 @@ public class FtcRobotControllerActivity extends Activity {
           @Override
           public void run() {
             driverStation.setVisibility(View.VISIBLE);
-            cfgFileMgr.changeBackground(R.color.opaque_dark_fixit_green, R.id.idActiveConfigHeader);
+            cfgFileMgr.changeBackground(0xFF539E2E, R.id.idActiveConfigHeader);
           }//run
         });
 
@@ -577,7 +567,7 @@ public class FtcRobotControllerActivity extends Activity {
           @Override
           public void run() {
             driverStation.setVisibility(View.INVISIBLE);
-            cfgFileMgr.changeBackground(R.color.opaque_dark_fixit_green, R.id.idActiveConfigHeader);
+            cfgFileMgr.changeBackground(0xFF539E2E, R.id.idActiveConfigHeader);
           }//run
         });
 
@@ -634,7 +624,7 @@ public class FtcRobotControllerActivity extends Activity {
 
     HardwareFactory factory;
     RobotConfigFile file = cfgFileMgr.getActiveConfigAndUpdateUI();
-    cfgFileMgr.changeBackground(R.color.opaque_dark_fixit_green, R.id.idActiveConfigHeader);
+    cfgFileMgr.changeBackground(0xFF539E2E, R.id.idActiveConfigHeader);
 
     HardwareFactory hardwareFactory = new HardwareFactory(context);
     try {
@@ -721,6 +711,10 @@ public class FtcRobotControllerActivity extends Activity {
     GlobalValuesActivity.add("VeerProportional", 0.7 / 90);
     GlobalValuesActivity.add("VeerDerivative", (0.5 / 90) / 10);
     GlobalValuesActivity.add("VeerIntegral", (0.1 / 90) / 1000);
+
+    GlobalValuesActivity.add("WallProportional", 0.7 / 90);
+    GlobalValuesActivity.add("WallDerivative", (0.5 / 90) / 10);
+    GlobalValuesActivity.add("WallIntegral", (0.1 / 90) / 1000);
     GlobalValuesActivity.addDashboard("WaitTime", 10000);
     GlobalValuesActivity.addDashboard("NumBalls", 1);
     GlobalValuesActivity.addDashboard("Cap-ball", true);

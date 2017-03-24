@@ -2,28 +2,17 @@ package org.firstinspires.ftc.teamcode.gamecode;
 
 import android.util.Log;
 
-import com.qualcomm.hardware.adafruit.AdafruitBNO055IMU;
-import com.qualcomm.hardware.adafruit.BNO055IMU;
-import com.qualcomm.hardware.adafruit.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
-import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.RC;
-import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.AdafruitIMU;
 import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
-import org.firstinspires.ftc.teamcode.opmodesupport.LinearTeleOpMode;
-import org.firstinspires.ftc.teamcode.opmodesupport.TeleOpMode;
 import org.firstinspires.ftc.teamcode.robots.Fermion;
 
 /**
- * Created by Owner on 8/31/2015.
+ * Created by Windows on 2017-03-04.
  */
 @Autonomous
-public class AdafruitCheck extends AutoOpMode{
+public class VeerCheck2 extends AutoOpMode{
 
 
     @Override
@@ -35,7 +24,7 @@ public class AdafruitCheck extends AutoOpMode{
 
         f.resetTargetAngle();
         f.addVeerCheckRunnable();
-        f.strafe(90, 1, true);
+        f.strafe(0, 0.75, true);
         sleep((long)RC.globalDouble("WaitTime"));
         f.stop();
 

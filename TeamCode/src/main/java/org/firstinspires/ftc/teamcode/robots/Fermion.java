@@ -57,18 +57,21 @@ public class Fermion {
     public FXTLED collectorFront;
 
     public double targetAngle = 0;
+    private double targetDistance = 0;
     private final static double TURNING_ACCURACY_DEG = 2;
     private final static double MINIMUM_TURNING_SPEED = 0.13;
     public static double LIGHT_THRESHOLD = 0.3;
 
     public boolean preservingStrafeSpeed = false;
     private boolean useVeerCheck = true;
-    private PID veerAlgorithm = new PID(PID.Type.PID, RC.globalDouble("VeerProportional"), 0, 0 /*RC.globalDouble("VeerDerivative"), RC.globalDouble("VeerIntegral")*/);
+    private PID veerAlgorithm = new PID(PID.Type.PID, RC.globalDouble("VeerProportional"), RC.globalDouble("VeerIntegral"), RC.globalDouble("VeerDerivative"));
+    private PID wallAlgorithm = new PID(PID.Type.P, 0.007);
     private final static double MINIMUM_TRACKING_SPEED = 0.19;
     private final static double TRACKING_ACCURACY_TIKS = 30;
 
     public double commandedStrafeSpeedRightForeLeftBack = 0;
     public double commandedStrafeSpeedRightBackLeftFore = 0;
+    public double commandedStrafeAngle = 0;
 
     public static int LOADED = 0;
     public static int RELOADING = 1;
@@ -99,8 +102,8 @@ public class Fermion {
         rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightBack.minSpeed = 0;
 
-        leftFore.setReverse(true);
-        leftBack.setReverse(true);
+        rightFore.setReverse(true);
+        rightBack.setReverse(true);
 
         collector = new Motor("collector");
         collector.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -121,7 +124,7 @@ public class Fermion {
         door.goToPos("close");
 
         capRelease = new FXTServo("capRelease");
-        capRelease.addPos("stored", 1);
+        capRelease.addPos("stored", 0.9);
         capRelease.addPos("released", 0.6);
         capRelease.goToPos("stored");
 
@@ -223,6 +226,10 @@ public class Fermion {
         rightBack.stop();
     }//stop
 
+    public double getCommandedStrafeSpeed(){
+        return (Math.abs(commandedStrafeSpeedRightForeLeftBack) + Math.abs(commandedStrafeSpeedRightBackLeftFore)) / 2;
+    }
+
     /*
     Allows robot to strafe in any direction, with 0° being the front of robot
                          0°
@@ -258,6 +265,7 @@ public class Fermion {
 
         commandedStrafeSpeedRightBackLeftFore = leftForeRightBack;
         commandedStrafeSpeedRightForeLeftBack = rightForeLeftBack;
+        commandedStrafeAngle = degrees - 45;
 
     }//strafe
 
@@ -470,11 +478,6 @@ public class Fermion {
     public void veer(double speed, boolean preservingStrafeSpeed, boolean setImmediately) {
 
         speed = Math.signum(speed) * Math.min(1, Math.abs(speed));
-//
-//        double leftForePower = (leftFore.getPower() + rightBack.getPower()) / 2.0;
-//        double leftBackPower = (leftBack.getPower() + rightFore.getPower()) / 2.0;
-//        double rightForePower = (leftBack.getPower() + rightFore.getPower()) / 2.0;
-//        double rightBackPower = (leftFore.getPower() + rightBack.getPower()) / 2.0;
 
         double leftForePower = commandedStrafeSpeedRightBackLeftFore;
         double leftBackPower = commandedStrafeSpeedRightForeLeftBack;
@@ -599,9 +602,9 @@ public class Fermion {
 
     public void setCollectorState(@CollectorStates int state){
         switch (state){
-            case Robot.IN: collector.setPower(-1);
+            case Robot.IN: collector.setPower(1);
                 break;
-            case Robot.OUT: collector.setPower(1);
+            case Robot.OUT: collector.setPower(-1);
                 break;
             case Robot.STOP: collector.stop();
         }
@@ -715,7 +718,31 @@ public class Fermion {
         lifter.setPower(1);
     }
 
+    public void setWallDistance(double mm){
+        this.targetDistance = mm;
+    }
 
+    public void startWallFollowing(final FXTAnalogUltrasonicSensor us){
 
+        TaskHandler.addLoopedTask("Wall Follower", new Runnable() {
+            @Override
+            public void run() {
+                wallFollow(us);
+                veerCheck();
+            }
+        });
+    }
+
+    private void wallFollow(FXTAnalogUltrasonicSensor us){
+        double error = targetDistance - us.getDistance();
+
+        if (commandedStrafeAngle < 0)
+            strafe(commandedStrafeAngle - wallAlgorithm.update(error), getCommandedStrafeSpeed(), true);
+        else
+            strafe(commandedStrafeAngle + wallAlgorithm.update(error), getCommandedStrafeSpeed(), true);
+
+        Log.i("WallFollow", commandedStrafeAngle - wallAlgorithm.update(error) + "");
+        Log.i("WallFollow", us.getDistance() + "");
+    }
 
 }//Fermion

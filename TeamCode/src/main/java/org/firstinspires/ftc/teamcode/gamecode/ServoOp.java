@@ -53,7 +53,7 @@ public class ServoOp extends LinearTeleOpMode {
                 clearTimer();
             }
             s2.setPosition(pos2);
-            s.setPosition(pos2);
+            s.setPosition(pos);
         }else{
             if (joy1.buttonA()) {
                 s.setPosition(0.7);
