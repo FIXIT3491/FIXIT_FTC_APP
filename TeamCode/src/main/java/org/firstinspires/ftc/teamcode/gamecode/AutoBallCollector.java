@@ -1,13 +1,25 @@
 package org.firstinspires.ftc.teamcode.gamecode;
 
+import android.graphics.Bitmap;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import org.firstinspires.ftc.robotcontroller.internal.FtcControllerUtils;
+import org.firstinspires.ftc.teamcode.R;
+import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
 import org.firstinspires.ftc.teamcode.roboticslibrary.FXTCamera;
 import org.firstinspires.ftc.teamcode.robots.Fermion;
 import org.firstinspires.ftc.teamcode.util.CircleDetector;
+import org.firstinspires.ftc.teamcode.util.OCVUtils;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
 
 import java.util.Arrays;
 
@@ -19,19 +31,14 @@ public class AutoBallCollector extends AutoOpMode {
     @Override
     public void runOp() throws InterruptedException {
         FXTCamera cam = new FXTCamera(FXTCamera.FACING_BACKWARD, true);
-        Fermion f = new Fermion(true);
 
         waitForStart();
 
-//        while (opModeIsActive()) {
+        sleep(1000);
 
-            double[] info = CircleDetector.findBestCircle(cam.getImage());
-            double angleH = (info[0] * 76 / 1920.833153);
+        Bitmap frame = cam.photo();
+        CircleDetector.findBestCircle(frame);
 
-            Log.i("Info", Arrays.toString(info));
-//            f.imuTurnR(angleH, 0.5);
-            sleep(4000);
-//        }//while
-
+        cam.destroy();
     }
 }

@@ -99,11 +99,11 @@ public class VeerFermionOp extends TeleOpMode implements TextToSpeech.OnInitList
             tau.door.goToPos("close");
         }
 
-        if (joy1.leftBumper() && getMilliSeconds(1) > 500) {
-            clearTimer(1);
+        if (joy1.tapLeftBumper()) {
             driveDirection *= -1;
             //tau.switchLights();
         }//if
+
 
         if(joy2.buttonY() && !tts.isSpeaking()){
             tts.speak("Hello, my name is Fermion", TextToSpeech.QUEUE_ADD, null);

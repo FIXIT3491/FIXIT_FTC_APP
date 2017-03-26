@@ -43,7 +43,7 @@ public class FermionRedNoVuf extends AutoOpMode {
         while(opModeIsActive() && top.getLight(Robot.LEFT) < Fermion.LIGHT_THRESHOLD){
             idle();
             Log.i(TAG, "runOp: " + top.getLight(Robot.LEFT));
-        }
+        }//while
 
         top.stop();
 
@@ -68,8 +68,6 @@ public class FermionRedNoVuf extends AutoOpMode {
         }
         top.stop();
 
-
-
         while (opModeIsActive() && top.ultra.getDistance() < 300) {
             top.backward(1);
         }//while
@@ -87,7 +85,7 @@ public class FermionRedNoVuf extends AutoOpMode {
             top.left(0.3);
 
             sensor = Robot.RIGHT;
-            while (opModeIsActive() && top.getLight(sensor) < 0.2){
+            while (opModeIsActive() && top.getLight(sensor) < Fermion.LIGHT_THRESHOLD){
                 Log.i("light", "" + top.getLight(sensor));
             }
             top.stop();
@@ -100,7 +98,58 @@ public class FermionRedNoVuf extends AutoOpMode {
         sleep(500);
         top.stop();
 
+        /************
+         * BEACON 2 *
+         ************/
 
+        top.left(1);
+
+        //INSERT WALLFOLLOWER
+
+        while (opModeIsActive() && top.getLight(Robot.LEFT) < Fermion.LIGHT_THRESHOLD) {
+            idle();
+        }//while
+
+        if (top.getLight(Robot.LEFT) < 0.2) {
+            top.right(0.3);
+
+            while (opModeIsActive() && top.getLight(Robot.LEFT) < Fermion.LIGHT_THRESHOLD) {
+                idle();
+            }//while
+        }//if
+
+        top.absoluteIMUTurn(90, 0.4);
+
+        while (opModeIsActive()) {
+            if (top.ultra.getDistance() > 280) {
+                top.forward(0.4);
+            } else if (top.ultra.getDistance() < 230) {
+                top.backward(0.4);
+            } else {
+                break;
+            }//else
+        }//while
+
+        config = VortexUtils.getBeaconConfig(cam.getImage());
+
+        if (config == VortexUtils.BEACON_BLUE_RED) {
+            top.left(0.3);
+
+            while (opModeIsActive() && top.getLight(Robot.RIGHT) < 0.2) {
+                idle();
+            }//while
+        }//if
+
+        top.forward(0.3);
+        sleep(1000);
+        top.backward(1);
+        sleep(500);
+        top.stop();
+
+        top.absoluteIMUTurn(45, 0.5);
+        top.backward(1);
+        sleep(2000);
+        top.stop();
 
         /*
         sleep(900);
@@ -129,5 +178,5 @@ public class FermionRedNoVuf extends AutoOpMode {
 
         cam.destroy();
 
-    }
+    }//runOp
 }

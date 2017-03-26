@@ -25,7 +25,7 @@ import org.opencv.imgproc.Moments;
  */
 
 public class CircleDetector {
-        static Scalar lowBlue = new Scalar(120, 100, 100);
+        static Scalar lowBlue = new Scalar(120, 100, 0);
         static Scalar highBlue = new Scalar(160, 255, 255);
 
         static Scalar lowRed1 = new Scalar(0, 100, 100);
@@ -39,13 +39,17 @@ public class CircleDetector {
 
 
         public static double[] findBestCircle(Bitmap image){
-            Mat imgOriginal = OCVUtils.bitmapToMat(image, CvType.CV_8UC3);
+            Mat imgOriginal = OCVUtils.bitmapToMat(image, CvType.CV_8UC4);
+            Imgproc.cvtColor(imgOriginal, imgOriginal, Imgproc.COLOR_RGBA2BGR);
+
             double shrink = 1000.0 / imgOriginal.cols();
             Size scaled = new Size(1000, 1000 * imgOriginal.height() / imgOriginal.width());
 
             Mat shrunk = new Mat();
             Imgproc.resize(imgOriginal, shrunk, scaled);
             Mat imgHSV = new Mat();
+
+            Log.i("Img Type", CvType.typeToString(shrunk.type()));
 
             long startTime = System.currentTimeMillis();
             Imgproc.cvtColor(shrunk, imgHSV, Imgproc.COLOR_BGR2HSV_FULL);
@@ -81,6 +85,7 @@ public class CircleDetector {
 
             Imgproc.cvtColor(imgThresholded, imgThresholded, Imgproc.COLOR_GRAY2BGR);
 
+            Log.i("# of Circles", circles.cols() + "");
             for(int i = 0; !circles.empty() && (i < circles.cols() && i < 3); i++){
                 double [] vals = circles.get(0, i);
 
@@ -137,8 +142,13 @@ public class CircleDetector {
                 Log.i("Save info" , save.getWidth() + ", " + save.getConfig());
                 FXTCamera.saveBitmap(save, "check3");
 
-                return new double[] {((vals[0] - scaled.width) / 2),((vals[1] + vals[2] - scaled.height) / 2), scaled.width*scaled.width + scaled.height*scaled.height};
+                return vals;
+//                return new double[] {((vals[0] - scaled.width) / 2),((vals[1] + vals[2] - scaled.height) / 2), scaled.width*scaled.width + scaled.height*scaled.height};
             }
+
+            Bitmap save = OCVUtils.matToBitmap(imgThresholded);
+            Log.i("Save info" , save.getWidth() + ", " + save.getConfig());
+            FXTCamera.saveBitmap(save, "check3");
 
             return new double[]{-1, -1, -1};
         }

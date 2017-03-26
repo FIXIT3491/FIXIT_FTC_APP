@@ -5,10 +5,12 @@ import android.graphics.Bitmap;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
+import android.util.Log;
 import android.view.TextureView;
 import android.widget.Toast;
 
 import org.firstinspires.ftc.robotcontroller.internal.FtcControllerUtils;
+import org.firstinspires.ftc.robotcore.internal.AppUtil;
 import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.RC;
 
@@ -49,7 +51,14 @@ public class FXTCamera implements TextureView.SurfaceTextureListener {
         try {
             cam = Camera.open(camID);
         } catch (RuntimeException e) {
-            Toast.makeText(RC.c(), "The camera is already being used in another app!", Toast.LENGTH_LONG).show();
+
+            RC.a().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(RC.c(), "The camera is already being used in another app!", Toast.LENGTH_LONG).show();
+                }//run
+            });
+
             e.printStackTrace();
             return;
         }//catch
@@ -58,9 +67,17 @@ public class FXTCamera implements TextureView.SurfaceTextureListener {
         params.setPreviewSize(640, 480);
         params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
         params.setPictureFormat(ImageFormat.JPEG);
+//        params.setAutoExposureLock(true);
 
-        params.setAutoExposureLock(false);
         cam.setParameters(params);
+        params = cam.getParameters();
+
+        String[] info = params.flatten().split(";");
+        for (String line : info) {
+            Log.i("Param", line);
+        }
+//
+//        cam.setParameters(params);
 
         this.displayStream = displayStream;
 
@@ -139,13 +156,15 @@ public class FXTCamera implements TextureView.SurfaceTextureListener {
     }
 
     public void saveFrame(String name){
-        saveBitmap(lastTakenBit, name);
+        Bitmap bm = photo();
+        Log.i(bm.getWidth() + "bit", bm.getByteCount()+ "");
+        saveBitmap(bm, name);
     }
 
     public void lockExposure(){
         Camera.Parameters params = cam.getParameters();
         params.setAutoExposureLock(true);
-        params.setExposureCompensation(params.getMinExposureCompensation());
+        params.setExposureCompensation(params.getMaxExposureCompensation());
         cam.setParameters(params);
     }
 
