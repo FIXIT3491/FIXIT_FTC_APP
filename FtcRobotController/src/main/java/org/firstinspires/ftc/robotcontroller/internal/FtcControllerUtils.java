@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.robotcontroller.internal;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.res.Resources;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +13,7 @@ import android.widget.Toast;
 
 import com.qualcomm.ftccommon.FtcEventLoop;
 import com.qualcomm.ftccommon.FtcEventLoopIdle;
+import com.qualcomm.ftccommon.FtcRobotControllerService;
 import com.qualcomm.ftccommon.configuration.RobotConfigFile;
 import com.qualcomm.hardware.HardwareFactory;
 import com.qualcomm.robotcore.eventloop.EventLoopManager;
@@ -20,6 +23,8 @@ import com.qualcomm.robotcore.exception.RobotCoreException;
 import com.qualcomm.robotcore.factory.RobotFactory;
 import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.util.ThreadPool;
+import com.qualcomm.robotcore.wifi.NetworkConnectionFactory;
+import com.qualcomm.robotcore.wifi.NetworkType;
 
 import org.firstinspires.ftc.robotcore.internal.AppUtil;
 
@@ -199,38 +204,37 @@ public class FtcControllerUtils {
 
     }//receiveSocketData
 
-    public static void setUpRobotWithoutWifi() {
-        EventLoopManager evtLpManager = new EventLoopManager(activity());
+    public static void reinitializeControllerService(boolean useNetwork) {
 
-        HardwareFactory factory;
-        RobotConfigFile file = activity().cfgFileMgr.getActiveConfigAndUpdateUI();
+        if (!useNetwork) {
+            ((FtcRobotControllerActivity) activity()).unbindFromService();
 
-        HardwareFactory hardwareFactory = new HardwareFactory(activity());
-        hardwareFactory.setXmlPullParser(file.getXml());
-        factory = hardwareFactory;
+            Intent intent = new Intent(activity(), FtcRobotControllerService.class);
+            intent.putExtra(NetworkConnectionFactory.NETWORK_CONNECTION_TYPE, NetworkType.SOFTAP);
+            ((FtcRobotControllerActivity) activity()).bindService(intent, ((FtcRobotControllerActivity) activity()).connection, Context.BIND_AUTO_CREATE);
+        } else {
+            ((FtcRobotControllerActivity) activity()).unbindFromService();
+            ((FtcRobotControllerActivity) activity()).bindToService();
+        }//else
+    }//reinitializeControllerService
 
-        OpModeRegister register = activity().createOpModeRegister();
-        activity().eventLoop = new FtcEventLoop(factory, register, activity().callback, activity(), activity().programmingModeController);
-        activity().eventLoop.getOpModeManager().init(evtLpManager);
-        FtcEventLoopIdle idleLoop = new FtcEventLoopIdle(factory, activity().callback, activity(), activity().programmingModeController);
-        evtLpManager.setIdleEventLoop(idleLoop);
-
-        activity().controllerService.setupRobot(activity().eventLoop, idleLoop);
-        activity().controllerService.shutdownRobot();
-
-        Robot robot;
-        try {
-            robot = RobotFactory.createRobot(evtLpManager);
-            robot.start(activity().eventLoop);
-        } catch (RobotCoreException e) {
-            e.printStackTrace();
-        }//catch
+    public static void confirmOpModeRegistration() {
 
         try {
-            activity().eventLoop.getOpModeManager().registerOpModes(register);
+            ((FtcRobotControllerActivity) activity()).eventLoop.getOpModeManager().registerOpModes(((FtcRobotControllerActivity) activity()).createOpModeRegister());
         } catch (Exception e) {
             e.printStackTrace();
         }//catch
+
+        while (!((FtcRobotControllerActivity) activity()).eventLoop.getOpModeManager().areOpModesRegistered()) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }//catch
+
+            Log.i(FtcRobotControllerActivity.TAG, "No Network Robot Setup: Waiting For Opmode Registration...");
+        }//while
 
     }//setUpRobotWithoutWifi
 

@@ -543,9 +543,9 @@ public class FtcRobotControllerActivity extends Activity {
       final RelativeLayout driverStation = (RelativeLayout) findViewById(R.id.driverstation);
 
       if (!driverStationEnabled) {
-
-        controllerService.shutdownRobot();
-        FtcControllerUtils.setUpRobotWithoutWifi();
+        FtcControllerUtils.reinitializeControllerService(false);
+        requestRobotRestart();
+        FtcControllerUtils.confirmOpModeRegistration();
 
         final Spinner spinner = (Spinner) findViewById(R.id.opModeList);
 
@@ -561,6 +561,8 @@ public class FtcRobotControllerActivity extends Activity {
 
         driverStationEnabled = true;
       } else {
+        FtcControllerUtils.reinitializeControllerService(true);
+
         requestRobotRestart();
 
         runOnUiThread(new Runnable() {
