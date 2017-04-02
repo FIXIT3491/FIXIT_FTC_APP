@@ -36,7 +36,7 @@ public class FXTSonar {
     }//setServoRange
 
     public void start() {
-        TaskHandler.addLoopedTask("PanServo" + (int) (Math.random() * 100), new Runnable() {
+        TaskHandler.addLoopedTask("FXTSonar." + (int) (Math.random() * 100), new Runnable() {
             @Override
             public void run() {
                 currentSonarState[(int) ((progress - beginPosition) * 360)] = ultra.getDistance();

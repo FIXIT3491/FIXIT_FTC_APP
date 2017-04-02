@@ -44,8 +44,8 @@ public class FermionRedShotTest extends AutoOpMode {
 
         double voltage = muon.getBatteryVoltage();
         RC.t.addData("OpMode", "initialized");
+
         muon.startShooterControl();
-        muon.prime();
         waitForStart();
         beacons.activate();
         muon.addVeerCheckRunnable();
@@ -59,7 +59,7 @@ public class FermionRedShotTest extends AutoOpMode {
         }
         muon.stop();
         muon.shoot();
-        muon.waitForState(Fermion.FIRE);
+        muon.waitForShooterState(Fermion.FIRE);
 
         muon.imuTurnR(25, 0.5);
 
@@ -98,11 +98,11 @@ public class FermionRedShotTest extends AutoOpMode {
 
         muon.absoluteIMUTurn(-90, 0.5);
 
-        while (opModeIsActive() && muon.ultra.getDistance() < 100){
+        while (opModeIsActive() && muon.getUltrasonicDistance(0) < 100){
             muon.backward(0.2);
         }
 
-        while(opModeIsActive() && muon.ultra.getDistance() > 457){
+        while(opModeIsActive() && muon.getUltrasonicDistance(0) > 457){
             muon.forward(0.2);
         }
 
@@ -118,7 +118,7 @@ public class FermionRedShotTest extends AutoOpMode {
         muon.absoluteIMUTurn(-90, 0.5);
         muon.stop();
 
-        while (opModeIsActive() && muon.ultra.getDistance() < 500) {
+        while (opModeIsActive() && muon.getUltrasonicDistance(0) < 500) {
             muon.backward(1);
         }//while
 
@@ -139,7 +139,7 @@ public class FermionRedShotTest extends AutoOpMode {
             telemetry.addData("Beacon", "could not not be found");
         }
 
-        while(opModeIsActive() && muon.ultra.getDistance() > 300){
+        while(opModeIsActive() && muon.getUltrasonicDistance(0) > 300){
             muon.forward(0.2);
         }
 
@@ -168,10 +168,10 @@ public class FermionRedShotTest extends AutoOpMode {
         muon.right(1);
         sleep(1200);
 
-        while (opModeIsActive() && muon.ultra.getDistance() < 100){
+        while (opModeIsActive() && muon.getUltrasonicDistance(0) < 100){
             muon.backward(0.2);
         }
-        while(opModeIsActive() && muon.ultra.getDistance() > 457){
+        while(opModeIsActive() && muon.getUltrasonicDistance(0) > 457){
             muon.forward(0.2);
         }
         muon.stop();
@@ -190,7 +190,7 @@ public class FermionRedShotTest extends AutoOpMode {
         muon.stop();
         RC.t.addData("Hi", "ya");
 
-        while (opModeIsActive() && muon.ultra.getDistance() < 500) {
+        while (opModeIsActive() && muon.getUltrasonicDistance(0) < 500) {
             muon.backward(1);
         }//while
         muon.stop();
@@ -210,7 +210,7 @@ public class FermionRedShotTest extends AutoOpMode {
             telemetry.addData("Beacon", "could not not be found");
         }
 
-        while(opModeIsActive() && muon.ultra.getDistance() > 300){
+        while(opModeIsActive() && muon.getUltrasonicDistance(0) > 300){
             muon.forward(0.2);
         }
 

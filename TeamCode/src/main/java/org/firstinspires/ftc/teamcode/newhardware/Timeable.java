@@ -5,8 +5,8 @@ package org.firstinspires.ftc.teamcode.newhardware;
  */
 public interface Timeable {
 
-    boolean timeFin();
+    boolean isTimeFin();
 
-    void check();
+    void updateTimer();
 
 }

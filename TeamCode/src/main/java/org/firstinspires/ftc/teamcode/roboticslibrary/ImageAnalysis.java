@@ -809,18 +809,18 @@ public class ImageAnalysis {
                 continue;
             }
 
-            //check north
+            //checkTimer north
             if(pixels[i] == pixels[i + width]){
                 label[i + width] = label[i];
                 same = 2;
             }
-            //check west
+            //checkTimer west
             if(pixels[i] == pixels[i + 1]){
                 label[i + 1] = label[i];
                 same = 1;
             }
 
-            //check northwest
+            //checkTimer northwest
             if(pixels[i] == pixels[i + width + 1] && same != -1){
                 label[i + width + 1] = label[i];
             }
@@ -905,18 +905,18 @@ public class ImageAnalysis {
                 continue;
             }
 
-            //check north
+            //checkTimer north
             if(pixels[i] == pixels[i + width]){
                 label[i + width] = label[i];
                 same = 2;
             }
-            //check west
+            //checkTimer west
             if(pixels[i] == pixels[i + 1]){
                 label[i + 1] = label[i];
                 same = 1;
             }
 
-            //check northwest
+            //checkTimer northwest
             if(pixels[i] == pixels[i + width + 1] && same != -1){
                 label[i + width + 1] = label[i];
             }
@@ -1028,18 +1028,18 @@ public class ImageAnalysis {
                 continue;
             }
 
-            //check north
+            //checkTimer north
             if(pixels[i] == pixels[i + width]){
                 label[i + width] = label[i];
                 same = 2;
             }
-            //check west
+            //checkTimer west
             if(pixels[i] == pixels[i + 1]){
                 label[i + 1] = label[i];
                 same = 1;
             }
 
-            //check northwest
+            //checkTimer northwest
             if(pixels[i] == pixels[i + width + 1] && same != -1){
                 label[i + width + 1] = label[i];
             }
@@ -1178,18 +1178,18 @@ public class ImageAnalysis {
                 continue;
             }
 
-            //check north
+            //checkTimer north
             if(pixels[i] == pixels[i + width]){
                 label[i + width] = label[i];
                 same = 2;
             }
-            //check west
+            //checkTimer west
             if(pixels[i] == pixels[i + 1]){
                 label[i + 1] = label[i];
                 same = 1;
             }
 
-            //check northwest
+            //checkTimer northwest
             if(pixels[i] == pixels[i + width + 1] && same != -1){
                 label[i + width + 1] = label[i];
             }

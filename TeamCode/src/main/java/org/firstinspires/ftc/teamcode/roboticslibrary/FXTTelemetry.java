@@ -218,7 +218,7 @@ public class FXTTelemetry {
     }//dataLogSensorList
 
     public void beginDataLogging(final String fileName) {
-        TaskHandler.addLoopedTask("DataLogging–" + fileName, new Runnable() {
+        TaskHandler.addLoopedTask("FXTTelemetry.DATALOGGING_" + fileName.toUpperCase(), new Runnable() {
             @Override
             public void run() {
                 dataLog(fileName);
@@ -228,7 +228,7 @@ public class FXTTelemetry {
 
     public void stopDataLogging(String fileName) {
         out.get(fileName).closeWriter();
-        TaskHandler.removeTask("DataLogging–" + fileName);
+        TaskHandler.removeTask("FXTTelemetry.DATALOGGING_" + fileName.toUpperCase());
     }
 
     public void dataLog(String fileName) {

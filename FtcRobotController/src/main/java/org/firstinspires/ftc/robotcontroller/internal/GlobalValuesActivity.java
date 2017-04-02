@@ -36,6 +36,8 @@ public class GlobalValuesActivity extends Activity {
     public static HashMap<String, Object> globals = new HashMap<>();
     public static ArrayList<String> autoKeys = new ArrayList<String>();
 
+    public static String GLOBALS_FILE_PATH = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -154,35 +156,26 @@ public class GlobalValuesActivity extends Activity {
                 @Override
                 public void onClick(View v) {
 
-                    try {
-                        FileOutputStream globalsWrite = new FileOutputStream(new File(
-                                AppUtil.getInstance().getActivity().getExternalFilesDir(null).getAbsolutePath() + "/globals.txt"));
+                    for (int i = 1; i < totalIds; i += 2) {
+                        String key = (String) ((TextView) findViewById(i - 1)).getText();
+                        View input = findViewById(i);
 
-                        for (int i = 1; i < totalIds; i += 2) {
-                            String key = (String) ((TextView) findViewById(i - 1)).getText();
-                            View input = findViewById(i);
+                        if (input instanceof EditText && ((EditText) input).getInputType() == (InputType.TYPE_CLASS_NUMBER)) {
+                            double val = Double.parseDouble(((EditText) input).getText().toString());
 
-                            if (input instanceof EditText && ((EditText) input).getInputType() == (InputType.TYPE_CLASS_NUMBER)) {
-                                double val = Double.parseDouble(((EditText) input).getText().toString());
+                            globals.put(key, new Double(val));
+                        } else if (input instanceof EditText) {
+                            globals.put(key, ((EditText) input).getText().toString());
+                        } else if (input instanceof ToggleButton) {
+                            boolean val = ((ToggleButton) input).isChecked();
+                            globals.put(key, new Boolean(val));
 
-                                globals.put(key, new Double(val));
-                                globalsWrite.write(("d,;" + key + ",;" + val + "\n").getBytes());
-                            } else if (input instanceof EditText) {
-                                globals.put(key, ((EditText) input).getText().toString());
-                                globalsWrite.write(("s,;" + key + ",;" + ((EditText) input).getText().toString() + "\n").getBytes());
-                            } else {
-                                boolean val = ((ToggleButton) input).isChecked();
-                                globals.put(key, new Boolean(val));
+                        }//else
 
-                                globalsWrite.write(("b,;" + key + ",;" + val + "\n").getBytes());
-                            }//else
+                    }//for
 
-                        }//for
+                    writeValuesToFile();
 
-                        globalsWrite.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }//catch
                     startActivity(new Intent(GlobalValuesActivity.this, FtcRobotControllerActivity.class));
                 }//onClick
             });//onClickListener
@@ -212,36 +205,43 @@ public class GlobalValuesActivity extends Activity {
 
     }//onCreate
 
-    public static void add(String key, double val) {
-        globals.put(key, new Double(val));
-    }//add
+    public static void writeValuesToFile() {
+        try {
+            FileOutputStream globalsWrite = new FileOutputStream(new File(GLOBALS_FILE_PATH));
 
-    public static void add(String key, String val) {
-        globals.put(key, val);
-    }//add
+            for (Map.Entry<String, Object> entry : globals.entrySet()) {
+                if (entry.getValue() instanceof Double) {
 
-    public static void add(String key, boolean val) {
-        globals.put(key, val);
-    }//add
+                    globalsWrite.write(("d,;" + entry.getKey() + ",;" + entry.getValue() + "\n").getBytes());
+                } else if (entry.getValue() instanceof String) {
+                    globalsWrite.write(("s,;" + entry.getKey() + ",;" + entry.getValue() + "\n").getBytes());
+                } else {
+                    globalsWrite.write(("b,;" + entry.getKey() + ",;" + entry.getValue() + "\n").getBytes());
+                }//else
+            }//for
+
+            globalsWrite.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }//catch
+
+    }//writeValuesToFile
 
     public static void add(String key, Object val){
         globals.put(key, val);
-    }
-
-    public static void addDashboard(String key, double val) {
-        globals.put(key, new Double(val));
-        autoKeys.add(key);
     }//add
 
-    public static void addDashboard(String key, String val) {
-        globals.put(key, val);
-        autoKeys.add(key);
-    }//add
+    //if key already exists, then we don't replace it
+    public static void tentativelyAdd(String key, Object val) {
+        if (!globals.containsKey(key)) {
+            globals.put(key, val);
+        }//if
+    }//recessivelyAdd
 
-    public static void addDashboard(String key, boolean val) {
-        globals.put(key, val);
+    public static void addDashboard(String key, Object val) {
+        tentativelyAdd(key, val);
         autoKeys.add(key);
-    }//add
+    }//addDashboard
 
 
     @Override

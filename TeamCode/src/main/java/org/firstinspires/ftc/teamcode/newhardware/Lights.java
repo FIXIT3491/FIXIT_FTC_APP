@@ -14,13 +14,13 @@ import org.firstinspires.ftc.teamcode.roboticslibrary.TaskHandler;
 
 public class Lights extends DcMotorImpl {
 
-    private String name = "";
-    private volatile int lightsState = 0;
+    private String TAG = "LIGHTS";
 
+    private String name;
+
+    private volatile int lightsState = 0;
     private volatile boolean useFlash = false;
     private volatile int flashState = 0;
-
-    private String TAG = "LIGHTS";
 
     private Lights(DcMotor motor) {
         super(motor.getController(), motor.getPortNumber());
@@ -31,24 +31,25 @@ public class Lights extends DcMotorImpl {
 
         this.name = addr;
 
-        TaskHandler.addLoopedTask("Lights: pattern, " + name, new Runnable() {
+        TaskHandler.addLoopedTask("LIGHTS." + name.toUpperCase(), new Runnable() {
             @Override
             public void run() {
 
                 synchronized (Lights.this) {
 
                     if (!useFlash) {
+
                         if (lightsState > 0) {
-                            //Log.i(TAG, "Blink!");
                             blink(lightsState);
                         } else if (lightsState < 0) {
-                            //                        Log.i(TAG, "Fading: " + lightsState);
                             fadeOut(Math.abs(lightsState) / 2);
                             fadeIn(Math.abs(lightsState) / 2);
                         } else {
                             Lights.this.setPower(1);
                         }//else
+
                     } else {
+
                         if (flashState > 0) {
                             blink(flashState);
                         } else if (flashState < 0) {
@@ -58,12 +59,12 @@ public class Lights extends DcMotorImpl {
                             Lights.this.setPower(1);
                         }//else
 
+                        flashState = lightsState;
                         useFlash = false;
                     }//else
 
                 }//synchronized
 
-//                Log.i(TAG, lightsState + ", " + flashState);
             }//run
         }, 5);
     }//Lights
@@ -98,7 +99,6 @@ public class Lights extends DcMotorImpl {
             close();
         }//catch
     }//blink
-
 
     private void fadeIn(final int time) {
 

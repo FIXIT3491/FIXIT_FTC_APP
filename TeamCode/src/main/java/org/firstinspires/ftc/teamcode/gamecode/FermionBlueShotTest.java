@@ -1,28 +1,15 @@
 package org.firstinspires.ftc.teamcode.gamecode;
 
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.vuforia.Image;
-import com.vuforia.PIXEL_FORMAT;
-import com.vuforia.Vuforia;
 
-import org.firstinspires.ftc.robotcontroller.internal.GlobalValuesActivity;
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
-import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
 import org.firstinspires.ftc.teamcode.roboticslibrary.FXTCamera;
 import org.firstinspires.ftc.teamcode.robots.Robot;
 import org.firstinspires.ftc.teamcode.robots.Fermion;
 import org.firstinspires.ftc.teamcode.util.VortexUtils;
-
-import static org.firstinspires.ftc.teamcode.util.VortexUtils.getImageFromFrame;
 
 /**
  * Created by FIXIT on 16-10-21.
@@ -50,9 +37,9 @@ public class FermionBlueShotTest extends AutoOpMode {
         }
         muon.stop();
         muon.shoot();
-        muon.waitForState(Fermion.LOADED);
+        muon.waitForShooterState(Fermion.LOADED);
         muon.shoot();
-        muon.waitForState(Fermion.FIRE);
+        muon.waitForShooterState(Fermion.FIRE);
 
         muon.absoluteIMUTurn(55, 0.6);
 
@@ -64,8 +51,7 @@ public class FermionBlueShotTest extends AutoOpMode {
 
         muon.absoluteIMUTurn(90, 0.6);
 
-        muon.setWallDistance(400);
-        muon.startWallFollowing(muon.ultra, -90, 0.3);
+        muon.startWallFollowing(0, -90, 0.3, 400);
 
         int sensor = Robot.LEFT;
         while (opModeIsActive() && muon.getLight(sensor) < muon.LIGHT_THRESHOLD){
@@ -85,7 +71,7 @@ public class FermionBlueShotTest extends AutoOpMode {
             telemetry.addData("Beacon", "could not not be found");
         }
 
-        while(opModeIsActive() && muon.ultra.getDistance() > 300){
+        while(opModeIsActive() && muon.getUltrasonicDistance(0) > 300){
             muon.forward(0.2);
         }
 
@@ -113,11 +99,11 @@ public class FermionBlueShotTest extends AutoOpMode {
 
         //------------------------------Beacon 2--------------
 
-        muon.setWallDistance(500);
-        muon.startWallFollowing(muon.ultra, -90, 1);
+        muon.startWallFollowing(0, -90, 1, 500);
         sleep(1500);
 
-        muon.setTargetSpeed(0.3);
+        muon.endWallFollowing();
+        muon.startWallFollowing(0, -90, 0.3, 500);
 
         sensor = Robot.LEFT;
         while (opModeIsActive() && muon.getLight(sensor) < Fermion.LIGHT_THRESHOLD){
@@ -128,7 +114,7 @@ public class FermionBlueShotTest extends AutoOpMode {
         muon.absoluteIMUTurn(90, 0.5);
         muon.stop();
 
-        while (opModeIsActive() && muon.ultra.getDistance() < 500) {
+        while (opModeIsActive() && muon.getUltrasonicDistance(0) < 500) {
             muon.backward(1);
         }//while
         muon.stop();
@@ -143,7 +129,7 @@ public class FermionBlueShotTest extends AutoOpMode {
             telemetry.addData("Beacon", "could not not be found");
         }
 
-        while(opModeIsActive() && muon.ultra.getDistance() > 300){
+        while(opModeIsActive() && muon.getUltrasonicDistance(0) > 300){
             muon.forward(0.2);
         }
 

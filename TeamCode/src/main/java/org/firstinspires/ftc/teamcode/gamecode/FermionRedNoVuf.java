@@ -33,7 +33,6 @@ public class FermionRedNoVuf extends AutoOpMode {
         FXTCamera cam = new FXTCamera(FXTCamera.FACING_BACKWARD, true);
 
         top.startShooterControl();
-        top.prime();
         waitForStart();
         top.addVeerCheckRunnable();
         top.resetTargetAngle();
@@ -68,7 +67,7 @@ public class FermionRedNoVuf extends AutoOpMode {
         }
         top.stop();
 
-        while (opModeIsActive() && top.ultra.getDistance() < 300) {
+        while (opModeIsActive() && top.getUltrasonicDistance(0) < 300) {
             top.backward(1);
         }//while
         top.stop();
@@ -121,9 +120,9 @@ public class FermionRedNoVuf extends AutoOpMode {
         top.absoluteIMUTurn(90, 0.4);
 
         while (opModeIsActive()) {
-            if (top.ultra.getDistance() > 280) {
+            if (top.getUltrasonicDistance(0) > 280) {
                 top.forward(0.4);
-            } else if (top.ultra.getDistance() < 230) {
+            } else if (top.getUltrasonicDistance(0) < 230) {
                 top.backward(0.4);
             } else {
                 break;
@@ -157,13 +156,13 @@ public class FermionRedNoVuf extends AutoOpMode {
         top.shoot();
 
 
-        top.waitForState(Fermion.FIRE);
+        top.waitForShooterState(Fermion.FIRE);
         top.absoluteIMUTurn(90, 0.5);
 
         top.strafe(-40, 1, true);
         while(opModeIsActive() && top.getLight(Robot.LEFT) < Fermion.LIGHT_THRESHOLD){
-            Log.i(TAG, "runOp: ultra" + top.ultra.getDistance());
-            if(top.ultra.getDistance() < 410){
+            Log.i(TAG, "runOp: ultra" + top.getUltrasonicDistance(0));
+            if(top.getUltrasonicDistance(0) < 410){
                 top.strafe(-90, 0.3, true);
             }
         }

@@ -19,7 +19,6 @@ public class Fermion2ShotCapBlue extends AutoOpMode {
 
             muon.startShooterControl();
             muon.addVeerCheckRunnable();
-            muon.prime();
             waitForStart();
             muon.resetTargetAngle();
 
@@ -33,7 +32,7 @@ public class Fermion2ShotCapBlue extends AutoOpMode {
                 muon.shoot();
 
                 if(RC.globalDouble("NumBalls") == 2){
-                    muon.waitForState(Fermion.LOADED);
+                    muon.waitForShooterState(Fermion.LOADED);
                     muon.door.goToPos("open");
                     muon.collector.setPower(-1);
                     muon.shoot();
@@ -42,7 +41,7 @@ public class Fermion2ShotCapBlue extends AutoOpMode {
                     muon.setCollectorState(Robot.STOP);
                 }//if
 
-                muon.waitForState(Fermion.FIRE);
+                muon.waitForShooterState(Fermion.FIRE);
             }
 
             if(RC.globalBool("Ramp")){

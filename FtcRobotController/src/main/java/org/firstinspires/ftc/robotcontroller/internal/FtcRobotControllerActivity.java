@@ -43,21 +43,16 @@ import android.content.res.Resources;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.net.wifi.WifiManager;
-import android.net.wifi.p2p.WifiP2pDevice;
-import android.net.wifi.p2p.WifiP2pDeviceList;
-import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -92,14 +87,12 @@ import com.qualcomm.robotcore.util.Dimmer;
 import com.qualcomm.robotcore.util.ImmersiveMode;
 import com.qualcomm.robotcore.util.ReadWriteFile;
 import com.qualcomm.robotcore.util.RobotLog;
-import com.qualcomm.robotcore.wifi.NetworkConnection;
 import com.qualcomm.robotcore.wifi.NetworkConnectionFactory;
 import com.qualcomm.robotcore.wifi.NetworkType;
 import com.qualcomm.robotcore.wifi.WifiDirectAssistant;
 
 import org.firstinspires.ftc.ftccommon.external.SoundPlayingRobotMonitor;
 import org.firstinspires.ftc.robotcore.internal.AppUtil;
-import org.firstinspires.ftc.robotcore.internal.network.CallbackResult;
 import org.firstinspires.inspection.RcInspectionActivity;
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
@@ -109,17 +102,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.Inet6Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -678,11 +662,14 @@ public class FtcRobotControllerActivity extends Activity {
 
   public static void initializeGlobals() {
     HashMap<String, Object> values = new HashMap<>();
+    String globalsPath = AppUtil.getInstance().getApplication().getExternalFilesDir(null).getAbsolutePath() + "/globals.txt";
+
+    GlobalValuesActivity.GLOBALS_FILE_PATH = globalsPath;
 
     try {
+        new File(globalsPath).createNewFile();
 
-        BufferedReader globalsRead = new BufferedReader(new FileReader(
-                AppUtil.getInstance().getApplication().getExternalFilesDir(null).getAbsolutePath() + "/globals.txt"));
+        BufferedReader globalsRead = new BufferedReader(new FileReader(globalsPath));
 
         String toAdd = globalsRead.readLine();
         while (toAdd != null) {
@@ -698,7 +685,7 @@ public class FtcRobotControllerActivity extends Activity {
                 val = data[2];
             }//else
 
-            values.put(key, val);
+            GlobalValuesActivity.add(key, val);
 
             toAdd = globalsRead.readLine();
         }//while
@@ -707,25 +694,27 @@ public class FtcRobotControllerActivity extends Activity {
         e.printStackTrace();
     }//catch
 
-    GlobalValuesActivity.add("RedAlliance", true);
-    GlobalValuesActivity.add("TeleBeginAngle", 0);
-    GlobalValuesActivity.add("EncoderDistance", 500);
-    GlobalValuesActivity.add("VeerProportional", 0.03);
-    GlobalValuesActivity.add("VeerDerivative", (5 / 9) * 1E-5);
-    GlobalValuesActivity.add("VeerIntegral", 3.1E-5);
+    int numEntries = GlobalValuesActivity.globals.size();
 
-    GlobalValuesActivity.add("WallProportional", 0.2);
-    GlobalValuesActivity.add("WallDerivative", 0.2);
-    GlobalValuesActivity.add("WallIntegral", 0);
+    GlobalValuesActivity.tentativelyAdd("RedAlliance", true);
+    GlobalValuesActivity.tentativelyAdd("TeleBeginAngle", 0);
+    GlobalValuesActivity.tentativelyAdd("EncoderDistance", 500);
+    GlobalValuesActivity.tentativelyAdd("VeerProportional", 0.03);
+    GlobalValuesActivity.tentativelyAdd("VeerDerivative", (5 / 9) * 1E-5);
+    GlobalValuesActivity.tentativelyAdd("VeerIntegral", 3.1E-5);
+
+    GlobalValuesActivity.tentativelyAdd("WallProportional", 0.2);
+    GlobalValuesActivity.tentativelyAdd("WallDerivative", 0.2);
+    GlobalValuesActivity.tentativelyAdd("WallIntegral", 0);
+
     GlobalValuesActivity.addDashboard("WaitTime", 10000);
     GlobalValuesActivity.addDashboard("NumBalls", 1);
     GlobalValuesActivity.addDashboard("Cap-ball", true);
     GlobalValuesActivity.addDashboard("Ramp",false);
 
-    for (Map.Entry<String, Object> entry : values.entrySet()) {
-        Log.i(entry.getKey(), entry.getValue().toString());
-        GlobalValuesActivity.add(entry.getKey(), entry.getValue());
-    }//for
+    if (GlobalValuesActivity.globals.size() > numEntries) {
+      GlobalValuesActivity.writeValuesToFile();
+    }//if
 
   }
 

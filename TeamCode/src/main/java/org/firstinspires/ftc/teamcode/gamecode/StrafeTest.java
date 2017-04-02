@@ -17,7 +17,7 @@ public class StrafeTest extends AutoOpMode {
     public void runOp() {
         Fermion f = new Fermion(true);
 
-        f.targetAngle = 0;
+        f.resetTargetAngle();
         waitForStart();
         f.addVeerCheckRunnable();
 

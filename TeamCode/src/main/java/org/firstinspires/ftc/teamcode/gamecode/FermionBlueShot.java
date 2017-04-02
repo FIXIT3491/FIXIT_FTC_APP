@@ -1,14 +1,11 @@
 package org.firstinspires.ftc.teamcode.gamecode;
 
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.vuforia.Image;
 import com.vuforia.PIXEL_FORMAT;
 import com.vuforia.Vuforia;
 
-import org.firstinspires.ftc.robotcontroller.internal.GlobalValuesActivity;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
@@ -18,7 +15,6 @@ import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
 import org.firstinspires.ftc.teamcode.robots.Robot;
-import org.firstinspires.ftc.teamcode.util.MathUtils;
 import org.firstinspires.ftc.teamcode.robots.Fermion;
 import org.firstinspires.ftc.teamcode.util.VortexUtils;
 
@@ -48,7 +44,6 @@ public class FermionBlueShot extends AutoOpMode {
 
         double voltage = muon.getBatteryVoltage();
         muon.startShooterControl();
-        muon.prime();
 
         waitForStart();
         beacons.activate();
@@ -63,7 +58,7 @@ public class FermionBlueShot extends AutoOpMode {
         }
         muon.stop();
         muon.shoot();
-        muon.waitForState(Fermion.FIRE);
+        muon.waitForShooterState(Fermion.FIRE);
 
         muon.imuTurnR(160, 0.6);
 
@@ -105,10 +100,10 @@ public class FermionBlueShot extends AutoOpMode {
 
         muon.absoluteIMUTurn(90, 0.6);
 
-        while (opModeIsActive() && muon.ultra.getDistance() < 50){
+        while (opModeIsActive() && muon.getUltrasonicDistance(0) < 50){
             muon.backward(0.2);
         }
-        while(opModeIsActive() && muon.ultra.getDistance() > 457){
+        while(opModeIsActive() && muon.getUltrasonicDistance(0) > 457){
             muon.forward(0.2);
         }
 
@@ -137,10 +132,10 @@ public class FermionBlueShot extends AutoOpMode {
         muon.left(1);
         sleep(1200);
 
-        while (opModeIsActive() && muon.ultra.getDistance() < 50){
+        while (opModeIsActive() && muon.getUltrasonicDistance(0) < 50){
             muon.backward(0.2);
         }
-        while(opModeIsActive() && muon.ultra.getDistance() > 457){
+        while(opModeIsActive() && muon.getUltrasonicDistance(0) > 457){
             muon.forward(0.2);
         }
 
@@ -154,7 +149,7 @@ public class FermionBlueShot extends AutoOpMode {
         muon.absoluteIMUTurn(90, 0.5);
         muon.stop();
 
-        while (opModeIsActive() && muon.ultra.getDistance() < 500) {
+        while (opModeIsActive() && muon.getUltrasonicDistance(0) < 500) {
             muon.backward(1);
         }//while
         muon.stop();
@@ -174,7 +169,7 @@ public class FermionBlueShot extends AutoOpMode {
             telemetry.addData("Beacon", "could not not be found");
         }
 
-        while(opModeIsActive() && muon.ultra.getDistance() > 300){
+        while(opModeIsActive() && muon.getUltrasonicDistance(0) > 300){
             muon.forward(0.2);
         }
 

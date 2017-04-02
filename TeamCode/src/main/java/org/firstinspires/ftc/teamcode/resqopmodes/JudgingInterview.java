@@ -68,9 +68,9 @@ public class JudgingInterview extends TeleOpMode implements TextToSpeech.OnInitL
         }
 
 
-        RC.t.addData("motorR", lily.motorR.getCurrentPosition());
+        RC.t.addData("motorR", lily.motorR.getBaseCurrentPosition());
 
-        RC.t.addData("motorL", lily.motorL.getCurrentPosition());
+        RC.t.addData("motorL", lily.motorL.getBaseCurrentPosition());
 
 
         if (joy1.buttonY() && lily.frontguard.currentPos < 0.5 && getMilliSeconds(2) > 300) {
@@ -139,30 +139,30 @@ public class JudgingInterview extends TeleOpMode implements TextToSpeech.OnInitL
         dataLogData(hardwareMap.voltageSensor.get("Motor Controller 1").getVoltage() + "\n");
         if (!currentlySwitching) {
             if (joy2.buttonA() && armStage == COLLECT) {
-                lily.elbow.minSpeed = 0.2;
-                lily.elbow.setTarget(12, 0.9);
-                lily.elbow.accuracy = 11;
+                lily.elbow.setMinimumSpeed(0.2);
+                lily.elbow.setTargetAndPower(12, 0.9);
+                lily.elbow.setPositioningAccuracy(11);
                 armStage = MANUAL;
             } else if (joy2.buttonY() && armStage == COLLECT) {
-                lily.elbow.setTarget(-12, 0.9);
-                lily.elbow.minSpeed = 0.1;
-                lily.elbow.accuracy = 11;
+                lily.elbow.setTargetAndPower(-12, 0.9);
+                lily.elbow.setMinimumSpeed(0.1);
+                lily.elbow.setPositioningAccuracy(11);
                 armStage = MANUAL;
             } else if (joy2.buttonA()) {
-                lily.elbow.minSpeed = 0.3;
-                lily.elbow.setTarget(25, 0.9);
-                lily.elbow.accuracy = 24;
+                lily.elbow.setMinimumSpeed(0.3);
+                lily.elbow.setTargetAndPower(25, 0.9);
+                lily.elbow.setPositioningAccuracy(24);
                 armStage = MANUAL;
             } else if (joy2.buttonY()) {
-                lily.elbow.setTarget(-25, 0.9);
-                lily.elbow.minSpeed = 0.3;
-                lily.elbow.accuracy = 24;
+                lily.elbow.setTargetAndPower(-25, 0.9);
+                lily.elbow.setMinimumSpeed(0.3);
+                lily.elbow.setPositioningAccuracy(24);
                 armStage = MANUAL;
             } else if (joy2.buttonB()) {
-                lily.turnTable.setTarget(25, 1.8);
+                lily.turnTable.setTargetAndPower(25, 1.8);
                 armStage = MANUAL;
             } else if (joy2.buttonX()) {
-                lily.turnTable.setTarget(-25, 1.8);
+                lily.turnTable.setTargetAndPower(-25, 1.8);
                 armStage = MANUAL;
             }//elseif
 
@@ -170,19 +170,19 @@ public class JudgingInterview extends TeleOpMode implements TextToSpeech.OnInitL
                 switchingFrom = armStage;
                 armStage = DEFAULT;
                 collecting = false;
-                lily.elbow.minSpeed = 0.04;
+                lily.elbow.setMinimumSpeed(0.04);
                 currentlySwitching = true;
             } else if (joy2.buttonDown() && armStage == DEFAULT) {
                 switchingFrom = armStage;
                 armStage = COLLECT;
                 currentlySwitching = true;
-                lily.elbow.minSpeed = 0.04;
+                lily.elbow.setMinimumSpeed(0.04);
                 collecting = true;
             } else if (joy2.buttonRight() && armStage != RAMP) {
                 switchingFrom = armStage;
                 armStage = RAMP;
                 currentlySwitching = true;
-                lily.elbow.minSpeed = 0.04;
+                lily.elbow.setMinimumSpeed(0.04);
                 collecting = false;
             }
 
@@ -201,7 +201,7 @@ public class JudgingInterview extends TeleOpMode implements TextToSpeech.OnInitL
             } else if (armStage == COLLECT) {
 
                 brushState = Robot.FORWARD;
-                lily.turnTable.minSpeed = 0.04;
+                lily.turnTable.setMinimumSpeed(0.04);
                 if (lily.moveArm(-65, 0, 0.5, false)) {
                     switchingFrom = COLLECT;
                     currentlySwitching = false;
@@ -210,7 +210,7 @@ public class JudgingInterview extends TeleOpMode implements TextToSpeech.OnInitL
             } else if (armStage == DEFAULT) {
 
                 brushState = Robot.STOP;
-                lily.turnTable.minSpeed = 0.04;
+                lily.turnTable.setMinimumSpeed(0.04);
                 if (lily.moveArm(-1650, 0, 0.5, false)) {
                     switchingFrom = DEFAULT;
                     currentlySwitching = false;
@@ -229,11 +229,11 @@ public class JudgingInterview extends TeleOpMode implements TextToSpeech.OnInitL
             brushState = Robot.STOP;
         }
 
-        RC.t.addData("TurnTable Position", lily.turnTable.getCurrentPosition());
-        RC.t.addData("Elbow Position", lily.elbow.getCurrentPosition());
+        RC.t.addData("TurnTable Position", lily.turnTable.getBaseCurrentPosition());
+        RC.t.addData("Elbow Position", lily.elbow.getBaseCurrentPosition());
         RC.t.addData("Wrist Position", lily.wrist.getPosition());
 
-        lily.checkAllSystems(); //check all motor positions
+        lily.checkAllSystems(); //checkTimer all motor positions
         if (getMilliSeconds(4) > 119000) {
             lily.brush.stop();
         }

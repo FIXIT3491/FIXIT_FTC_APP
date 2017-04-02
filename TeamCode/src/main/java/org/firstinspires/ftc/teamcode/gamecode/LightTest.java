@@ -37,7 +37,7 @@ public class LightTest extends AutoOpMode {
         while(opModeIsActive()) {
             RC.t.addData("Left", muon.getLight(Robot.LEFT));
             RC.t.addData("RIght", muon.getLight(Robot.RIGHT));
-            RC.t.addData("Ultra", muon.ultra.getDistance());
+            RC.t.addData("Ultra", muon.getUltrasonicDistance(0));
             telemetry.update();
 
         }

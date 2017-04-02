@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.resqopmodes;
 
-import android.util.Log;
-
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.RC;
@@ -97,9 +95,9 @@ public class LilyOp extends TeleOpMode {
         }
 
 
-        RC.t.addData("motorR", lily.motorR.getCurrentPosition());
+        RC.t.addData("motorR", lily.motorR.getBaseCurrentPosition());
 
-        RC.t.addData("motorL", lily.motorL.getCurrentPosition());
+        RC.t.addData("motorL", lily.motorL.getBaseCurrentPosition());
 
 //
 //        if (joy1.buttonX() && getMilliSeconds() > 500) {
@@ -179,29 +177,29 @@ public class LilyOp extends TeleOpMode {
         //dataLogData(hardwareMap.voltageSensor.get("Motor Controller 1").getVoltage() + "\n");
         if (!currentlySwitching) {
             if (joy2.buttonA() && armStage == COLLECT) {
-                lily.elbow.setTarget(12);
+                lily.elbow.setTarget(12 + lily.elbow.getBaseCurrentPosition());
                 lily.elbow.setPower(0.4);
                 armStage = MANUAL;
             } else if (joy2.buttonY() && armStage == COLLECT) {
-                lily.elbow.setTarget(-12);
+                lily.elbow.setTarget(-12 + lily.elbow.getBaseCurrentPosition());
                 lily.elbow.setPower(0.4);
                 armStage = MANUAL;
             } else if (joy2.buttonA()) {
-                lily.elbow.setTarget(-25);
+                lily.elbow.setTarget(-25 + lily.elbow.getBaseCurrentPosition());
                 lily.elbow.setPower(0.6);
                 armStage = MANUAL;
             } else if (joy2.buttonY()) {
-                lily.elbow.setTarget(25);
+                lily.elbow.setTarget(25 + lily.elbow.getBaseCurrentPosition());
                 lily.elbow.setPower(0.6);
                 armStage = MANUAL;
             } else
 
             if (joy2.buttonB()) {
-                lily.turnTable.setTarget(25);
+                lily.turnTable.setTarget(25 + lily.turnTable.getBaseCurrentPosition());
                 lily.turnTable.setPower(0.6);
                 armStage = MANUAL;
             } else if (joy2.buttonX()) {
-                lily.turnTable.setTarget(-25);
+                lily.turnTable.setTarget(-25 + lily.turnTable.getBaseCurrentPosition());
                 lily.turnTable.setPower(0.6);
                 armStage = MANUAL;
             }//elseif
@@ -210,19 +208,19 @@ public class LilyOp extends TeleOpMode {
                 switchingFrom = armStage;
                 armStage = DEFAULT;
                 collecting = false;
-                lily.elbow.minSpeed = 0.04;
+                lily.elbow.setMinimumSpeed(0.04);
                 currentlySwitching = true;
             } else if (joy2.buttonDown() && armStage == DEFAULT) {
                 switchingFrom = armStage;
                 armStage = COLLECT;
                 currentlySwitching = true;
-                lily.elbow.minSpeed = 0.04;
+                lily.elbow.setMinimumSpeed(0.04);
                 collecting = true;
             } else if (joy2.buttonRight() && armStage != RAMP) {
                 switchingFrom = armStage;
                 armStage = RAMP;
                 currentlySwitching = true;
-                lily.elbow.minSpeed = 0.04;
+                lily.elbow.setMinimumSpeed(0.04);
                 collecting = false;
             }
 
@@ -241,7 +239,7 @@ public class LilyOp extends TeleOpMode {
             } else if (armStage == COLLECT) {
 
                 brushState = Robot.FORWARD;
-                lily.turnTable.minSpeed = 0.04;
+                lily.turnTable.setMinimumSpeed(0.04);
                 if (lily.moveArm(-65, 0, 0.5, false)) {
                     switchingFrom = COLLECT;
                     currentlySwitching = false;
@@ -250,7 +248,7 @@ public class LilyOp extends TeleOpMode {
             } else if (armStage == DEFAULT) {
 
                 brushState = Robot.STOP;
-                lily.turnTable.minSpeed = 0.04;
+                lily.turnTable.setMinimumSpeed(0.04);
                 if (lily.moveArm(-1650, 0, 0.5, false)) {
                     switchingFrom = DEFAULT;
                     currentlySwitching = false;
@@ -269,15 +267,15 @@ public class LilyOp extends TeleOpMode {
             brushState = Robot.STOP;
         }
 
-        RC.t.addData("TurnTable Position", lily.turnTable.getCurrentPosition());
-        RC.t.addData("Elbow Position", lily.elbow.getCurrentPosition());
+        RC.t.addData("TurnTable Position", lily.turnTable.getBaseCurrentPosition());
+        RC.t.addData("Elbow Position", lily.elbow.getBaseCurrentPosition());
         RC.t.addData("Wrist Position", lily.wrist.getPosition());
 
 
-//        Log.i("Elbow", lily.elbow.getCurrentPosition() + "----" + lily.elbow.getM().getTargetPosition() + "");
-//        Log.i("TurnTable", lily.turnTable.getCurrentPosition() + "----" + lily.turnTable.getM().getTargetPosition() + "");
+//        Log.i("Elbow", lily.elbow.getBaseCurrentPosition() + "----" + lily.elbow.getM().getTargetPosition() + "");
+//        Log.i("TurnTable", lily.turnTable.getBaseCurrentPosition() + "----" + lily.turnTable.getM().getTargetPosition() + "");
 
-        lily.checkAllSystems(); //check all motor positions
+        lily.checkAllSystems(); //checkTimer all motor positions
         if (getMilliSeconds(4) > 119000) {
             lily.brush.stop();
         }

@@ -36,7 +36,7 @@ public class VeerFermionOp extends TeleOpMode implements TextToSpeech.OnInitList
         cam = new FXTCamera(FXTCamera.FACING_BACKWARD, true);
 
         tau.startShooterControl();
-        tau.prime();
+
         clearTimer(3);
         clearTimer(4);
         cam.setExposure(-12);
@@ -91,7 +91,7 @@ public class VeerFermionOp extends TeleOpMode implements TextToSpeech.OnInitList
 
         if (joy2.rightTrigger()) {
             tau.setCollectorState(Robot.OUT);
-        } else if(tau.shooterState == Fermion.LOADED){
+        } else if(tau.getShooterState() == Fermion.LOADED){
             tau.setCollectorState(collectorState);
         }//else
 
@@ -102,8 +102,6 @@ public class VeerFermionOp extends TeleOpMode implements TextToSpeech.OnInitList
          */
         if(joy2.buttonA()){
             tau.shoot();
-        } else {
-            tau.reload();
         }//else
 
         /*
@@ -111,7 +109,7 @@ public class VeerFermionOp extends TeleOpMode implements TextToSpeech.OnInitList
          */
         if(-joy2.y1() < -0.15){
             tau.door.goToPos("open");
-        } else if(tau.shooterState == Fermion.LOADED){
+        } else if(tau.getShooterState() == Fermion.LOADED){
             tau.door.goToPos("close");
         }//else
 

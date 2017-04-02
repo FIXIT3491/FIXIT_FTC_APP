@@ -103,24 +103,24 @@ public class Billy extends Robot {
                 turnTable.stop();
                 break;
         }//switch
-        RC.t.addData("arm", turnTable.getCurrentPosition());
-        RC.t.addData("base", baseJoint.getCurrentPosition());
+        RC.t.addData("arm", turnTable.getBaseCurrentPosition());
+        RC.t.addData("base", baseJoint.getBaseCurrentPosition());
     }
 
     public void turnArm(int direction, int degrees) {
-        int target = turnTable.getCurrentPosition();
+        int target = turnTable.getBaseCurrentPosition();
         switch (direction) {
             case LEFT:
                 turnTable.setPower(0.05);
                 target += degrees;
-                while (turnTable.getCurrentPosition() < target && RC.l.opModeIsActive()) {
+                while (turnTable.getBaseCurrentPosition() < target && RC.l.opModeIsActive()) {
                     RC.l.idle();
                 }
                 break;
             case RIGHT:
                 turnTable.setPower(-0.05);
                 target -= degrees;
-                while (turnTable.getCurrentPosition() > target && RC.l.opModeIsActive()) {
+                while (turnTable.getBaseCurrentPosition() > target && RC.l.opModeIsActive()) {
                     RC.l.idle();
                 }
                 break;
@@ -178,12 +178,12 @@ public class Billy extends Robot {
                 baseJoint.stop();
                 break;
         }//switch
-        RC.t.addData("arm", turnTable.getCurrentPosition());
-        RC.t.addData("base", baseJoint.getCurrentPosition());
+        RC.t.addData("arm", turnTable.getBaseCurrentPosition());
+        RC.t.addData("base", baseJoint.getBaseCurrentPosition());
     }//setBaseJoint
 
     public void setBaseJointState(int state, int deg) {
-        int target = baseJoint.getCurrentPosition();
+        int target = baseJoint.getBaseCurrentPosition();
 
         try {
             ((LinearOpMode) (RC.o)).waitOneFullHardwareCycle();
@@ -194,15 +194,15 @@ public class Billy extends Robot {
             case UP:
                 baseJoint.setPower(0.1);
                 target += deg;
-                while (baseJoint.getCurrentPosition() < target && RC.l.opModeIsActive()) {
-                    RC.t.addData("base", baseJoint.getCurrentPosition());
+                while (baseJoint.getBaseCurrentPosition() < target && RC.l.opModeIsActive()) {
+                    RC.t.addData("base", baseJoint.getBaseCurrentPosition());
                     RC.l.idle();
                 }
                 break;
             case DOWN:
                 baseJoint.setPower(-0.1);
                 target -= deg;
-                while (baseJoint.getCurrentPosition() > target && RC.l.opModeIsActive()) {
+                while (baseJoint.getBaseCurrentPosition() > target && RC.l.opModeIsActive()) {
                     RC.l.idle();
                 }
                 break;
@@ -219,14 +219,14 @@ public class Billy extends Robot {
     //LOW
     public void moveToLowBasket() {
 
-        turnTable.setTarget(770, 0.5);
+        turnTable.setTargetAndPower(770, 0.5);
         elbow.setPosition(0.48);
 
     }
 
     public void backFromLowBasket() {
 
-        turnTable.setTarget(-700, 0.3);
+        turnTable.setTargetAndPower(-700, 0.3);
         elbow.setPosition(0.2);
 
     }
@@ -236,14 +236,14 @@ public class Billy extends Robot {
     //MED
     public void moveToMedBasket() {
 
-        turnTable.setTarget(770, 0.5);
+        turnTable.setTargetAndPower(770, 0.5);
         elbow.setPosition(0.48);
 
     }
 
     public void backFromMedBasket() {
 
-        turnTable.setTarget(-700, 0.3);
+        turnTable.setTargetAndPower(-700, 0.3);
         elbow.setPosition(0.2);
 
     }
@@ -251,14 +251,14 @@ public class Billy extends Robot {
     //HIGH
     public void moveToHighBasket() {
 
-        turnTable.setTarget(770, 0.5);
+        turnTable.setTargetAndPower(770, 0.5);
         elbow.setPosition(0.48);
 
     }
 
     public void backFromHighBasket() {
 
-        turnTable.setTarget(-700, 0.3);
+        turnTable.setTargetAndPower(-700, 0.3);
         elbow.setPosition(0.2);
 
     }

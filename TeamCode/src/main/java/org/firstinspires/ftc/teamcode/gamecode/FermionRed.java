@@ -127,7 +127,7 @@ public class FermionRed extends AutoOpMode {
         muon.stop();
         RC.t.addData("Hi", "ya");
 
-        while (opModeIsActive() && muon.ultra.getDistance() < 500) {
+        while (opModeIsActive() && muon.getUltrasonicDistance(0) < 500) {
             muon.backward(1);
         }//while
         muon.stop();
@@ -147,7 +147,7 @@ public class FermionRed extends AutoOpMode {
             telemetry.addData("Beacon", "could not not be found");
         }
 
-        while(opModeIsActive() && muon.ultra.getDistance() > 300){
+        while(opModeIsActive() && muon.getUltrasonicDistance(0) > 300){
             muon.forward(0.2);
         }
 

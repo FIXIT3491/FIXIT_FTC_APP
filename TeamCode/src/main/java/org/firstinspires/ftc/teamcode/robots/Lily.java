@@ -142,7 +142,7 @@ public class Lily extends Robot {
         turnTable = new Motor("turnTable");
         turnTable.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //        turnTable.toggleTargetFixing(true);
-//        turnTable.accuracy = 11;
+//        turnTable.positioningAccuracy = 11;
 
         elbow = new Motor("elbow");
         elbow.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -174,8 +174,8 @@ public class Lily extends Robot {
 
         super.checkAllSystems();
 
-//        elbow.check();
-//        turnTable.check();
+//        elbow.checkTimer();
+//        turnTable.checkTimer();
 
         if (adafruit != null) {
             angleCheck();
@@ -222,12 +222,12 @@ public class Lily extends Robot {
 
         if (elbowFirst) {
             if (motionStage == 0) {
-                elbow.setTarget(elbow.beginningPosition + newElbowPosition - elbow.getCurrentPosition());
+                elbow.setTarget(elbow.getBeginningPosition() + newElbowPosition);
                 elbow.setPower(0.3);
                 motionStage++;
             } else if (motionStage == 1 && armReady()) {
                 elbow.stop();
-                turnTable.setTarget(turnTable.beginningPosition + newTurnTablePosition - turnTable.getCurrentPosition());
+                turnTable.setTarget(turnTable.getBeginningPosition() + newTurnTablePosition);
                 turnTable.setPower(0.3);
                 motionStage++;
             } else if (motionStage == 2 && armReady()) {
@@ -238,12 +238,12 @@ public class Lily extends Robot {
             }//elseif
         } else {
             if (motionStage == 0) {
-                turnTable.setTarget(turnTable.beginningPosition + newTurnTablePosition - turnTable.getCurrentPosition());
+                turnTable.setTarget(turnTable.getBeginningPosition() + newTurnTablePosition);
                 turnTable.setPower(0.3);
                 motionStage++;
             } else if (motionStage == 1 && armReady()) {
                 turnTable.stop();
-                elbow.setTarget(elbow.beginningPosition + newElbowPosition - elbow.getCurrentPosition());
+                elbow.setTarget(elbow.getBeginningPosition() + newElbowPosition);
                 elbow.setPower(0.3);
                 motionStage++;
             } else if (motionStage == 2 && armReady()) {
@@ -275,8 +275,8 @@ public class Lily extends Robot {
             //if the angle to turn is less than 0.5 degree, we're done.
             if (Math.abs(angleToTurn) < 0.5) {
                 angleReached = true;
-//                motorL.target = motorL.getCurrentPosition();
-//                motorR.target = motorR.getCurrentPosition();
+//                motorL.target = motorL.getBaseCurrentPosition();
+//                motorR.target = motorR.getBaseCurrentPosition();
                 halt();
                 return;
             }//if

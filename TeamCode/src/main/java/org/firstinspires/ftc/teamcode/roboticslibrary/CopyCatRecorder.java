@@ -41,7 +41,7 @@ public class CopyCatRecorder {
     }//CopyCat
 
     public void recordJoystick() {
-        TaskHandler.addLoopedTask("CopyCat: " + fileName, recordJoy, 100);
+        TaskHandler.addLoopedTask("CopyCatRecorder." + fileName.toUpperCase(), recordJoy, 100);
     }//recordJoystick
 
     public void terminate() {

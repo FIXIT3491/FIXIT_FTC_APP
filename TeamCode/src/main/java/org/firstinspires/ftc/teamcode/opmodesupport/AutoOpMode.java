@@ -32,7 +32,7 @@ public abstract class AutoOpMode extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         RC.setOpMode(this);
         TaskHandler.init();
-        TaskHandler.addLoopedTask("Telemetry", new Runnable() {
+        TaskHandler.addLoopedTask("AutoOpMode.TELEMETRY", new Runnable() {
             @Override
             public void run() {
                 telemetry.update();

@@ -41,7 +41,7 @@ public class JudgingInterview extends LinearOpMode implements TextToSpeech.OnIni
         while (opModeIsActive() && text.isSpeaking()){
             idle();
         }
-        fermion.prime();
+
         text.speak("Then I open the servo to let the ball into the shooter.", TextToSpeech.QUEUE_ADD, null);
         fermion.door.goToPos("open");
         sleep(1000);
@@ -49,7 +49,7 @@ public class JudgingInterview extends LinearOpMode implements TextToSpeech.OnIni
 
         text.speak("Now, I will shoot a particle.", TextToSpeech.QUEUE_ADD, null);
         fermion.shoot();
-        fermion.waitForState(Fermion.FIRE);
+        fermion.waitForShooterState(Fermion.FIRE);
         while (opModeIsActive() && text.isSpeaking()){
             idle();
         }

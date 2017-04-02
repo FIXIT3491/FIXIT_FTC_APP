@@ -132,7 +132,7 @@ public class FermionBlue extends AutoOpMode {
 
         long timeBack = 0;
         clearTimer();
-        while (opModeIsActive() && muon.ultra.getDistance() < 500) {
+        while (opModeIsActive() && muon.getUltrasonicDistance(0) < 500) {
             muon.backward(1);
         }//while
         muon.stop();
@@ -158,7 +158,7 @@ public class FermionBlue extends AutoOpMode {
             RC.t.speakString("Right");
         }//else
 
-        while(opModeIsActive() && muon.ultra.getDistance() > 300){
+        while(opModeIsActive() && muon.getUltrasonicDistance(0) > 300){
             muon.forward(0.2);
         }
 
