@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.robots.Fermion;
 public class CollectorTester extends TeleOpMode {
     double speed = 0;
     Fermion electron;
+
     @Override
     public void initialize() {
         electron = new Fermion(false);

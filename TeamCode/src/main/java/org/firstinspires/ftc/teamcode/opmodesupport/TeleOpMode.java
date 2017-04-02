@@ -85,7 +85,7 @@ public abstract class TeleOpMode extends OpMode {
 
 
     /**
-     * Method that is run at the end of the opmode. It closes the datalogger in FXTTelemetry
+     * Method that is run at the end of the opmode. It closes the dataloggers in FXTTelemetry
      * @see FXTTelemetry
      */
     @Override

@@ -19,15 +19,11 @@ public class VeerFermionOp extends TeleOpMode implements TextToSpeech.OnInitList
 
     private Fermion tau;
     private TextToSpeech tts;
+    private FXTCamera cam;
 
     private double driveDirection = 1;
-
-    private long ballCollectId = 28347289352L;
-
     private boolean capReleased = false;
     private int collectorState = Robot.STOP;
-
-    private FXTCamera cam;
 
     @Override
     public void initialize() {
@@ -56,6 +52,7 @@ public class VeerFermionOp extends TeleOpMode implements TextToSpeech.OnInitList
 
     @Override
     public void loopOpMode() {
+
         //variable to keep track of which timer is for which function
         int timerIdx = 0;
 
@@ -64,6 +61,7 @@ public class VeerFermionOp extends TeleOpMode implements TextToSpeech.OnInitList
          */
         if (tap(timerIdx++, joy1.leftBumper())) {
             driveDirection *= -1;
+            tau.lights.flashState(-1000);
         }//if
 
         /*
@@ -145,14 +143,12 @@ public class VeerFermionOp extends TeleOpMode implements TextToSpeech.OnInitList
             tau.lifter.stop();
         }//else
 
-
-        if (tap(timerIdx++, tau.seesBall())) {
-            tau.lights.setPower(0);
-        } else {
-            tau.lights.setPower(1);
+        /*
+        BALL NOTIFICATION
+         */
+        if (tap(timerIdx++, tau.seesBall(), 1000)) {
+            tau.lights.flashState(500);
         }//if
-
-
 
     }//loopOpMode
 
@@ -160,9 +156,8 @@ public class VeerFermionOp extends TeleOpMode implements TextToSpeech.OnInitList
         cam.destroy();
     }
 
-
     @Override
     public void onInit(int status) {
-        RC.t.addData("Ready to talk", "!");
+        RC.t.addData(TAG, "Ready to Talk!");
     }
 }//VeerFermionOp

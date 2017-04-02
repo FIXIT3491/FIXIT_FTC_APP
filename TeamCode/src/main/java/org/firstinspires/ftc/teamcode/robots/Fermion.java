@@ -224,7 +224,7 @@ public class Fermion {
         ROBOT LIGHTS
          */
         lights = new Lights("lights");
-
+        lights.setLightsState(0);
     }//Fermion
 
     /**
@@ -307,6 +307,8 @@ public class Fermion {
         rightFore.stop();
         leftBack.stop();
         rightBack.stop();
+
+        resetTargetAngle();
     }//stop
 
     /*
