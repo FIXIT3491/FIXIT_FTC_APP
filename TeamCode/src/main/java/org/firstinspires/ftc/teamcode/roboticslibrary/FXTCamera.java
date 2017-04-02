@@ -134,7 +134,7 @@ public class FXTCamera implements TextureView.SurfaceTextureListener {
     public static void saveBitmap(Bitmap bm, String name) {
         ContextWrapper cw = new ContextWrapper(RC.c().getApplicationContext());
         // path to /data/data/yourapp/app_data/imageDir
-        File directory = RC.c().getExternalFilesDir("");
+        File directory = cw.getExternalFilesDir("");
         // Create imageDir
         File mypath = new File(directory, name + ".jpg");
 
@@ -147,11 +147,12 @@ public class FXTCamera implements TextureView.SurfaceTextureListener {
         try {
 
             // Use the compress method on the BitMap object to write image to the OutputStream
-            bm.compress(Bitmap.CompressFormat.PNG, 100, file);
+            bm.compress(Bitmap.CompressFormat.JPEG, 100, file);
 
             file.close();
         } catch (Exception e) {
             e.printStackTrace();
+            Log.i("hi", "bad" );
         }
     }
 

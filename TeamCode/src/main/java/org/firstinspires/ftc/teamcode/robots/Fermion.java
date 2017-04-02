@@ -34,6 +34,7 @@ public class Fermion {
     public AdafruitBNO055IMU imu;
     public TrackBall mouse;
     public FXTAnalogUltrasonicSensor ultra;
+    public FXTAnalogUltrasonicSensor ultraSide;
 
     //drive motors
     public Motor leftFore;
@@ -42,6 +43,8 @@ public class Fermion {
     public Motor rightBack;
     public Motor collector;
     public Motor lifter;
+    public Motor lights;
+    public Motor shooter;
 
     public LinearServo shooter1;
     public LinearServo shooter2;
@@ -65,13 +68,14 @@ public class Fermion {
     public boolean preservingStrafeSpeed = false;
     private boolean useVeerCheck = true;
     private PID veerAlgorithm = new PID(PID.Type.PID, RC.globalDouble("VeerProportional"), RC.globalDouble("VeerIntegral"), RC.globalDouble("VeerDerivative"));
-    private PID wallAlgorithm = new PID(PID.Type.P, 0.007);
+    private PID wallAlgorithm = new PID(PID.Type.PD, 0.25, 0.2);
     private final static double MINIMUM_TRACKING_SPEED = 0.19;
     private final static double TRACKING_ACCURACY_TIKS = 30;
 
     public double commandedStrafeSpeedRightForeLeftBack = 0;
     public double commandedStrafeSpeedRightBackLeftFore = 0;
     public double commandedStrafeAngle = 0;
+    public double targetSpeed = 0;
 
     public static int LOADED = 0;
     public static int RELOADING = 1;
@@ -81,9 +85,9 @@ public class Fermion {
     public static int PRIMING = 5;
     private long fireTime = 0;
 
-
     public int shooterState = LOADED;
     public int requestedShooterState = LOADED;
+    private int shooterTarget = 0;
 
     public Fermion(boolean auto) {
         leftFore = new Motor("leftFore");
@@ -102,20 +106,23 @@ public class Fermion {
         rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightBack.minSpeed = 0;
 
-        rightFore.setReverse(true);
-        rightBack.setReverse(true);
+        leftFore.setReverse(true);
+        leftBack.setReverse(true);
 
         collector = new Motor("collector");
         collector.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        collector.setReverse(true);
+        collector.setReverse(false);
 
         lifter = new Motor("lifter");
-        collector.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        lifter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        shooter1 = new LinearServo("shoot1");
-        shooter1.setPosition(0.2);
-        shooter2 = new LinearServo("shoot2");
-        shooter2.setPosition(0.2);
+        lights = new Motor("lights");
+
+        shooter = new Motor("shooter");
+        shooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        shooter.setMotorType(Motor.Type.AM60);
+        shooter.resetEncoders();
+        shooter.stop();
 
 
         door = new FXTServo("door");
@@ -124,9 +131,10 @@ public class Fermion {
         door.goToPos("close");
 
         capRelease = new FXTServo("capRelease");
-        capRelease.addPos("stored", 0.9);
-        capRelease.addPos("released", 0.6);
-        capRelease.goToPos("stored");
+        capRelease.addPos("init", 0.65);
+        capRelease.addPos("start", 0.1);
+        capRelease.addPos("release", 0.9);
+        capRelease.goToPos("init");
 
         mouse = new TrackBall("rightFore", "rightBack");
         if (auto) {
@@ -142,6 +150,7 @@ public class Fermion {
         rightBeacon = new FXTOpticalDistanceSensor("rightBeacon");
         ball = new FXTOpticalDistanceSensor("ball");
         ultra = new FXTAnalogUltrasonicSensor("ultra");
+        ultraSide = new FXTAnalogUltrasonicSensor("ultra2");
 
 
 //        collectorFront = new FXTLED("collectorLED");
@@ -265,9 +274,13 @@ public class Fermion {
 
         commandedStrafeSpeedRightBackLeftFore = leftForeRightBack;
         commandedStrafeSpeedRightForeLeftBack = rightForeLeftBack;
-        commandedStrafeAngle = degrees - 45;
+        //commandedStrafeAngle = degrees - 45;
 
     }//strafe
+
+    public void setTargetSpeed(double speed){
+        targetSpeed = speed;
+    }
 
     public void track(double degrees, double mm, double speed) {
 
@@ -648,58 +661,46 @@ public class Fermion {
         requestedShooterState = PRIMED;
     }
 
-    protected void updateShooter(){
-        if(fireTime < System.currentTimeMillis()) {
-            if(shooterState == FIRING){
-                shooterState = FIRE;
-                return;
-            } else if(shooterState == PRIMING){
-                shooterState = PRIMED;
-                return;
-            } else if(shooterState == RELOADING){
-                shooterState = LOADED;
-                return;
-            }
+    protected void updateShooter() {
+        if (requestedShooterState == FIRE){
+            shooterState = FIRING;
+            shooterTarget += shooter.getNumTiksPerRev() / 2;
+            shooter.setPower(1);
 
-            if (shooterState == LOADED) {
-                if (requestedShooterState == PRIMED) {
-                    shooter1.setPosition(0.45);
-                    shooter2.setPosition(0.45);
-                    fireTime = System.currentTimeMillis() + 1910;
-                    requestedShooterState = -1;
-                    shooterState = PRIMING;
-                } else if(requestedShooterState == FIRE){
-                    shooter1.setPosition(0.6);
-                    shooter2.setPosition(0.6);
-                    fireTime = System.currentTimeMillis() + 4200;
-                    shooterState = FIRING;
-                } else {
-                    shooter1.setPosition(0.2);
-                    shooter2.setPosition(0.2);
-                }
-            } else if(shooterState == PRIMED){
-                if(requestedShooterState == FIRE){
-                    shooter1.setPosition(0.8);
-                    shooter2.setPosition(0.8);
-                    fireTime = System.currentTimeMillis() + 2200;
-                    requestedShooterState = -1;
-                    shooterState = FIRING;
-                }
-            } else if(shooterState == FIRE){
-                shooter1.setPosition(0.12);
-                shooter2.setPosition(0.12);
-                fireTime = System.currentTimeMillis() + 4300;
-                requestedShooterState = -1;
-                shooterState = RELOADING;
-            }
+            while (shooter.getCurrentPosition() < shooterTarget) {
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }//catch
+            }//while
+
+            shooter.stop();
+
+            shooterState = FIRE;
+
+            door.goToPos("open");
+            setCollectorState(Robot.IN);
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }//catch
+
+            door.goToPos("close");
+            setCollectorState(Robot.STOP);
+
+            shooterState = LOADED;
         }
     }
 
     public void waitForState(int state){
         while (RC.l.opModeIsActive() && shooterState != state ){
             RC.l.idle();
-        }
-    }
+        }//while
+    }//waitForState
+
     public void startShooterControl(){
         TaskHandler.addLoopedTask("Shooter", new Runnable(){
             @Override
@@ -707,7 +708,7 @@ public class Fermion {
                 updateShooter();
             }
         }, 5);
-    }
+    }//startShooterControl
 
 
     public void liftCapBall () {
@@ -722,7 +723,16 @@ public class Fermion {
         this.targetDistance = mm;
     }
 
-    public void startWallFollowing(final FXTAnalogUltrasonicSensor us){
+    public void startWallFollowing(final FXTAnalogUltrasonicSensor us, int strafeAngle, double targetSpeed){
+        targetAngle = strafeAngle;
+        setTargetSpeed(targetSpeed);
+        if(TaskHandler.containsTask("Wall Follower")){
+            TaskHandler.removeTask("Wall Follower");
+        }
+
+        if(TaskHandler.containsTask("veerCheck")){
+            TaskHandler.removeTask("veerCheck");
+        }
 
         TaskHandler.addLoopedTask("Wall Follower", new Runnable() {
             @Override
@@ -730,19 +740,27 @@ public class Fermion {
                 wallFollow(us);
                 veerCheck();
             }
-        });
+        }, 10);
     }
 
-    private void wallFollow(FXTAnalogUltrasonicSensor us){
+    public void endWallFollowing(){
+        TaskHandler.removeTask("Wall Follower");
+        addVeerCheckRunnable();
+    }
+
+    private void wallFollow(FXTAnalogUltrasonicSensor us) {
         double error = targetDistance - us.getDistance();
+        if (Math.abs(error) > 200) {
+            error = Math.signum(error) * 200;
+        }
 
-        if (commandedStrafeAngle < 0)
-            strafe(commandedStrafeAngle - wallAlgorithm.update(error), getCommandedStrafeSpeed(), true);
+        if (commandedStrafeAngle <= 0)
+            strafe(commandedStrafeAngle - wallAlgorithm.update(error), targetSpeed, true);
         else
-            strafe(commandedStrafeAngle + wallAlgorithm.update(error), getCommandedStrafeSpeed(), true);
+            strafe(commandedStrafeAngle + wallAlgorithm.update(error), targetSpeed, true);
 
-        Log.i("WallFollow", commandedStrafeAngle - wallAlgorithm.update(error) + "");
-        Log.i("WallFollow", us.getDistance() + "");
+        Log.i("WallFollowA", commandedStrafeAngle - wallAlgorithm.update(error) + "");
+        Log.i("WallFollowD", "," + us.getDistance() + "");
     }
 
 }//Fermion

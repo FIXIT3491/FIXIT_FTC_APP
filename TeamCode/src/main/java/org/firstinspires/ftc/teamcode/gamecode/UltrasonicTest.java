@@ -18,12 +18,44 @@ public class UltrasonicTest extends AutoOpMode {
 
         waitForStart();
         top.resetTargetAngle();
-
-        top.setWallDistance(400);
-        top.strafe(-90, 1, true);
-        top.startWallFollowing(top.ultra);
-        sleep(3000);
-        top.stop();
-
+//        hile(opModeIsActive()){
+//            top.setWallDistance(200);
+//            top.strafe(0, 0.5, true);
+//            top.commandedStrafeAngle = 0;
+//            top.setTargetSpeed(0.5);
+//            top.startWallFollowing(top.ultraSide, 0, 0.5);
+//            while (opModeIsActive() && top.ultra.getDistance() > 400) {
+//                idle();
+//            }
+//            top.strafe(-90, 0.5, true);
+//            top.commandedStrafeAngle = -90;
+//            top.setTargetSpeed(0.5);
+//            top.setWallDistance(400);
+//            top.startWallFollowing(top.ultra, -90, 0.5);
+//
+//            while (opModeIsActive() && top.ultraSide.getDistance() < 600) {
+//                idle();
+//            }
+//
+//            top.strafe(180, 0.5, true);
+//            top.commandedStrafeAngle = 180;
+//            top.setTargetSpeed(0.5);
+//            top.setWallDistance(600);
+//            top.startWallFollowing(top.ultraSide);
+//
+//            while (opModeIsActive() && top.ultra.getDistance() < 1500) {
+//                idle();
+//            }
+//
+//            top.strafe(90, 0.5, true);
+//            top.commandedStrafeAngle = 90;
+//            top.setTargetSpeed(0.5);
+//            top.setWallDistance(1500);
+//            top.startWallFollowing(top.ultra);
+//
+//            while (opModeIsActive() && top.ultraSide.getDistance() > 300) {
+//                idle();
+//            }
+//        }w
     }
 }

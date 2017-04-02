@@ -126,6 +126,7 @@ public class FXTTelemetry {
 
     public void addData(String key, int data) {
         telemetry.addData(key, data);
+        Log.i(key, "" + data);
     }
 
     public void addData(String key, float data) {

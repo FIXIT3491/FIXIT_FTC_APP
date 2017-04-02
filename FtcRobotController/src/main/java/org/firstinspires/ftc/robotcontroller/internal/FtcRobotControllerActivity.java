@@ -710,13 +710,13 @@ public class FtcRobotControllerActivity extends Activity {
     GlobalValuesActivity.add("RedAlliance", true);
     GlobalValuesActivity.add("TeleBeginAngle", 0);
     GlobalValuesActivity.add("EncoderDistance", 500);
-    GlobalValuesActivity.add("VeerProportional", 0.7 / 90);
-    GlobalValuesActivity.add("VeerDerivative", (0.5 / 90) / 10);
-    GlobalValuesActivity.add("VeerIntegral", (0.1 / 90) / 1000);
+    GlobalValuesActivity.add("VeerProportional", 0.03);
+    GlobalValuesActivity.add("VeerDerivative", (5 / 9) * 1E-5);
+    GlobalValuesActivity.add("VeerIntegral", 3.1E-5);
 
-    GlobalValuesActivity.add("WallProportional", 0.7 / 90);
-    GlobalValuesActivity.add("WallDerivative", (0.5 / 90) / 10);
-    GlobalValuesActivity.add("WallIntegral", (0.1 / 90) / 1000);
+    GlobalValuesActivity.add("WallProportional", 0.2);
+    GlobalValuesActivity.add("WallDerivative", 0.2);
+    GlobalValuesActivity.add("WallIntegral", 0);
     GlobalValuesActivity.addDashboard("WaitTime", 10000);
     GlobalValuesActivity.addDashboard("NumBalls", 1);
     GlobalValuesActivity.addDashboard("Cap-ball", true);

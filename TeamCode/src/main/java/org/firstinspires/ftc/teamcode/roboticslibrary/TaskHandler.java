@@ -62,6 +62,20 @@ public final class TaskHandler {
         addTask(name, delayed);
     }
 
+    public static boolean containsTask(String key){
+        return futures.containsKey(key);
+    }
+
+    public static boolean containsTaskStartingWith(String prefix){
+        for (Map.Entry<String, Future> entry : futures.entrySet()) {
+            if (entry.getKey().startsWith(prefix)) {
+                return true;
+            }//if
+        }//for
+
+        return false;
+    }//containsTaskStartingWith
+
     public static boolean removeTask(String name) {
         if (futures.containsKey(name)) {
             futures.get(name).cancel(true);
@@ -87,10 +101,6 @@ public final class TaskHandler {
             future.getValue().cancel(true);
         }//for
     }//removeAllTasks
-
-    public static boolean taskExists(String name) {
-        return futures.containsKey(name);
-    }//taskExists
 
 
     private static Runnable loop (final Runnable r, final int delay) {

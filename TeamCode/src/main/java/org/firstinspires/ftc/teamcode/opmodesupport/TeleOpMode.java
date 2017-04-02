@@ -34,12 +34,15 @@ public abstract class TeleOpMode extends OpMode {
      * List of long numbers. Used for timers
      */
     private List<Long> startNanoTimes = new ArrayList<Long>();
+    private List<Boolean> prevJoystickValues = new ArrayList<>();
 
     protected int cycles = 0;
 
     protected String TAG = "FIX IT";
 
     protected String dataLogFileName = null;
+
+    protected final static int DEFAULT_TAP_TIMEOUT = 500;
 
     /**
      * Method that runs once at the beginning of the opmode
@@ -134,6 +137,29 @@ public abstract class TeleOpMode extends OpMode {
     /**
      * TIMER METHODS
      */
+
+    public boolean tap(int idx, boolean val, int timeout) {
+
+        if (getMilliSeconds(idx) > timeout) { //value used to be false
+
+            if (val) {
+                clearTimer(idx);
+            }//if
+
+            return val;
+        } else {
+            return false;
+        }//else
+    }//tap
+
+    public boolean tap(int idx, boolean val) {
+        return tap(idx, val, DEFAULT_TAP_TIMEOUT);
+    }//tap
+
+    public boolean tap(boolean val) {
+        return tap(0, val);
+    }//tap
+
 
     /**
      * Adds another timer

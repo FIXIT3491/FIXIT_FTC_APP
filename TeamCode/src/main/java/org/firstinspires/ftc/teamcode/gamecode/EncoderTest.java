@@ -20,48 +20,22 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 @Autonomous
 public class EncoderTest extends AutoOpMode {
 
-    Motor rFore;
-    Motor lFore;
-    Motor rBack;
-    Motor lBack;
-    Fermion top;
+
 
     @Override
     public void runOp() throws InterruptedException {
 
-        Motor forward = new Motor("rightBack");
-        Motor lateral = new Motor("rightFore");
-        top = new Fermion(true);
+        Motor forward = new Motor("yTrack");
+        Motor lateral = new Motor("xTrack");
 
-        top.targetAngle = 0;
         waitForStart();
 
-        top.addVeerCheckRunnable();
-
-        double mm = RC.globalDouble("EncoderDistance");
-
-        mm *= (1440 / (4 * Math.PI * 25.4));
-
-        Log.i("MM", mm + "");
-
-        int beginX = lateral.getCurrentPosition();
-        int beginY = forward.getCurrentPosition();
-        int currentX = beginX;
-        int currentY = beginY;
-
-        double remaining = mm;
-//
-//        top.strafe(90, 0.5);
-//        while (opModeIsActive() && remaining > 0) {
-//            currentX = lateral.getCurrentPosition();
-//            currentY = forward.getCurrentPosition();
-//            remaining = mm - Math.hypot((currentX - beginX), (currentY - beginY));
-//
-//            top.strafe(90, (0.45 * (remaining) + 0.05));
-//            Log.i("INFO", "Begin: " + beginX + ", MM: " + mm + ", CURRENT: " + remaining);
-//        }//while
-
-        top.track(28, 1000, 0.5);
+        while(opModeIsActive()){
+            RC.t.addData("X", lateral.getCurrentPosition());
+            RC.t.addData("Y", forward.getCurrentPosition());
+            telemetry.update();
+            sleep(10);
+        }
 
     }
 

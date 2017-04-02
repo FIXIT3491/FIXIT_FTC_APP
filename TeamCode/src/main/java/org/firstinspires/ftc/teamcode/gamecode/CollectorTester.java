@@ -22,14 +22,8 @@ public class CollectorTester extends TeleOpMode {
 
     @Override
     public void loopOpMode() {
-        if(joy1.rightBumper() && getMilliSeconds() > 300){
-            speed += 0.01;
-            clearTimer();
-        } else if(joy1.rightTrigger() && getMilliSeconds() > 300){
-            speed -= 0.01;
-            clearTimer();
-        }
-        electron.collector.setPower(speed);
+
+        electron.collector.setPower(1);
         RC.t.addData("Speed", speed);
     }
 }

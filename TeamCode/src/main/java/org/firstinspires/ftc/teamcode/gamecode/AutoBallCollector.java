@@ -37,7 +37,7 @@ public class AutoBallCollector extends AutoOpMode {
         sleep(1000);
 
         Bitmap frame = cam.photo();
-        CircleDetector.findBestCircle(frame);
+        CircleDetector.findBestCircle(frame, 0, 0);
 
         cam.destroy();
     }

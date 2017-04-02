@@ -15,10 +15,19 @@ public class Motor implements FXTDevice {
 
     public int beginningPosition = 0;
     private long targetTime = -1;
+    private int numTiksPerRev = 1120;
 
     public double minSpeed = 0.09;
     public int accuracy = 20;
     public double plannedSpeed = 0;
+
+    public enum Type {
+        AM20,
+        AM40,
+        AM60,
+        Tetrix,
+    }
+
 
     /**
      * Constructors
@@ -74,6 +83,37 @@ public class Motor implements FXTDevice {
         }//else
     }//toggleChecking
 
+    public void setMotorType(Type motor){
+        switch (motor){
+            case AM20: numTiksPerRev = 560;
+                break;
+            case AM40: numTiksPerRev = 1120;
+                break;
+            case AM60: numTiksPerRev = 1680;
+                break;
+            case Tetrix: numTiksPerRev = 1440;
+                break;
+        }
+    }
+
+    public int getNumTiksPerRev() {
+        return numTiksPerRev;
+    }
+
+    public void setAbsoluteTarget(int target){
+
+        setTarget(getCurrentPosition() + target - getAbsolutePosition());
+
+    }
+
+    public int getAbsolutePosition(){
+        return (getCurrentPosition() - beginningPosition) % numTiksPerRev;
+    }
+
+    public void resetEncoders(){
+        beginningPosition = getCurrentPosition();
+    }
+
     public void setTimer(int millis, double speed) {
         setPower(speed);
         targetTime = System.currentTimeMillis() + millis;
@@ -102,22 +142,25 @@ public class Motor implements FXTDevice {
     }//getM
 
     public void setTarget(int tik) {
-        toggleChecking(true);
-
         synchronized (m) {
             m.setTargetPosition(tik + m.getCurrentPosition());
         }//synchronized
     }//setTarget
 
-    public void setAbsoluteTarget(int tik) {
+    public void setRelativeTarget(int tik) {
         setTarget(tik - getCurrentPosition());
     }//setAbsTarget
+
 
     public int getCurrentPosition() {
         synchronized (m) {
             return m.getCurrentPosition();
         }//synchronized
     }//getCurrentPosition
+
+    public int getTarget(){
+        return m.getTargetPosition();
+    }
 
     public double getPower() {
         synchronized (m) {

@@ -84,6 +84,10 @@ public class VortexUtils {
         return config;
     }
 
+    /*
+    NOTE: this method requires an image from an upside down camera
+     */
+
     public static int getBeaconConfig(Bitmap bm) {
 
 
@@ -120,9 +124,9 @@ public class VortexUtils {
             //if centroid is in the bottom half of the image, the blue beacon is on the left
             //if the centroid is in the top half, the blue beacon is on the right
             if ((mmnts.get_m01() / mmnts.get_m00()) < image.rows() / 2) {
-                return VortexUtils.BEACON_RED_BLUE;
-            } else {
                 return VortexUtils.BEACON_BLUE_RED;
+            } else {
+                return VortexUtils.BEACON_RED_BLUE;
             }//else
         }//if
 
@@ -185,14 +189,6 @@ public class VortexUtils {
             //calculating centroid of the resulting binary mask via image moments
             Log.i("CentroidX", "" + ((mmnts.get_m10() / mmnts.get_m00())));
             Log.i("CentroidY", "" + ((mmnts.get_m01() / mmnts.get_m00())));
-
-            //checking if blue either takes up the majority of the image (which means the beacon is all blue)
-            //or if there's barely any blue in the image (which means the beacon is all red or off)
-//            if (mmnts.get_m00() / mask.total() > 0.8) {
-//                return VortexUtils.BEACON_ALL_BLUE;
-//            } else if (mmnts.get_m00() / mask.total() < 0.1) {
-//                return VortexUtils.BEACON_NO_BLUE;
-//            }//elseif
 
             //Note: for some reason, we end up with a image that is rotated 90 degrees
             //if centroid is in the bottom half of the image, the blue beacon is on the left
