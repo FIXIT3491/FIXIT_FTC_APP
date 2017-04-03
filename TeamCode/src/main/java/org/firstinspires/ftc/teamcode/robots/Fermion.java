@@ -33,7 +33,7 @@ public class Fermion {
     private String TAG = "FERMION";
 
     private String VEER_CHECK_TASK_KEY = "Fermion.VEERCHECK";
-    private String WALL_FOLLOW_TASK_KEY = "Fermion.WALLFOLLOW";
+    public String WALL_FOLLOW_TASK_KEY = "Fermion.WALLFOLLOW";
     private String SHOOTER_TASK_KEY = "Fermion.SHOOTERCONTROL";
 
     /*
@@ -84,9 +84,11 @@ public class Fermion {
     ROBOT DRIVING VARIABLES
      */
     private double targetAngle = 0;
+    private double targetStrafeAngle = 0;
     private double commandedStrafeSpeedRightForeLeftBack = 0;
     private double commandedStrafeSpeedRightBackLeftFore = 0;
     private double commandedStrafeAngle = 0;
+    private double targetSpeed = 0;
 
     /*
     DRIVING CONSTANTS
@@ -631,9 +633,11 @@ public class Fermion {
      */
     public void startWallFollowing(int ultrasonicIdx, int strafeAngle, final double targetSpeed, final int targetDistance){
 
-        targetAngle = strafeAngle;
+        targetStrafeAngle = strafeAngle;
+        this.targetSpeed = targetSpeed;
+        strafe(strafeAngle, targetSpeed, true);
 
-        TaskHandler.removeTask(WALL_FOLLOW_TASK_KEY);
+        //TaskHandler.removeTask(WALL_FOLLOW_TASK_KEY);
 
         TaskHandler.pauseTask(VEER_CHECK_TASK_KEY);
 
@@ -642,7 +646,7 @@ public class Fermion {
         TaskHandler.addLoopedTask(WALL_FOLLOW_TASK_KEY, new Runnable() {
             @Override
             public void run() {
-                wallFollow(us, targetDistance, targetSpeed);
+                wallFollow(us, targetDistance);
                 veerCheck(false);
             }
         }, 10);
@@ -653,19 +657,23 @@ public class Fermion {
         TaskHandler.resumeTask(VEER_CHECK_TASK_KEY);
     }//endWallFollowing
 
-    private void wallFollow(FXTAnalogUltrasonicSensor us, int targetDistance, double targetSpeed) {
+    public void setTargetSpeed(double speed){
+        targetSpeed = speed;
+    }
+
+    private void wallFollow(FXTAnalogUltrasonicSensor us, int targetDistance) {
         double error = targetDistance - us.getDistance();
         if (Math.abs(error) > 200) {
             error = Math.signum(error) * 200;
         }//if
 
-        if (commandedStrafeAngle <= 0) {
-            strafe(commandedStrafeAngle - wallAlgorithm.update(error), targetSpeed, true);
+        if (targetStrafeAngle <= 0) {
+            strafe(targetStrafeAngle - wallAlgorithm.update(error), targetSpeed, true);
         } else {
-            strafe(commandedStrafeAngle + wallAlgorithm.update(error), targetSpeed, true);
+            strafe(targetStrafeAngle + wallAlgorithm.update(error), targetSpeed, true);
         }//else
 
-        Log.i("WallFollowA", commandedStrafeAngle - wallAlgorithm.update(error) + "");
+        Log.i("WallFollowA", targetStrafeAngle - wallAlgorithm.update(error) + "");
         Log.i("WallFollowD", "," + us.getDistance() + "");
     }//wallFollow
 
@@ -696,10 +704,12 @@ public class Fermion {
     }//getShooterState
 
     private void updateShooter() {
+        Log.i(TAG, "updateShooter: ");
         if (shooterState == FIRE) {
             shooterState = FIRING;
             shooter.addToTarget(shooter.getNumTiksPerRev() / 2);
             shooter.setPower(1);
+            Log.i(TAG, "updateShooter: ");
 
             while (shooter.getBaseCurrentPosition() < shooter.getTarget()) {
                 try {

@@ -59,7 +59,6 @@ public final class TaskHandler {
     }//addLoopedTask
 
     public static boolean addLoopedTask(String name, Runnable task, int delay) {
-
         if (!containsTask(name)) {
             pauseLocks.put(name, false);
         }//if
@@ -142,7 +141,10 @@ public final class TaskHandler {
     public static boolean removeTask(String name) {
         if (futures.containsKey(name)) {
             futures.get(name).cancel(true);
+            futures.remove(name);
         }//if
+
+        pauseLocks.remove(name);
 
         return futures.containsKey(name);
     }//removeTask
@@ -158,9 +160,13 @@ public final class TaskHandler {
     }//removeAllTasksWith
 
     public static void removeAllTasks() {
+        Log.i(TAG, "removeAllTasks: ");
         for (Map.Entry<String, Future> future : futures.entrySet()) {
             future.getValue().cancel(true);
         }//for
+
+        futures.clear();
+        pauseLocks.clear();
     }//removeAllTasks
 
     /*
