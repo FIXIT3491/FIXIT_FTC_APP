@@ -29,17 +29,10 @@ public class AdafruitCheck extends AutoOpMode{
     @Override
     public void runOp() throws InterruptedException {
         Fermion f = new Fermion(true);
-        Log.i("VeerProportional", RC.globalDouble("VeerProportional") + "");
-        Log.i("VeerIntegral", RC.globalDouble("VeerIntegral") + "");
-        Log.i("VeerDerivative", RC.globalDouble("VeerDerivative") + "");
 
-        f.resetTargetAngle();
-        f.addVeerCheckRunnable();
-        f.strafe(90, 1, true);
-        sleep((long)RC.globalDouble("WaitTime"));
-        f.stop();
+        waitForStart();
 
-        Log.i("FINAL ANGLE", f.getIMUAngle()[0] + "");
+        f.imuTurnL(90, 0.5);
 
         sleep(500);
     }

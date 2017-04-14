@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.newhardware;
 
 import org.firstinspires.ftc.teamcode.RC;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorImpl;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 /**
@@ -17,13 +18,13 @@ public class Motor implements FXTDevice, Timeable {
     private double plannedSpeed = 0;
 
     private int numTiksPerRev = 1120;
-    private Type motorType = Type.AM40;
+    private MotorType motorType = MotorType.AM40;
 
     private int beginningPosition = 0;
     private double minSpeed = 0.09;
     private int positioningAccuracy = 20;
 
-    public enum Type {
+    public enum MotorType {
         AM20,
         AM40,
         AM60,
@@ -59,7 +60,7 @@ public class Motor implements FXTDevice, Timeable {
         return numTiksPerRev;
     }//getNumTiksPerRev
 
-    public void setMotorType(Type motor){
+    public void setMotorType(MotorType motor){
         switch (motor){
             case AM20: numTiksPerRev = 560;
                 break;
@@ -74,7 +75,7 @@ public class Motor implements FXTDevice, Timeable {
         this.motorType = motor;
     }//setMotorType
 
-    public Type getMotorType() {
+    public MotorType getMotorType() {
         return motorType;
     }//getMotorType
 

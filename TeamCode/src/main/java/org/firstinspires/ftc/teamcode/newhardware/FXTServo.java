@@ -12,9 +12,8 @@ import java.util.HashMap;
 public class FXTServo implements FXTDevice {
 
     private Servo s;
-    public double currentPos = 0.0;
 
-    protected HashMap<String, Double> pos = new HashMap<String, Double>();
+    protected HashMap<String, Double> savedPositions = new HashMap<String, Double>();
 
     public FXTServo(Servo s) {
         this.s = s;
@@ -24,27 +23,19 @@ public class FXTServo implements FXTDevice {
     }
 
     public void addPos (String name, double position) {
-        pos.put(name, position);
+        savedPositions.put(name, position);
     }
 
     public void removePos(String name) {
-        pos.remove(name);
+        savedPositions.remove(name);
     }
 
     public void goToPos(String name) {
-        setPosition(pos.get(name));
+        setPosition(savedPositions.get(name));
     }
-
-    public void goTo(double position) {
-        setPosition(position);
-    }//goTo
 
     private double translate (int angle) {
         return angle / 180.0;
-    }
-
-    public void go(){
-        setPosition(currentPos);
     }
 
     public double getPosition() {
@@ -58,7 +49,6 @@ public class FXTServo implements FXTDevice {
         if(pos > 1) pos = 1;
         if(pos < 0) pos = 0;
 
-        currentPos = pos;
         synchronized (s) {
             s.setPosition(pos);
         }//synchronized
@@ -66,11 +56,11 @@ public class FXTServo implements FXTDevice {
     }//setPosition
 
     public void add(double increment) {
-        setPosition(currentPos + increment);
+        setPosition(getPosition() + increment);
     }
 
     public void subtract(double decrement) {
-        setPosition(currentPos - decrement);
+        setPosition(getPosition() - decrement);
     }
 
 }//FXTServo

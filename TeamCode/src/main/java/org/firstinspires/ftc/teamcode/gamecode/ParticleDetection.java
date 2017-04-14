@@ -38,17 +38,9 @@ public class ParticleDetection extends TeleOpMode {
     public void loopOpMode() {
 
         Bitmap bit = cam.photo();
-        double[] circle = CircleDetector.findBestCircle(bit, 0, 0);
+        double[] circle = CircleDetector.findBestCircle2(bit);
 
-        Log.i("XCircle", Arrays.toString(circle));
-
-
-
-        double vFOV = Math.toRadians(cam.getBaseCamera().getParameters().getHorizontalViewAngle());
-
-        double f = (bit.getHeight() / 2.0) / Math.tan(vFOV);
-
-        Log.i("X", "" + Math.toDegrees(Math.atan((circle[1] - bit.getHeight() / 2) / f)));
+        Log.i("Circle", Arrays.toString(circle));
     }
 
     public void stop() {

@@ -6,6 +6,7 @@ import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.util.Log;
+import android.view.SurfaceView;
 import android.view.TextureView;
 import android.widget.Toast;
 
@@ -17,6 +18,7 @@ import org.firstinspires.ftc.teamcode.RC;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * Created by FIXIT on 15-09-20.
@@ -26,7 +28,9 @@ public class FXTCamera implements TextureView.SurfaceTextureListener {
 
     Camera cam;
     private Bitmap lastTakenBit = Bitmap.createBitmap(640, 480, Bitmap.Config.ARGB_8888);
+
     private TextureView previewTexture;
+    private SurfaceTexture dummyPreview;
 
     private boolean destroyed = false;
     private boolean displayStream = false;
@@ -80,14 +84,20 @@ public class FXTCamera implements TextureView.SurfaceTextureListener {
 //        cam.setParameters(params);
 
         this.displayStream = displayStream;
-
         this.previewTexture = new TextureView(RC.c());
+
+        this.previewTexture.setSurfaceTextureListener(this);
+        Log.i("Texture Params", this.previewTexture.isAvailable() + ", " + this.previewTexture.isOpaque());
         if (displayStream) {
             this.previewTexture.setRotation(90f);
             FtcControllerUtils.addView(previewTexture, R.id.cameraMonitorViewId);
-        }//if
+        } else {
+            previewTexture.setSurfaceTexture(new SurfaceTexture(10));
+        }//else
 
-        this.previewTexture.setSurfaceTextureListener(this);
+
+        Log.i("Texture Params", this.previewTexture.isAvailable() + ", " + this.previewTexture.isOpaque());
+
 
     }//FXTCamera
 
@@ -177,7 +187,10 @@ public class FXTCamera implements TextureView.SurfaceTextureListener {
 
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+
+        Log.i("hello!", "Texture");
         try {
+            previewTexture.getSurfaceTexture().setDefaultBufferSize(640, 480);
             cam.setPreviewTexture(previewTexture.getSurfaceTexture());
         } catch (Exception e) {
             e.printStackTrace();
@@ -202,6 +215,8 @@ public class FXTCamera implements TextureView.SurfaceTextureListener {
 
     @Override
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+
+        Log.i("Texture", "Updated");
 
         synchronized (lastTakenBit) {
             lastTakenBit = previewTexture.getBitmap();

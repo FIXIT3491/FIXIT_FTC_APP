@@ -28,7 +28,7 @@ public class VeerFermionOp extends TeleOpMode implements TextToSpeech.OnInitList
     @Override
     public void initialize() {
         tts = new TextToSpeech(RC.c(), this);
-        tau = new Fermion(false);
+        tau = new Fermion(true); //REVERT TO FALSE
         cam = new FXTCamera(FXTCamera.FACING_BACKWARD, true);
 
         tau.startShooterControl();
@@ -48,6 +48,7 @@ public class VeerFermionOp extends TeleOpMode implements TextToSpeech.OnInitList
     }
     public void start(){
         tau.capRelease.goToPos("start");
+        tau.mouse.addAbsoluteCoordinateRunnable(tau.imu);
     }
 
     @Override
@@ -149,6 +150,10 @@ public class VeerFermionOp extends TeleOpMode implements TextToSpeech.OnInitList
         if (tap(timerIdx++, tau.seesBall(), 1000)) {
             tau.lights.flashState(500);
         }//if
+
+
+        Log.i("EncTiks", tau.mouse.getEncTiks() + "");
+//        Log.i("EncTiksMM", tau.mouse.getEncTiks().multiply(25.4 * 3 * Math.PI / 1440) + "");
 
     }//loopOpMode
 

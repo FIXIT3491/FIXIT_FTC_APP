@@ -14,9 +14,9 @@ import org.firstinspires.ftc.teamcode.resqopmodes.ServoDebug;
  */
 public class FXTCRServo extends CRServoImpl implements FXTDevice, Timeable {
 
-    long targetTime = -1;
+    private long targetTime = -1;
 
-    public FXTCRServo(CRServo cs) {
+    private FXTCRServo(CRServo cs) {
         super(cs.getController(), cs.getPortNumber());
     }
 

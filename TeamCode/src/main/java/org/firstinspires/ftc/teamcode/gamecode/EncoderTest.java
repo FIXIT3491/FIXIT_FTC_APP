@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.gamecode;
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.newhardware.Motor;
 import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
+import org.firstinspires.ftc.teamcode.robots.Fermion;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
@@ -17,17 +18,10 @@ public class EncoderTest extends AutoOpMode {
     @Override
     public void runOp() throws InterruptedException {
 
-        Motor forward = new Motor("yTrack");
-        Motor lateral = new Motor("xTrack");
+        Fermion f = new Fermion(true);
 
         waitForStart();
-
-        while(opModeIsActive()){
-            RC.t.addData("X", lateral.getBaseCurrentPosition());
-            RC.t.addData("Y", forward.getBaseCurrentPosition());
-            telemetry.update();
-            sleep(10);
-        }
+        f.track(90, 24 * 25.4, 0.6);
 
     }
 

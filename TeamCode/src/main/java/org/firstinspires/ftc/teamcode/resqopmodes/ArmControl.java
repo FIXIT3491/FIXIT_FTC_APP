@@ -55,7 +55,7 @@ public class ArmControl extends TeleOpMode {
 
         RC.t.addData("basejoint", "" + lily.elbow.getBaseCurrentPosition());
         RC.t.addData("turntable", "" + lily.turnTable.getBaseCurrentPosition());
-        RC.t.addData("wrist", "" + lily.wrist.currentPos);
+        RC.t.addData("wrist", "" + lily.wrist.getPosition());
 
     }
 }

@@ -90,7 +90,7 @@ public class Lily extends Robot {
         }//if
 
         tapeAdjust = new LinearServo("tapeAdjust");
-        tapeAdjust.max = 0.5;
+        tapeAdjust.setRange(0, 0.5);
 
         motorL.setReverse(true);
         motorR.setReverse(false);

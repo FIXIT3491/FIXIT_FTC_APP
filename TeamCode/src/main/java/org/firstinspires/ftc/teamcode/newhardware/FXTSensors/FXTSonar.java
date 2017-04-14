@@ -41,7 +41,7 @@ public class FXTSonar {
             public void run() {
                 currentSonarState[(int) ((progress - beginPosition) * 360)] = ultra.getDistance();
 
-                pan.goTo(progress);
+                pan.setPosition(progress);
 
                 progress += panDirection * (endPosition - beginPosition) / 100;
 

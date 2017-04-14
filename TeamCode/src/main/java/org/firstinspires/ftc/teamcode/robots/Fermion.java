@@ -39,8 +39,8 @@ public class Fermion {
     /*
     SENSORS
      */
-    private AdafruitBNO055IMU imu;
-    private TrackBall mouse;
+    public AdafruitBNO055IMU imu;
+    public TrackBall mouse;
 
     private FXTAnalogUltrasonicSensor ultra;
     private FXTAnalogUltrasonicSensor ultraSide;
@@ -150,21 +150,21 @@ public class Fermion {
         collector = new Motor("collector");
         collector.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         collector.setReverse(false);
-        collector.setMotorType(Motor.Type.AM20);
+        collector.setMotorType(Motor.MotorType.AM20);
 
         /*
         LIFTER
          */
         lifter = new Motor("lifter");
         lifter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        lifter.setMotorType(Motor.Type.AM20);
+        lifter.setMotorType(Motor.MotorType.AM20);
 
         /*
         SHOOTER
          */
         shooter = new Motor("shooter");
         shooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        shooter.setMotorType(Motor.Type.AM60);
+        shooter.setMotorType(Motor.MotorType.AM60);
         shooter.resetEncoder();
         shooter.stop();
 
@@ -348,31 +348,41 @@ public class Fermion {
         commandedStrafeSpeedRightBackLeftFore = leftForeRightBack;
         commandedStrafeSpeedRightForeLeftBack = rightForeLeftBack;
         commandedStrafeAngle = degrees - 45;
+
+        Log.i("Left Fore", leftFore.returnCurrentState());
+        Log.i("Left Back", leftBack.returnCurrentState());
+        Log.i("Right Fore", rightFore.returnCurrentState());
+        Log.i("Right Back", rightBack.returnCurrentState());
     }//strafe
 
     /*
     TRACKING METHODS
      */
+
+    //RELATIVE TRACKING
     public void track(double degrees, double mm, double speed) {
         TaskHandler.pauseTask(VEER_CHECK_TASK_KEY);
 
-        strafe(degrees, speed, true);
-        mm *= 1440 / (4 * Math.PI * 25.4);
+        mm *= (1440 / (25.4 * 3 * Math.PI));
 
-        double distanceRemaining;
-        TrackBall.Point begin = mouse.getEncTiks();
-        TrackBall.Point end = new TrackBall.Point(begin.x + mm * Math.sin(Math.toRadians(degrees)), begin.y + mm * Math.cos(Math.toRadians(degrees)));
+        TrackBall.Point dest = mouse.getEncTiks().add(new TrackBall.Point(mm * Math.sin(Math.toRadians(degrees)), mm * Math.cos(Math.toRadians(degrees))));
+
+        Log.i("Start, Dest", mouse.getEncTiks() + ", " + dest + "");
 
         while (RC.l.opModeIsActive()) {
-            TrackBall.Point current = mouse.getEncTiks();
-            distanceRemaining = Math.hypot(end.x - current.x, end.y - current.y);
+            Log.i("EncTiks", mouse.getEncTiks() + "");
 
-            strafe(Math.toDegrees(Math.atan2(end.x - current.x, end.y - current.y)), (((speed - MINIMUM_TRACKING_SPEED) * Math.pow(distanceRemaining / mm, 2)) + MINIMUM_TRACKING_SPEED), true);
-            veerCheck(false);
+            double distanceRemaining = dest.subtract(mouse.getEncTiks()).hypot();
 
-            if (Math.abs(distanceRemaining) < TRACKING_ACCURACY_TIKS) {
+            if (distanceRemaining <= TRACKING_ACCURACY_TIKS) {
                 break;
             }//if
+
+            double nextSpeed = ((speed - 0.1) * (distanceRemaining / mm)) + 0.1;
+            double nextDegrees = dest.subtract(mouse.getEncTiks()).acot();
+
+            strafe(nextDegrees, nextSpeed, true);
+            veerCheck(false);
         }//while
 
         stop();
@@ -396,9 +406,12 @@ public class Fermion {
             double currentAngle = MathUtils.cvtAngleToNewDomain(getIMUAngle()[0]);
             double angleToTurn = MathUtils.cvtAngleJumpToNewDomain(currentAngle - targetAngle);
 
-            turnL(angleToTurn / 180 * (speed - MINIMUM_TURNING_SPEED) + MINIMUM_TURNING_SPEED);
+            Log.i("CurrentAngleXA", currentAngle + "");
+            Log.i("AngleToTurn", angleToTurn + "");
 
-            if (angleToTurn < TURNING_ACCURACY_DEG) {
+            turnL(Math.abs(angleToTurn) / 180 * (speed - MINIMUM_TURNING_SPEED) + MINIMUM_TURNING_SPEED);
+
+            if (Math.abs(angleToTurn) < TURNING_ACCURACY_DEG) {
                 break;
             }//if
         }//while
@@ -430,6 +443,7 @@ public class Fermion {
                 break;
             }//if
         }//while
+
 
         stop();
         TaskHandler.resumeTask(VEER_CHECK_TASK_KEY);
@@ -528,6 +542,10 @@ public class Fermion {
     public void setTargetAngle(double targetAngle){
         this.targetAngle = targetAngle;
     }//setTargetAngle
+
+    public double getTargetAngle() {
+        return targetAngle;
+    }//getTargetAngle
 
     public void addVeerCheckRunnable() {
         addVeerCheckRunnable(false);

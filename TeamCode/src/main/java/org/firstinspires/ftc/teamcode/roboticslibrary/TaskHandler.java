@@ -15,6 +15,7 @@ import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by FIXIT on 16-10-02.
@@ -26,7 +27,6 @@ public final class TaskHandler {
     private static ExecutorService exec;
 
     private static HashMap<String, Future> futures = new HashMap<>();
-    private static HashMap<String, Boolean> pauseLocks = new HashMap<>();
 
     public static void init() {
         exec = Executors.newCachedThreadPool();
@@ -51,26 +51,18 @@ public final class TaskHandler {
 
     public static boolean addLoopedTask(String name, Runnable task) {
 
-        if (!containsTask(name)) {
-            pauseLocks.put(name, false);
-        }//if
+        return addLoopedTask(name, task, 0);
 
-        return addTask(name, loop(name, task, 0));
     }//addLoopedTask
 
     public static boolean addLoopedTask(String name, Runnable task, int delay) {
-        if (!containsTask(name)) {
-            pauseLocks.put(name, false);
-        }//if
+
 
         return addTask(name, loop(name, task, delay));
     }//addLoopedTask
 
     public static boolean addCountedTask(String name, Runnable task, int count){
 
-        if (!containsTask(name)) {
-            pauseLocks.put(name, false);
-        }//if
 
         return addTask(name, count(name, task, count));
     }//addCountedTask
@@ -98,7 +90,6 @@ public final class TaskHandler {
      */
     public static boolean pauseTask(String name) {
         if (containsTask(name)) {
-            pauseLocks.put(name, true);
 
             return true;
         }//if
@@ -108,8 +99,6 @@ public final class TaskHandler {
 
     public static boolean resumeTask(String name) {
         if (containsTask(name)) {
-            pauseLocks.put(name, false);
-
             return true;
         }//if
 
@@ -144,8 +133,6 @@ public final class TaskHandler {
             futures.remove(name);
         }//if
 
-        pauseLocks.remove(name);
-
         return futures.containsKey(name);
     }//removeTask
 
@@ -166,37 +153,29 @@ public final class TaskHandler {
         }//for
 
         futures.clear();
-        pauseLocks.clear();
     }//removeAllTasks
 
     /*
     RUNNABLE MODIFIERS
      */
 
-    private static Runnable loop (final String pauseLockName, final Runnable r, final int delay) {
+    private static Runnable loop (final String name, final Runnable r, final int delay) {
 
         return new Runnable() {
             @Override
             public void run() {
                 while (true) {
 
-                    while (pauseLocks.get(pauseLockName)) {
-                        try {
-                            Thread.sleep(1);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }//catch
-                    }//while
-
                     r.run();
 
-                    if (delay > 0) {
-                        try {
+                    try {
+                        if (delay > 0) {
                             Thread.sleep(delay);
-                        } catch (InterruptedException e) {
-                            break;
-                        }//catch
-                    }//if
+                        }//if
+
+                    } catch (InterruptedException e) {
+                        break;
+                    }//catch
 
                     if (Thread.currentThread().isInterrupted()) {
                         break;
@@ -213,13 +192,12 @@ public final class TaskHandler {
             public void run() {
                 for(int i = 0; i < count; i++){
 
-                    while (pauseLocks.get(pauseLockName)) {
-                        try {
-                            Thread.sleep(1);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }//catch
-                    }//while
+//                    synchronized (pauseLocks) {
+//                        if (pauseLocks.get(pauseLockName)) {
+//                            i--;
+//                            continue;
+//                        }//if
+//                    }//synchronized
 
                     r.run();
                 }//for

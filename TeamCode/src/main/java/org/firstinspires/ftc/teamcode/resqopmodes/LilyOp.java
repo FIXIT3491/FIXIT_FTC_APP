@@ -111,11 +111,11 @@ public class LilyOp extends TeleOpMode {
 //            clearTimer();
 //        }//if
 
-        if (joy1.buttonY() && lily.frontguard.currentPos < 0.5 && getMilliSeconds(2) > 300) {
+        if (joy1.buttonY() && lily.frontguard.getPosition() < 0.5 && getMilliSeconds(2) > 300) {
             lily.frontguard.goToPos("up");
             lily.backguard.goToPos("up");
             clearTimer(2);
-        } else if (joy1.buttonY() && lily.frontguard.currentPos > 0.5 && getMilliSeconds(2) > 300) {
+        } else if (joy1.buttonY() && lily.frontguard.getPosition() > 0.5 && getMilliSeconds(2) > 300) {
             lily.frontguard.goToPos("down");
             lily.backguard.goToPos("down");
             clearTimer(2);
@@ -275,7 +275,7 @@ public class LilyOp extends TeleOpMode {
 //        Log.i("Elbow", lily.elbow.getBaseCurrentPosition() + "----" + lily.elbow.getM().getTargetPosition() + "");
 //        Log.i("TurnTable", lily.turnTable.getBaseCurrentPosition() + "----" + lily.turnTable.getM().getTargetPosition() + "");
 
-        lily.checkAllSystems(); //checkTimer all motor positions
+        lily.checkAllSystems(); //checkTimer all motor savedPositions
         if (getMilliSeconds(4) > 119000) {
             lily.brush.stop();
         }

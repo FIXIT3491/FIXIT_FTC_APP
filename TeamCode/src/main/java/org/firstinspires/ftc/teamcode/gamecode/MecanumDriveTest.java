@@ -1,45 +1,60 @@
 package org.firstinspires.ftc.teamcode.gamecode;
 
+import android.util.Log;
+
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.RC;
+import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.TrackBall;
+import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
 import org.firstinspires.ftc.teamcode.opmodesupport.TeleOpMode;
+import org.firstinspires.ftc.teamcode.roboticslibrary.TaskHandler;
 import org.firstinspires.ftc.teamcode.robots.Fermion;
 
 /**
- * Created by FIXIT on 16-10-14.
+ * Created by FIYIT on 16-10-14.
  */
-@TeleOp
-public class MecanumDriveTest extends TeleOpMode {
+@Autonomous
+public class MecanumDriveTest extends AutoOpMode {
 
     Fermion rbt;
 
-    @Override
-    public void initialize() {
-        rbt = new Fermion(false);
-    }
+
 
     @Override
-    public void loopOpMode() {
+    public void runOp() throws InterruptedException {
+        rbt = new Fermion(true);
 
-//        double degrees = 90 - Math.toDegrees(Math.asin(-joy1.y1()));
-//
-//        degrees *= Math.signum(joy1.x1());
-//
-//        rbt.strafe(degrees, Math.hypot(joy1.y1(), joy1.x1()));
+        waitForStart();
+        rbt.resetTargetAngle();
 
-        rbt.rightFore.setPower((joy1.x2() + joy1.y1() + joy1.x1()) / 3.0);
-        rbt.rightBack.setPower((joy1.x2() + joy1.y1() - joy1.x1()) / 3.0);
-        rbt.leftFore.setPower((-joy1.x2() + joy1.y1() - joy1.x1()) / 3.0);
-        rbt.leftBack.setPower((-joy1.x2() + joy1.y1() + joy1.x1())/ 3.0);
+        double tiks = (300 / (1.4 * 25.4 * 3 * Math.PI)) * 1440;
+        double speed = 0.7;
+        double minSpeed = 0.1;
+        double degrees = 0;
 
-//        RC.t.addData("h", degrees);
-        RC.t.addData("leftFore", rbt.leftFore.returnCurrentState());
-        RC.t.addData("leftBack", rbt.leftBack.returnCurrentState());
-        RC.t.addData("rightFore", rbt.rightFore.returnCurrentState());
-        RC.t.addData("rightBack", rbt.rightBack.returnCurrentState());
+        rbt.strafe(degrees, speed, true);
+
+        TrackBall.Point begin = rbt.mouse.getEncTiks();
+        TrackBall.Point end = begin.add(new TrackBall.Point(Math.sin(degrees) * tiks, Math.cos(degrees) * tiks));
+
+        Log.i("Points", end + ", " + begin);
+
+        while (opModeIsActive()) {
+            TrackBall.Point remaining = end.subtract(rbt.mouse.getEncTiks());
+
+            Log.i("Point", remaining + "");
+            if (remaining.hypot() < 100) {
+                break;
+            }//if
+
+            rbt.strafe(remaining.acot(), Math.abs(speed - minSpeed) * Math.abs(remaining.hypot() / tiks) + minSpeed, true);
+            rbt.veerCheck(false);
+
+        }
+
+        rbt.stop();
 
     }
-
-
 }

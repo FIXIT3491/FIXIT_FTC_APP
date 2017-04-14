@@ -36,73 +36,83 @@ public class CircleDetector {
         static Scalar lowRed2 = new Scalar(240, 100, 100);
         static Scalar highRed2 = new Scalar(255, 255, 255);
 
-        static boolean blueAlliance = true;
+        static boolean blueAlliance = false;
 
-        public static double [] findBestCircle(Bitmap bit, double vCamFOV, double hCamFOV) {
-
-            Log.i("Bit Info", bit.getWidth() + ", " + bit.getConfig());
-            Mat imgOriginal = OCVUtils.bitmapToMat(bit, CvType.CV_8UC4);
-            Imgproc.cvtColor(imgOriginal, imgOriginal, Imgproc.COLOR_RGBA2BGR);
-
-            double shrink = 1000.0 / imgOriginal.cols();
-
-            Size scaled = new Size(1000, 1000 * imgOriginal.height() / imgOriginal.width());
-
-            Mat shrunk = new Mat();
-            Imgproc.resize(imgOriginal, shrunk, scaled);
-            Mat imgHSV = new Mat();
-
-            Imgproc.cvtColor(shrunk, imgHSV, Imgproc.COLOR_BGR2HSV_FULL);
-
-            Mat imgThresholded = new Mat();
-
-            if(blueAlliance){
-                Core.inRange(imgHSV, lowBlue, highBlue, imgThresholded);
-            } else {
-                Mat red1 = new Mat();
-                Mat red2 = new Mat();
-                Core.inRange(imgHSV, lowRed1, highRed1, red1);
-                Core.inRange(imgHSV, lowRed2, highRed2, red2);
-                Core.add(red1,  red2, imgThresholded);
-
-            }//else
-
-            // morphological opening (removes small objects from the foreground)
-            Size morph = new Size(10, 10);
-
-            Imgproc.erode(imgThresholded, imgThresholded, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, morph));
-            Imgproc.dilate(imgThresholded, imgThresholded, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, morph));
-
-            // morphological closing (removes small holes from the foreground)
-            Imgproc.dilate(imgThresholded, imgThresholded, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, morph));
-            Imgproc.erode(imgThresholded, imgThresholded, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, morph));
+        public final static Scalar OTHER_BLUE_AVG = new Scalar(140, 250, 127);
+        public final static Scalar OTHER_RED_AVG = new Scalar(252, 219, 177);
 
 
-            Mat circles = new Mat();
+    public static double [] findBestCircle(Bitmap bit, double vCamFOV, double hCamFOV) {
 
-            Imgproc.HoughCircles(imgThresholded, circles, Imgproc.CV_HOUGH_GRADIENT,5, 100);
+        Mat imgOriginal = OCVUtils.bitmapToMat(bit, CvType.CV_8UC4);
+        Imgproc.cvtColor(imgOriginal, imgOriginal, Imgproc.COLOR_RGBA2BGR);
 
-            Imgproc.cvtColor(imgThresholded, imgThresholded, Imgproc.COLOR_GRAY2BGR);
+        if (blueAlliance) {
+            Imgproc.rectangle(imgOriginal, new Point(imgOriginal.cols(), 0), new Point(imgOriginal.cols() * 0.53, imgOriginal.rows()), new Scalar(0, 0, 255), -1);
+        } else {
+            Imgproc.rectangle(imgOriginal, new Point(imgOriginal.cols(), 0), new Point(imgOriginal.cols() * 0.53, imgOriginal.rows()), new Scalar(255, 0, 0), -1);
+        }//else
 
-            Log.i("Data", "" + circles.cols());
+        double shrink = 1000.0 / imgOriginal.cols();
 
-            for(int i = 0; !circles.empty() && (i < circles.cols() && i < 3); i++){
-                double [] vals = circles.get(0, i);
+        Size scaled = new Size(1000, 1000 * imgOriginal.height() / imgOriginal.width());
 
-                Log.i("Circle!", Arrays.toString(vals));
+        Mat shrunk = new Mat();
+        Imgproc.resize(imgOriginal, shrunk, scaled);
+        Mat imgHSV = new Mat();
 
-                Rect bounds = new Rect(new Point(vals[0] - vals[2], vals[1] - vals[2]), new Point(vals[0] + vals[2], vals[1] + vals[2]));
-                Mat subImage = safeSubMat(bounds, imgThresholded);
+        Imgproc.cvtColor(shrunk, imgHSV, Imgproc.COLOR_BGR2HSV_FULL);
 
-                Scalar result = Core.mean(subImage);
+        Mat imgThresholded = new Mat();
 
-                if(result.val[0] < 150){
-                    continue;
-                }
+        if(blueAlliance){
+            Core.inRange(imgHSV, lowBlue, highBlue, imgThresholded);
+        } else {
+            Mat red1 = new Mat();
+            Mat red2 = new Mat();
+            Core.inRange(imgHSV, lowRed1, highRed1, red1);
+            Core.inRange(imgHSV, lowRed2, highRed2, red2);
+            Core.add(red1,  red2, imgThresholded);
 
-                if(Math.PI * vals[2] * vals[2] > 100000){
-                    continue;
-                }
+        }//else
+
+        // morphological opening (removes small objects from the foreground)
+        Size morph = new Size(10, 10);
+
+        Imgproc.erode(imgThresholded, imgThresholded, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, morph));
+        Imgproc.dilate(imgThresholded, imgThresholded, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, morph));
+
+        // morphological closing (removes small holes from the foreground)
+        Imgproc.dilate(imgThresholded, imgThresholded, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, morph));
+        Imgproc.erode(imgThresholded, imgThresholded, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, morph));
+
+
+        Mat circles = new Mat();
+
+        Imgproc.HoughCircles(imgThresholded, circles, Imgproc.CV_HOUGH_GRADIENT, 5, 100, 100, 10, 30, 100);
+
+        Imgproc.cvtColor(imgThresholded, imgThresholded, Imgproc.COLOR_GRAY2BGR);
+
+        Log.i("Data", "" + circles.cols());
+
+        for(int i = 0; !circles.empty() && (i < circles.cols() && i < 3); i++) {
+            double[] vals = circles.get(0, i);
+
+            Log.i("Circle!", Arrays.toString(vals));
+
+            Rect bounds = new Rect(new Point(vals[0] - vals[2], vals[1] - vals[2]), new Point(vals[0] + vals[2], vals[1] + vals[2]));
+            Mat subImage = safeSubMat(bounds, imgThresholded);
+
+            Scalar result = Core.mean(subImage);
+
+            if (result.val[0] < 150) {
+                continue;
+            }
+
+            if (Math.PI * vals[2] * vals[2] > 100000) {
+                continue;
+            }
+
 
 //                Rect bigBounds = scaleRect(bounds, 1.0 / shrink);
 //                Mat originalSubImage = safeSubMat(bigBounds, imgOriginal);
@@ -143,11 +153,9 @@ public class CircleDetector {
 //                    continue;
 //                }//if
 
-                Imgproc.circle(shrunk, new Point(vals[0], vals[1]), (int) vals[2], new Scalar(((i == 0)?255:0), 255, 0), 10);
+//                Imgproc.circle(shrunk, new Point(vals[0], vals[1]), (int) vals[2], new Scalar(((i == 0)?255:0), 255, 0), 10);
 
-                double diagonal = Math.sqrt(scaled.width*scaled.width + scaled.height*scaled.height);
-
-                return new double[] {(vals[0] - scaled.width / 2) * (72 / diagonal), (vals[1] + vals[2] - scaled.height / 2) * (72 / diagonal)};
+                return new double[] {vals[0], vals[1], vals[2], shrunk.rows(), shrunk.cols()};
             }
 
 //            Bitmap save = OCVUtils.matToBitmap(imgThresholded);
@@ -180,6 +188,101 @@ public class CircleDetector {
             return outer.submat(bounds);
         }
 
+
+        public static double[] findBestCircle2(Bitmap bit) {
+
+            long startTime = System.nanoTime();
+
+            Mat read = OCVUtils.bitmapToMat(bit, CvType.CV_8UC4);
+            Imgproc.cvtColor(read, read, Imgproc.COLOR_RGBA2BGR);
+
+            Imgproc.pyrDown(read, read);
+
+            if (blueAlliance) {
+                Imgproc.rectangle(read, new Point(read.cols(), 0), new Point(read.cols() * 0.53, read.rows()), new Scalar(0, 0, 255), -1);
+            } else {
+                Imgproc.rectangle(read, new Point(read.cols(), 0), new Point(read.cols() * 0.53, read.rows()), new Scalar(255, 0, 0), -1);
+            }//else
+
+            ArrayList<Mat> channels = new ArrayList<>();
+            Core.split(read, channels);
+
+            Mat transfer = new Mat();
+            Imgproc.equalizeHist(channels.get(0), transfer);
+            channels.set(0, transfer);
+
+            transfer = new Mat();
+            Imgproc.equalizeHist(channels.get(1), transfer);
+            channels.set(1, transfer);
+
+            transfer = new Mat();
+            Imgproc.equalizeHist(channels.get(2), transfer);
+            channels.set(2, transfer);
+
+            Core.merge(channels, read);
+            Imgproc.cvtColor(read, read, Imgproc.COLOR_BGR2HSV_FULL);
+
+            Imgproc.medianBlur(read, read, 5);
+
+
+            if (blueAlliance) {
+                Core.absdiff(read, OTHER_BLUE_AVG, read);
+            } else {
+                Core.absdiff(read, new Scalar(0, 235, 177), transfer);
+                Core.absdiff(read, new Scalar(255, 235, 177), read);
+                Core.min(read, transfer, read);
+            }//else
+
+            Core.split(read, channels);
+
+            Core.addWeighted(channels.get(0), 0.8, channels.get(1), 0.2, 0, read);
+
+            Imgproc.threshold(read, read, 20, 255, Imgproc.THRESH_BINARY_INV);
+
+            // morphological opening (removes small objects from the foreground)
+            Size morph = new Size(5, 5);
+
+            Imgproc.erode(read, read, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, morph), new Point(-1, -1), 1);
+            Imgproc.dilate(read, read, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, morph), new Point(-1, -1), 1);
+
+            // morphological closing (removes small holes from the foreground)
+            Imgproc.dilate(read, read, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, morph));
+            Imgproc.erode(read, read, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, morph));
+
+            Mat circles = new Mat();
+            Imgproc.HoughCircles(read, circles, Imgproc.CV_HOUGH_GRADIENT, 5, 100, 100, 10, 30, 100);
+
+            if (circles.cols() > 0) {
+                double[] circle = circles.get(0, 0);
+
+                return new double[] {circle[0], circle[1], circle[2], read.rows(), read.cols()};
+            }//if
+
+//            for (int i = 0; i < circles.cols(); i++) {
+//                double[] circle = circles.get(0, i);
+//
+//                Rect r = new Rect(new double[] {circle[0] - circle[2], circle[1] - circle[2], circle[2] * 2, circle[2] * 2});
+//                r.x = Math.max(r.x, 0);
+//                r.y = Math.max(r.y, 0);
+//                r.width = Math.min(r.width, read.cols() - r.x);
+//                r.height = Math.min(r.height, read.rows() - r.y);
+//
+//                if (r.x > 0 && r.y > 0 && r.x + r.width < read.cols() && r.y + r.height < read.rows()) {
+//                    int numPixels = Core.countNonZero(new Mat(read, r));
+//
+//                    if (numPixels / r.area() > 0.1) {
+//                        double angle = 36 * ((circle[1] / read.rows()) - 0.5);
+//
+//                        return new double[] {circle[0], circle[1], circle[2], read.rows(), read.cols()};
+//                    }//if
+//                }//if
+//
+//
+//
+//            }//for
+
+            return new double[] {-1, -1, -1, read.rows(), read.cols()};
+        }
 
 
 }

@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode.gamecode;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.TrackBall;
 import org.firstinspires.ftc.teamcode.opmodesupport.TeleOpMode;
 import org.firstinspires.ftc.teamcode.robots.Robot;
 
@@ -13,15 +16,19 @@ import org.firstinspires.ftc.teamcode.robots.Robot;
 public class BasicTeleOp extends TeleOpMode {
 
     Robot robot;
+    TrackBall mouse;
 
     @Override
     public void initialize() {
         robot = new Robot();
+        mouse = new TrackBall("rightFore", "rightBack");
     }
 
     @Override
     public void loopOpMode() {
         robot.driveL(joy1.y1());
         robot.driveR(joy1.y2());
+
+        Log.i("EncTiks", mouse.getEncTiks().toString());
     }
 }
