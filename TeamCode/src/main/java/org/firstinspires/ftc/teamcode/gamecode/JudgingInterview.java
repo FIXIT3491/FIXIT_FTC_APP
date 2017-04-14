@@ -3,9 +3,9 @@ package org.firstinspires.ftc.teamcode.gamecode;
 import android.speech.tts.TextToSpeech;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.RC;
+import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
 import org.firstinspires.ftc.teamcode.robots.Fermion;
 import org.firstinspires.ftc.teamcode.robots.Robot;
 
@@ -14,11 +14,12 @@ import org.firstinspires.ftc.teamcode.robots.Robot;
  */
 
 @Autonomous
-public class JudgingInterview extends LinearOpMode implements TextToSpeech.OnInitListener{
+public class JudgingInterview extends AutoOpMode implements TextToSpeech.OnInitListener{
 
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOp() throws InterruptedException {
         TextToSpeech text = new TextToSpeech(RC.c(), this);
+        text.setSpeechRate(0.9f);
         Fermion fermion = new Fermion(false);
         fermion.stop();
         fermion.startShooterControl();
@@ -27,14 +28,14 @@ public class JudgingInterview extends LinearOpMode implements TextToSpeech.OnIni
 
         text.speak("Hello, my name is fermion. Today I am going to describe myself." +
                 "If you look down at my wheels, you will notice that I have 4 mecanum wheels." +
-                "These allow me to drive in any direction and spin simultaneously. This is really helpful for pushing beacons." +
-                "Next you'll notice my collector. Guy, please put a ball in my collector.", TextToSpeech.QUEUE_ADD, null);
+                "These allow me to drive in any direction and spin simultaneously. This is really helpful navigating shopping malls... oh wait.... for pushing beacons." +
+                "Next you'll notice my collector. Guy, please put a ball in my collector. Don't get too close, I may bite", TextToSpeech.QUEUE_ADD, null);
         while (opModeIsActive() && text.isSpeaking()){
             idle();
         }
 
         fermion.setCollectorState(Robot.IN);
-        sleep(2000);
+        sleep(4000);
         fermion.setCollectorState(Robot.STOP);
 
         text.speak("Now that I have a ball, I can store it in my trough. Once we are ready to shoot, I prime the shooter.", TextToSpeech.QUEUE_ADD, null);
@@ -46,10 +47,11 @@ public class JudgingInterview extends LinearOpMode implements TextToSpeech.OnIni
         fermion.door.goToPos("open");
         sleep(1000);
         fermion.door.goToPos("close");
+        sleep(1000);
 
         text.speak("Now, I will shoot a particle.", TextToSpeech.QUEUE_ADD, null);
         fermion.shoot();
-        fermion.waitForShooterState(Fermion.FIRE);
+        fermion.waitForShooterState(Fermion.LOADING);
         while (opModeIsActive() && text.isSpeaking()){
             idle();
         }
@@ -59,6 +61,7 @@ public class JudgingInterview extends LinearOpMode implements TextToSpeech.OnIni
         while (opModeIsActive() && text.isSpeaking()){
             idle();
         }
+        fermion.capRelease.goToPos("release");
 
         fermion.liftCapBall();
         sleep(3000);
@@ -66,7 +69,12 @@ public class JudgingInterview extends LinearOpMode implements TextToSpeech.OnIni
         sleep(3000);
         fermion.lifter.stop();
 
-        text.speak("Thank you, now I will hand you off to Aila to talk about programming.", TextToSpeech.QUEUE_ADD, null);
+        text.speak("I also have had some problems with balls getting in front me so I use my whiskers to clear balls from in front of the beacons", TextToSpeech.QUEUE_ADD, null);
+        fermion.clearBall();
+        sleep(500);
+        fermion.resetBallClearing();
+
+
 
 
 

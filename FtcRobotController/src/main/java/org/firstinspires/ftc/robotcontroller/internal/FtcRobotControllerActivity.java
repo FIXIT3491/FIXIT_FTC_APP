@@ -700,7 +700,7 @@ public class FtcRobotControllerActivity extends Activity {
     GlobalValuesActivity.tentativelyAdd("TeleBeginAngle", 0);
     GlobalValuesActivity.tentativelyAdd("EncoderDistance", 500);
     GlobalValuesActivity.tentativelyAdd("VeerProportional", 0.03);
-    GlobalValuesActivity.tentativelyAdd("VeerDerivative", (5 / 9) * 1E-5);
+    GlobalValuesActivity.tentativelyAdd("VeerDerivative", (5 / 9) * 1E-6);
     GlobalValuesActivity.tentativelyAdd("VeerIntegral", 3.1E-5);
 
     GlobalValuesActivity.tentativelyAdd("WallProportional", 0.2);

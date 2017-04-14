@@ -79,6 +79,8 @@ public class Fermion {
      */
     public FXTServo door;
     public FXTServo capRelease;
+    public FXTServo whisker1;
+    public FXTServo whisker2;
 
     /*
     ROBOT DRIVING VARIABLES
@@ -184,6 +186,21 @@ public class Fermion {
         capRelease.addPos("start", 0.1);
         capRelease.addPos("release", 0.9);
         capRelease.goToPos("init");
+
+        /*
+        BALL CLEARING SERVOS
+         */
+        whisker1 = new FXTServo("whisker1");
+        whisker1.addPos("out", 0);
+        whisker1.addPos("in", 1);
+        whisker1.goToPos("in");
+
+        whisker2 = new FXTServo("whisker2");
+        whisker2.addPos("out", 1);
+        whisker2.addPos("in", 0);
+        whisker2.goToPos("in");
+
+        Log.i(TAG, "Fermion: ");
 
         /*
         TRACKBALL
@@ -724,12 +741,10 @@ public class Fermion {
     }//getShooterState
 
     private void updateShooter() {
-        Log.i(TAG, "updateShooter: ");
         if (shooterState == FIRE) {
             shooterState = FIRING;
             shooter.addToTarget(shooter.getNumTiksPerRev() / 2);
             shooter.setPower(1);
-            Log.i(TAG, "updateShooter: ");
 
             while (shooter.getBaseCurrentPosition() < shooter.getTarget()) {
                 try {
@@ -865,5 +880,15 @@ public class Fermion {
             RC.t.addData("FERMION", "Strafe To Beacon failed: Beacon not visible");
         }//else
     }//strafeToBeacon
+
+    public void clearBall(){
+        whisker1.goToPos("out");
+        whisker2.goToPos("out");
+    }
+
+    public void resetBallClearing(){
+        whisker1.goToPos("in");
+        whisker2.goToPos("in");
+    }
 
 }//Fermion

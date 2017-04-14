@@ -151,6 +151,12 @@ public class VeerFermionOp extends TeleOpMode implements TextToSpeech.OnInitList
             tau.lights.flashState(500);
         }//if
 
+        if(joy2.y2() < -0.15){
+            tau.clearBall();
+        } else {
+            tau.resetBallClearing();
+        }
+
 
         Log.i("EncTiks", tau.mouse.getEncTiks() + "");
 //        Log.i("EncTiksMM", tau.mouse.getEncTiks().multiply(25.4 * 3 * Math.PI / 1440) + "");

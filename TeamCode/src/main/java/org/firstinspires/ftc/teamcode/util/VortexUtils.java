@@ -35,7 +35,7 @@ public class VortexUtils {
     public final static int BEACON_BLUE_RED = 1;
     public final static int BEACON_RED_BLUE = 2;
     public final static int BEACON_ALL_BLUE = 3;
-    public final static int BEACON_NO_BLUE = 4;
+    public final static int BEACON_ALL_RED = 4;
 
     public final static int OBJECT_BLUE = 1;
     public final static int OBJECT_RED = 2;
@@ -44,6 +44,8 @@ public class VortexUtils {
     //DON'T CHANGE THESE NUMBERS
     public final static Scalar BEACON_BLUE_LOW = new Scalar(108, 0, 220);
     public final static Scalar BEACON_BLUE_HIGH = new Scalar(178, 255, 255);
+    public final static Scalar BEACON_RED_LOW = new Scalar(200, 50, 0);
+    public final static Scalar BEACON_RED_HIGH = new Scalar(255, 130, 255);
     
     public final static Scalar OTHER_BLUE_LOW = new Scalar(105, 120, 110);
     public final static Scalar OTHER_BLUE_HIGH = new Scalar(185, 255, 255);
@@ -89,10 +91,7 @@ public class VortexUtils {
      */
 
     public static int getBeaconConfig(Bitmap bm) {
-
-
         if (bm != null) {
-
 
             //turning the corner pixel coordinates into a proper bounding box
             Mat image = OCVUtils.bitmapToMat(bm, CvType.CV_8UC3);
@@ -103,27 +102,26 @@ public class VortexUtils {
             //get filtered mask
             //if pixel is within acceptable blue-beacon-colour range, it's changed to white.
             //Otherwise, it's turned to black
-            Mat mask = new Mat();
+            Mat blueMask = new Mat();
+            Mat redMask = new Mat();
 
-            Core.inRange(image, BEACON_BLUE_LOW, BEACON_BLUE_HIGH, mask);
-            Moments mmnts = Imgproc.moments(mask, true);
+            Core.inRange(image, BEACON_BLUE_LOW, BEACON_BLUE_HIGH, blueMask);
+            Core.inRange(image, BEACON_RED_LOW, BEACON_RED_HIGH, redMask);
+            Moments blueMmnts = Imgproc.moments(blueMask, true);
+            Moments redMmnts = Imgproc.moments(redMask, true);
 
             //calculating centroid of the resulting binary mask via image moments
-            Log.i("CentroidX", "" + ((mmnts.get_m10() / mmnts.get_m00())));
-            Log.i("CentroidY", "" + ((mmnts.get_m01() / mmnts.get_m00())));
+            Log.i("CentroidBlueX", "" + (( blueMmnts.get_m00())));
+            Log.i("CentroidBlueY", "" + (blueMmnts.get_m00()));
+            Log.i("CentroidRedX", "" + (redMmnts.get_m00()));
+            Log.i("CentroidRedY", "" + (redMmnts.get_m00()));
+            Log.i("Momentus", (blueMmnts.get_m00() / redMmnts.get_m00()) + "");
 
-            //checking if blue either takes up the majority of the image (which means the beacon is all blue)
-            //or if there's barely any blue in the image (which means the beacon is all red or off)
-//            if (mmnts.get_m00() / mask.total() > 0.8) {
-//                return VortexUtils.BEACON_ALL_BLUE;
-//            } else if (mmnts.get_m00() / mask.total() < 0.1) {
-//                return VortexUtils.BEACON_NO_BLUE;
-//            }//elseif
 
             //Note: for some reason, we end up with a image that is rotated 90 degrees
             //if centroid is in the bottom half of the image, the blue beacon is on the left
             //if the centroid is in the top half, the blue beacon is on the right
-            if ((mmnts.get_m01() / mmnts.get_m00()) < image.rows() / 2) {
+            if ((blueMmnts.get_m01() / blueMmnts.get_m00()) < image.rows() / 2) {
                 return VortexUtils.BEACON_BLUE_RED;
             } else {
                 return VortexUtils.BEACON_RED_BLUE;
@@ -133,6 +131,53 @@ public class VortexUtils {
         return VortexUtils.NOT_VISIBLE;
     }//getBeaconConfig
 
+    public static int doubleCheckBeaconConfig(Bitmap bm) {
+
+        if (bm != null) {
+            //turning the corner pixel coordinates into a proper bounding box
+            Mat image = OCVUtils.bitmapToMat(bm, CvType.CV_8UC3);
+
+            //filtering out non-beacon-blue colours in HSV colour space
+            Imgproc.cvtColor(image, image, Imgproc.COLOR_RGB2HSV_FULL);
+
+            //get filtered mask
+            //if pixel is within acceptable blue-beacon-colour range, it's changed to white.
+            //Otherwise, it's turned to black
+            Mat blueMask = new Mat();
+            Mat redMask = new Mat();
+
+            Core.inRange(image, BEACON_BLUE_LOW, BEACON_BLUE_HIGH, blueMask);
+            Core.inRange(image, BEACON_RED_LOW, BEACON_RED_HIGH, redMask);
+            Moments blueMmnts = Imgproc.moments(blueMask, true);
+            Moments redMmnts = Imgproc.moments(redMask, true);
+
+            //calculating centroid of the resulting binary mask via image moments
+            Log.i("CentroidBlueX", "" + (( blueMmnts.get_m00())));
+            Log.i("CentroidBlueY", "" + (blueMmnts.get_m00()));
+            Log.i("CentroidRedX", "" + (redMmnts.get_m00()));
+            Log.i("CentroidRedY", "" + (redMmnts.get_m00()));
+            Log.i("Momentus", (blueMmnts.get_m00() / redMmnts.get_m00()) + "");
+
+    //            checking if blue either takes up the majority of the image (which means the beacon is all blue)
+    //            or if there's barely any blue in the image (which means the beacon is all red or off)
+            if (blueMmnts.get_m00() / redMmnts.get_m00() > 3) {
+                return VortexUtils.BEACON_ALL_BLUE;
+            } else if (blueMmnts.get_m00() / redMmnts.get_m00() < 0.1) {
+                return VortexUtils.BEACON_ALL_RED;
+            }//elseif
+
+            //Note: for some reason, we end up with a image that is rotated 90 degrees
+            //if centroid is in the bottom half of the image, the blue beacon is on the left
+            //if the centroid is in the top half, the blue beacon is on the right
+            if ((blueMmnts.get_m01() / blueMmnts.get_m00()) < image.rows() / 2) {
+                return VortexUtils.BEACON_BLUE_RED;
+            } else {
+                return VortexUtils.BEACON_RED_BLUE;
+            }//else
+        }//if
+
+        return VortexUtils.NOT_VISIBLE;
+    }
 
     public static int getBeaconConfig(Image img, VuforiaTrackableDefaultListener beacon, CameraCalibration camCal) {
 

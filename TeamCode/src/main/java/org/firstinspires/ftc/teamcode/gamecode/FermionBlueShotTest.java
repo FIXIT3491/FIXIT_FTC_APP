@@ -32,9 +32,9 @@ public class FermionBlueShotTest extends AutoOpMode {
 
         muon.right(1);
         if(voltage > 13.5){
-            sleep(700);
-        } else {
             sleep(900);
+        } else {
+            sleep(1100);
         }
         muon.stop();
         muon.shoot();
@@ -89,20 +89,62 @@ public class FermionBlueShotTest extends AutoOpMode {
         }
 
         muon.forward(0.3);
+        muon.clearBall();
         sleep(1000);
         muon.stop();
         muon.backward(0.5);
+        muon.resetBallClearing();
         sleep(500);
         muon.stop();
 
         muon.absoluteIMUTurn(90, 0.5);
 
+        config = VortexUtils.doubleCheckBeaconConfig(cam.photo());
+        if (config != VortexUtils.BEACON_ALL_BLUE) {
+
+            if (config == VortexUtils.BEACON_ALL_RED) {
+                sleep(5000);
+            } else if (config == VortexUtils.BEACON_RED_BLUE) {
+                if (muon.getLight(Robot.RIGHT) < Fermion.LIGHT_THRESHOLD) {
+                    muon.stop();
+                    muon.left(0.4);
+
+                    sensor = Robot.RIGHT;
+                    while (opModeIsActive() && muon.getLight(sensor) < muon.LIGHT_THRESHOLD) {
+                        Log.i("light", "" + muon.getLight(sensor));
+                    }
+                    muon.stop();
+                    sleep(100);
+                }//if
+            } else {
+                if (muon.getLight(Robot.LEFT) < Fermion.LIGHT_THRESHOLD) {
+                    muon.stop();
+                    muon.right(0.4);
+
+                    sensor = Robot.LEFT;
+                    while (opModeIsActive() && muon.getLight(sensor) < muon.LIGHT_THRESHOLD) {
+                        Log.i("light", "" + muon.getLight(sensor));
+                    }
+                    muon.stop();
+                    sleep(100);
+                }//if
+            }//else
+
+            muon.forward(0.3);
+            muon.clearBall();
+            sleep(1000);
+            muon.stop();
+            muon.backward(0.5);
+            muon.resetBallClearing();
+            sleep(500);
+            muon.stop();
+
+        }//if
+
 
         //------------------------------Beacon 2--------------
         muon.startWallFollowing(0, -90, 1, 400);
         sleep(1000);
-
-        muon.setTargetSpeed(0.5);
 
         sensor = Robot.LEFT;
         while (opModeIsActive() && muon.getLight(sensor) < Fermion.LIGHT_THRESHOLD){
@@ -139,19 +181,65 @@ public class FermionBlueShotTest extends AutoOpMode {
             muon.stop();
             sleep(100);
         }
-
+        muon.clearBall();
         muon.forward(0.3);
         sleep(1000);
         muon.stop();
         muon.backward(0.5);
+        muon.resetBallClearing();
         sleep(300);
         muon.stop();
 
+        muon.absoluteIMUTurn(90, 0.5);
+
+        config = VortexUtils.doubleCheckBeaconConfig(cam.photo());
+        if (config != VortexUtils.BEACON_ALL_BLUE) {
+
+            if (config == VortexUtils.BEACON_ALL_RED) {
+                sleep(5000);
+            } else if (config == VortexUtils.BEACON_RED_BLUE) {
+                if (muon.getLight(Robot.RIGHT) < Fermion.LIGHT_THRESHOLD) {
+                    muon.stop();
+                    muon.left(0.4);
+
+                    sensor = Robot.RIGHT;
+                    while (opModeIsActive() && muon.getLight(sensor) < muon.LIGHT_THRESHOLD) {
+                        Log.i("light", "" + muon.getLight(sensor));
+                    }
+                    muon.stop();
+                    sleep(100);
+                }//if
+            } else {
+                if (muon.getLight(Robot.LEFT) < Fermion.LIGHT_THRESHOLD) {
+                    muon.stop();
+                    muon.right(0.4);
+
+                    sensor = Robot.LEFT;
+                    while (opModeIsActive() && muon.getLight(sensor) < muon.LIGHT_THRESHOLD) {
+                        Log.i("light", "" + muon.getLight(sensor));
+                    }
+                    muon.stop();
+                    sleep(100);
+                }//if
+            }//else
+
+            muon.forward(0.3);
+            muon.clearBall();
+            sleep(1000);
+            muon.stop();
+            muon.backward(0.5);
+            muon.resetBallClearing();
+            sleep(500);
+            muon.stop();
+
+        }//if
+
+
 
         if(RC.globalBool("Cap-ball")){
-            muon.imuTurnL(45, 0.7);
+            muon.imuTurnL(50, 0.7);
             muon.backward(1);
-            sleep(2000);
+            sleep(1800);
             muon.stop();
         }
         cam.destroy();

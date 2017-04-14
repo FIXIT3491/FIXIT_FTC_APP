@@ -133,7 +133,7 @@ public class FermionRedShotTest extends AutoOpMode {
             muon.right(0.4);
 
             sensor = Robot.LEFT;
-            while (opModeIsActive() && muon.getLight(sensor) < muon.LIGHT_THRESHOLD){
+            while (opModeIsActive() && muon.getLight(sensor) < Fermion.LIGHT_THRESHOLD){
                 Log.i("light", "" + muon.getLight(sensor));
             }
             muon.stop();
