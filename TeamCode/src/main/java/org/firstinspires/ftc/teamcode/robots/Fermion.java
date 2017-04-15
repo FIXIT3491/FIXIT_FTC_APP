@@ -376,6 +376,39 @@ public class Fermion {
     TRACKING METHODS
      */
 
+    public void absoluteTrack(TrackBall.Point dest, double speed, boolean turnFirst) {
+
+        TrackBall.Point start = mouse.getAbsoluteCoord();
+
+        Log.i("AbsoluteInfo", start.toString());
+
+        TrackBall.Point change = dest.subtract(start);
+
+        if (turnFirst) {
+
+            double degrees = MathUtils.cvtAngleToNewDomain(dest.acot());
+            start = mouse.getAbsoluteCoord();
+
+            Log.i("Info", degrees + ", " + change.toString() + ", " + change.hypot());
+            if (degrees < 0) {
+                imuTurnL(-degrees, 0.5);
+            } else {
+                imuTurnR(degrees, 0.5);
+            }//else
+
+            change = dest.subtract(start);
+
+            Log.i("Info", degrees + ", " + change.toString() + ", " + change.hypot());
+
+            track(0, change.hypot(), speed);
+        } else {
+            double degrees = MathUtils.cvtAngleToNewDomain(dest.acot());
+
+            track(degrees, change.hypot(), speed);
+        }//else
+
+    }
+
     //RELATIVE TRACKING
     public void track(double degrees, double mm, double speed) {
         TaskHandler.pauseTask(VEER_CHECK_TASK_KEY);

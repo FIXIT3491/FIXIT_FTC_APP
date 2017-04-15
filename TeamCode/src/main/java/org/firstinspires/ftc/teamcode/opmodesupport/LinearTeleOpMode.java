@@ -64,6 +64,8 @@ public abstract class LinearTeleOpMode extends LinearOpMode {
                 loopOpMode();
                 telemetry.update();
             }
+
+            TaskHandler.removeAllTasks();
         }
 
 

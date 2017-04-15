@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.roboticslibrary.TaskHandler;
+import org.firstinspires.ftc.teamcode.util.MathUtils;
 
 /**
  * Created by FIXIT on 16-10-08.
@@ -23,7 +24,7 @@ public class TrackBall {
         xEnc = RC.h.dcMotor.get(xAddr);
         yEnc = RC.h.dcMotor.get(yAddr);
 
-        lastTiks = new Point(xEnc.getCurrentPosition(), -yEnc.getCurrentPosition());
+        lastTiks = getEncTiks();
     }//TrackBall
 
     //switch encoder ports
@@ -49,16 +50,27 @@ public class TrackBall {
                     updateAbsolutePoint(-imu.getAngularOrientation().firstAngle);
                 }//synchronized
             }//run
-        }, 5);//TaskHandler
+        }, 20);//TaskHandler
 
     }//addAbsoluteCoordinateRunnable
 
     public void updateAbsolutePoint(double robotAngle) {
+        robotAngle = MathUtils.cvtAngleToNewDomain(robotAngle);
+
         Point delta = getEncTiks().subtract(lastTiks);
         lastTiks = getEncTiks();
 
+        if (Math.abs(robotAngle) > 90) {
+            delta.x *= -1;
+            delta.y *= -1;
+        }
+
+        Log.i("EncTiks", delta.toString() + ", " + getEncTiks());
+        Log.i("Angle", robotAngle + "");
+
         double yChange = delta.y * Math.cos(Math.toRadians(robotAngle)) - delta.x * Math.sin(Math.toRadians(robotAngle));
         double xChange = delta.y * Math.sin(Math.toRadians(robotAngle)) + delta.x * Math.cos(Math.toRadians(robotAngle));
+
         Point change = new Point(xChange, yChange);
 
         Log.i("Tik Change", change.toString());

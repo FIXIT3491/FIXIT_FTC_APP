@@ -72,6 +72,8 @@ public class FermionBlueShotTest extends AutoOpMode {
             telemetry.addData("Beacon", "could not not be found");
         }
 
+        muon.clearBall();
+
         while(opModeIsActive() && muon.getUltrasonicDistance(0) > 300){
             muon.forward(0.2);
         }
@@ -89,7 +91,6 @@ public class FermionBlueShotTest extends AutoOpMode {
         }
 
         muon.forward(0.3);
-        muon.clearBall();
         sleep(1000);
         muon.stop();
         muon.backward(0.5);
@@ -101,6 +102,8 @@ public class FermionBlueShotTest extends AutoOpMode {
 
         config = VortexUtils.doubleCheckBeaconConfig(cam.photo());
         if (config != VortexUtils.BEACON_ALL_BLUE) {
+
+            muon.clearBall();
 
             if (config == VortexUtils.BEACON_ALL_RED) {
                 sleep(5000);
@@ -131,7 +134,6 @@ public class FermionBlueShotTest extends AutoOpMode {
             }//else
 
             muon.forward(0.3);
-            muon.clearBall();
             sleep(1000);
             muon.stop();
             muon.backward(0.5);
@@ -166,6 +168,8 @@ public class FermionBlueShotTest extends AutoOpMode {
             telemetry.addData("Beacon", "could not not be found");
         }
 
+        muon.clearBall();
+
         while(opModeIsActive() && muon.getUltrasonicDistance(0) > 300){
             muon.forward(0.2);
         }
@@ -181,7 +185,7 @@ public class FermionBlueShotTest extends AutoOpMode {
             muon.stop();
             sleep(100);
         }
-        muon.clearBall();
+
         muon.forward(0.3);
         sleep(1000);
         muon.stop();
@@ -194,6 +198,7 @@ public class FermionBlueShotTest extends AutoOpMode {
 
         config = VortexUtils.doubleCheckBeaconConfig(cam.photo());
         if (config != VortexUtils.BEACON_ALL_BLUE) {
+            muon.clearBall();
 
             if (config == VortexUtils.BEACON_ALL_RED) {
                 sleep(5000);
@@ -224,7 +229,6 @@ public class FermionBlueShotTest extends AutoOpMode {
             }//else
 
             muon.forward(0.3);
-            muon.clearBall();
             sleep(1000);
             muon.stop();
             muon.backward(0.5);
