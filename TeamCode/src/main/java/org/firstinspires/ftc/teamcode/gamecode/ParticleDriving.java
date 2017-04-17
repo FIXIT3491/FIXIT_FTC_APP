@@ -1,58 +1,63 @@
 package org.firstinspires.ftc.teamcode.gamecode;
 
-import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.TrackBall;
 import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
 import org.firstinspires.ftc.teamcode.roboticslibrary.FXTCamera;
-import org.firstinspires.ftc.teamcode.roboticslibrary.TaskHandler;
 import org.firstinspires.ftc.teamcode.robots.Fermion;
 import org.firstinspires.ftc.teamcode.robots.Robot;
 import org.firstinspires.ftc.teamcode.util.CircleDetector;
 import org.firstinspires.ftc.teamcode.util.MathUtils;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 
 /**
- * Created by FIXIT on 16-10-07.
+ * Created by FIXIT on 2017-04-15.
  */
 @Autonomous
-public class AutoBallCollector extends AutoOpMode {
+public class ParticleDriving extends AutoOpMode {
 
-    /*
-    RANGE: 285 to 500 mm away from beacon
-    TARGET: 370mm
-     */
+    Fermion f;
     FXTCamera cam;
 
     @Override
     public void runOp() throws InterruptedException {
 
-        Fermion f = new Fermion(true);
+        f = new Fermion(true);
         cam = new FXTCamera(FXTCamera.FACING_BACKWARD, true);
 
-
         waitForStart();
-        f.addVeerCheckRunnable();
-        TaskHandler.pauseTask("Fermion.VEERCHECK");
 
-        f.capRelease.goToPos("start");
+        int angleToFace = 0;
 
         double[] circle = null;
-        while (opModeIsActive()) {
-            circle = CircleDetector.findBestCircle(cam.photo(), true);
 
-            if (circle[0] != -1) {
-                break;
+        while (opModeIsActive()) {
+            f.absoluteIMUTurn(angleToFace, 0.7);
+
+            circle = f.lookForCircleWithTimeout(cam, 3000);
+
+            Log.i("LOGGING", Arrays.toString(circle));
+
+
+            if (circle == null || circle[0] == -1) {
+                switch(angleToFace) {
+                    case 0: angleToFace = -45; continue;
+                    case -45: angleToFace = 45; continue;
+                    case 45: angleToFace = 0; continue;
+                }//switch
             }//if
+
+            break;
         }//while
 
         double angleH = 36 * (circle[1] / circle[3] - 0.5);
-//        angleH += Math.signum(angleH) * (10);
 
-        double vHeight = (circle[0] / circle[4]) * 100 - 5;
+        double vHeight = (circle[0] / circle[4]) * 100;
 
         Log.i("TurningXA", angleH + "");
         Log.i("DistanceXA", vHeight + "");
@@ -64,12 +69,12 @@ public class AutoBallCollector extends AutoOpMode {
             f.imuTurnR(angleH, 0.5);
         }//else
 
-        f.forward(0.4);
-        TaskHandler.resumeTask("Fermion.VEERCHECK");
+        f.forward(0.2);
+
+        long start = System.currentTimeMillis();
 
         while (opModeIsActive()) {
-            Bitmap bm = cam.photo();
-            circle = CircleDetector.findBestCircle2(bm, true);
+            circle = CircleDetector.findBestCircle(cam.photo(), true);
 
             angleH = 36 * (circle[1] / circle[3] - 0.5);
 
@@ -81,15 +86,15 @@ public class AutoBallCollector extends AutoOpMode {
 
             f.setTargetAngle(MathUtils.cvtAngleToNewDomain(f.getTargetAngle() + 0.18 * angleH));
 
-            if (vHeight < 15) {
+            if (vHeight < 20) {
                 break;
             }//if
 
         }//while
 
+        Log.i("HELLO!", "hello...");
+
         f.stop();
-//
-        TaskHandler.pauseTask("Fermion.VEERCHECK");
 
         f.imuTurnL(180, 0.5);
 
@@ -101,34 +106,10 @@ public class AutoBallCollector extends AutoOpMode {
         }//while
 
         f.stop();
+    }
 
-//        f.track(0, distanceToBall, 0.25);
-//
-//        circle = CircleDetector.findBestCircle2(cam.photo());
-//
-//        angleH  = 36 * (circle[1] / circle[3] - 0.5);
-//
-//        Log.i("TurningXA", "" + angleH);
-//        Log.i("XACircle", "" + Arrays.toString(circle));
-//
-//
-//        if (angleH < 0) {
-//            f.imuTurnL(-angleH, 0.5);
-//        } else {
-//            f.imuTurnR(angleH, 0.5);
-//        }//else
-
-//        if (angleH < 0) {
-//            f.imuTurnR(180 + angleH, 0.5);
-//        } else {
-//            f.imuTurnL(180 - angleH, 0.5);
-//        }//else
-
-    }//runOp
-
-
-    public void stopOpMode() {
-        if (cam != null)
-            cam.destroy();
+    public void stopOpMode(){
+//        f.stop();
+//        cam.destroy();
     }
 }

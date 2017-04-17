@@ -38,7 +38,7 @@ public class ParticleDetection extends TeleOpMode {
     public void loopOpMode() {
 
         Bitmap bit = cam.photo();
-        double[] circle = CircleDetector.findBestCircle2(bit);
+        double[] circle = CircleDetector.findBestCircle2(bit, true);
 
         Log.i("Circle", Arrays.toString(circle));
     }

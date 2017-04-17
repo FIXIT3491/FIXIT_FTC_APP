@@ -30,15 +30,14 @@ public class CircleDetector {
     private static Scalar lowRed2 = new Scalar(240, 100, 100);
     private static Scalar highRed2 = new Scalar(255, 255, 255);
 
-    public static boolean blueAlliance = false;
 
     public final static Scalar OTHER_BLUE_AVG = new Scalar(140, 250, 127);
     public final static Scalar OTHER_RED_AVG = new Scalar(252, 219, 177);
 
 
-    public static double [] findBestCircle(Bitmap bit, double vCamFOV, double hCamFOV) {
+    public static double [] findBestCircle(Bitmap camImg, boolean blueAlliance) {
 
-        Mat imgOriginal = OCVUtils.bitmapToMat(bit, CvType.CV_8UC4);
+        Mat imgOriginal = OCVUtils.bitmapToMat(camImg, CvType.CV_8UC4);
         Imgproc.cvtColor(imgOriginal, imgOriginal, Imgproc.COLOR_RGBA2BGR);
 
         if (blueAlliance) {
@@ -110,7 +109,7 @@ public class CircleDetector {
             return new double[] {vals[0], vals[1], vals[2], shrunk.rows(), shrunk.cols()};
         }
 
-        return new double[]{-1, -1, -1};
+        return new double[]{-1, -1, -1, shrunk.rows(), shrunk.cols()};
     }
 
     public static Rect scaleRect(Rect r, double scale){
@@ -138,7 +137,7 @@ public class CircleDetector {
     }
 
 
-    public static double[] findBestCircle2(Bitmap bit) {
+    public static double[] findBestCircle2(Bitmap bit, boolean blueAlliance) {
 
         long startTime = System.nanoTime();
 

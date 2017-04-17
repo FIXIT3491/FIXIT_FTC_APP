@@ -50,26 +50,32 @@ public class TrackBall {
                     updateAbsolutePoint(-imu.getAngularOrientation().firstAngle);
                 }//synchronized
             }//run
-        }, 20);//TaskHandler
+        }, 5);//TaskHandler
 
     }//addAbsoluteCoordinateRunnable
 
     public void updateAbsolutePoint(double robotAngle) {
+
         robotAngle = MathUtils.cvtAngleToNewDomain(robotAngle);
 
         Point delta = getEncTiks().subtract(lastTiks);
         lastTiks = getEncTiks();
 
-        if (Math.abs(robotAngle) > 90) {
-            delta.x *= -1;
-            delta.y *= -1;
-        }
-
         Log.i("EncTiks", delta.toString() + ", " + getEncTiks());
         Log.i("Angle", robotAngle + "");
 
-        double yChange = delta.y * Math.cos(Math.toRadians(robotAngle)) - delta.x * Math.sin(Math.toRadians(robotAngle));
-        double xChange = delta.y * Math.sin(Math.toRadians(robotAngle)) + delta.x * Math.cos(Math.toRadians(robotAngle));
+        /*
+        y = y * cos(robotAngle) + x * cos(robotAngle + 90)
+        x = y * sin(robotAngle) + x * sin(robotAngle + 90)
+         */
+
+
+
+        double yChange = delta.y * Math.cos(Math.toRadians(robotAngle)) + delta.x * Math.cos(Math.toRadians(robotAngle + 90));
+        double xChange = delta.y * Math.sin(Math.toRadians(robotAngle)) + delta.x * Math.sin(Math.toRadians(robotAngle + 90));
+
+//        double yChange = delta.y * Math.cos(Math.toRadians(robotAngle)) - delta.x * Math.sin(Math.toRadians(robotAngle));
+//        double xChange = delta.y * Math.sin(Math.toRadians(robotAngle)) + delta.x * Math.cos(Math.toRadians(robotAngle));
 
         Point change = new Point(xChange, yChange);
 

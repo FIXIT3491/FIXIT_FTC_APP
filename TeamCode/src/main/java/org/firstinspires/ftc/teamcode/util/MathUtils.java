@@ -76,6 +76,25 @@ public class MathUtils {
         return (num > bound1 && num < bound2) || (num > bound2 && num < bound1);
     }
 
+    //currently for angles from IMU only
+    public static double getReflexiveAngle(double angdeg) {
+        angdeg += 90;
+
+        if (angdeg > 360) {
+            angdeg -= 360;
+        }//if
+
+        if (angdeg > 270) {
+            return 360 - angdeg;
+        } else if (angdeg > 180) {
+            return angdeg - 180;
+        } else if (angdeg > 90) {
+            return 180 - angdeg;
+        } else {
+            return angdeg;
+        }//else
+    }
+
     public static double cvtAngleToNewDomain(double angle) {
         if (angle < -180) {
             angle += 360;
@@ -88,7 +107,7 @@ public class MathUtils {
 
     public static double cvtAngleJumpToNewDomain(double delta) {
         if (Math.abs(delta) > 180) {
-            delta = Math.signum(delta) * 360 - delta;
+            delta = -(Math.signum(delta) * 360 - delta);
         }//if
 
         return delta;

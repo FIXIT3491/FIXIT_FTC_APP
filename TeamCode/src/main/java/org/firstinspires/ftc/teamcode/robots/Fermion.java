@@ -17,7 +17,9 @@ import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.TrackBall;
 import org.firstinspires.ftc.teamcode.newhardware.FXTServo;
 import org.firstinspires.ftc.teamcode.newhardware.Lights;
 import org.firstinspires.ftc.teamcode.newhardware.Motor;
+import org.firstinspires.ftc.teamcode.roboticslibrary.FXTCamera;
 import org.firstinspires.ftc.teamcode.roboticslibrary.TaskHandler;
+import org.firstinspires.ftc.teamcode.util.CircleDetector;
 import org.firstinspires.ftc.teamcode.util.MathUtils;
 import org.firstinspires.ftc.teamcode.util.PID;
 import org.firstinspires.ftc.teamcode.util.VortexUtils;
@@ -99,7 +101,7 @@ public class Fermion {
     private final static double TURNING_ACCURACY_DEG = 2;
 
     private final static double MINIMUM_TRACKING_SPEED = 0.19;
-    private final static double TRACKING_ACCURACY_TIKS = 30;
+    private final static double TRACKING_ACCURACY_TIKS = 280;
 
     /*
     LIGHT SENSOR CONSTANT
@@ -378,7 +380,7 @@ public class Fermion {
 
     public void absoluteTrack(TrackBall.Point dest, double speed, boolean turnFirst) {
 
-        TrackBall.Point start = mouse.getAbsoluteCoord();
+        TrackBall.Point start = mouse.getAbsoluteCoord().multiply(3 * Math.PI * 25.4 / 1440);
 
         Log.i("AbsoluteInfo", start.toString());
 
@@ -386,15 +388,12 @@ public class Fermion {
 
         if (turnFirst) {
 
-            double degrees = MathUtils.cvtAngleToNewDomain(dest.acot());
-            start = mouse.getAbsoluteCoord();
+            double degrees = MathUtils.cvtAngleToNewDomain(change.acot());
 
             Log.i("Info", degrees + ", " + change.toString() + ", " + change.hypot());
-            if (degrees < 0) {
-                imuTurnL(-degrees, 0.5);
-            } else {
-                imuTurnR(degrees, 0.5);
-            }//else
+            absoluteIMUTurn(degrees, 0.6);
+
+            start = mouse.getAbsoluteCoord().multiply(3 * Math.PI * 25.4 / 1440);
 
             change = dest.subtract(start);
 
@@ -402,7 +401,7 @@ public class Fermion {
 
             track(0, change.hypot(), speed);
         } else {
-            double degrees = MathUtils.cvtAngleToNewDomain(dest.acot());
+            double degrees = MathUtils.cvtAngleToNewDomain(change.acot());
 
             track(degrees, change.hypot(), speed);
         }//else
@@ -451,15 +450,17 @@ public class Fermion {
         double beginAngle = MathUtils.cvtAngleToNewDomain(getIMUAngle()[0]);
         double targetAngle = MathUtils.cvtAngleToNewDomain(beginAngle - degrees);
 
+        Log.i("targetAngleIMUTURNL", targetAngle + "");
+
         while (RC.l.opModeIsActive()) {
 
             double currentAngle = MathUtils.cvtAngleToNewDomain(getIMUAngle()[0]);
             double angleToTurn = MathUtils.cvtAngleJumpToNewDomain(currentAngle - targetAngle);
 
-            Log.i("CurrentAngleXA", currentAngle + "");
-            Log.i("AngleToTurn", angleToTurn + "");
+            Log.i("CurrentAngleXAIMUTURNL", currentAngle + "");
+            Log.i("AngleToTurnIMUTURNL", angleToTurn + "");
 
-            turnL(Math.abs(angleToTurn) / 180 * (speed - MINIMUM_TURNING_SPEED) + MINIMUM_TURNING_SPEED);
+            turnL(Math.signum(angleToTurn) * (Math.abs(angleToTurn) / 180 * (speed - MINIMUM_TURNING_SPEED) + MINIMUM_TURNING_SPEED));
 
             if (Math.abs(angleToTurn) < TURNING_ACCURACY_DEG) {
                 break;
@@ -502,7 +503,9 @@ public class Fermion {
     public void absoluteIMUTurn(double degrees, double speed) {
         double currentAngle = MathUtils.cvtAngleToNewDomain(getIMUAngle()[0]);
 
-        double toTurn = MathUtils.cvtAngleJumpToNewDomain(degrees - currentAngle);
+        double toTurn = MathUtils.cvtAngleToNewDomain(degrees - currentAngle);
+
+        Log.i("ToTurnIMUTURNL", toTurn + "");
 
         if (toTurn < 0) {
             imuTurnL(-toTurn, speed);
@@ -769,6 +772,12 @@ public class Fermion {
         }//if
     }//shoot
 
+    public void loadShooter() {
+        if (shooterState != FIRE && shooterState != FIRING) {
+            shooterState = LOADING;
+        }//if
+    }//loadShooter
+
     public int getShooterState() {
         return shooterState;
     }//getShooterState
@@ -792,6 +801,11 @@ public class Fermion {
             shooterState = LOADING;
 
             door.goToPos("open");
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             setCollectorState(Robot.IN);
 
             try {
@@ -804,7 +818,22 @@ public class Fermion {
             setCollectorState(Robot.STOP);
 
             shooterState = LOADED;
-        }//if
+        }
+        else if (shooterState == LOADING) {
+            door.goToPos("open");
+            setCollectorState(Robot.IN);
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }//catch
+
+            door.goToPos("close");
+            setCollectorState(Robot.STOP);
+
+            shooterState = LOADED;
+        }//else
     }//updateShooter
 
     public void waitForShooterState(int state){
@@ -877,7 +906,20 @@ public class Fermion {
     }//getUltrasonicDistance
 
 
+    public double[] lookForCircleWithTimeout(FXTCamera cam, int timeout) {
 
+        long start = System.currentTimeMillis();
+        double[] circle = null;
+        while (RC.l.opModeIsActive() && System.currentTimeMillis() - start < timeout) {
+            circle = CircleDetector.findBestCircle(cam.photo(), true);
+
+            if (circle[0] != -1) {
+                break;
+            }//if
+        }//while
+
+        return circle;
+    }
 
     @Deprecated
     public void strafeToBeacon(VuforiaTrackableDefaultListener beacon, double bufferDistance, double speed, boolean strafe,

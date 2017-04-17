@@ -19,7 +19,6 @@ public class VeerFermionOp extends TeleOpMode implements TextToSpeech.OnInitList
 
     private Fermion tau;
     private TextToSpeech tts;
-    private FXTCamera cam;
 
     private double driveDirection = 1;
     private boolean capReleased = false;
@@ -29,23 +28,14 @@ public class VeerFermionOp extends TeleOpMode implements TextToSpeech.OnInitList
     public void initialize() {
         tts = new TextToSpeech(RC.c(), this);
         tau = new Fermion(true); //REVERT TO FALSE
-        cam = new FXTCamera(FXTCamera.FACING_BACKWARD, true);
 
         tau.startShooterControl();
 
         clearTimer(3);
         clearTimer(4);
-        cam.setExposure(-12);
 
     }//initialize
 
-    public void init_loop() {
-        if (getMilliSeconds(4) > 1000) {
-            cam.setExposure(12);
-            Log.i("fsdf", "fsdfs");
-            Log.i(cam.getBaseCamera().getParameters().getExposureCompensation() + "", cam.getBaseCamera().getParameters().getExposureCompensationStep() + "");
-        }
-    }
     public void start(){
         tau.capRelease.goToPos("start");
         tau.mouse.addAbsoluteCoordinateRunnable(tau.imu);
@@ -169,7 +159,6 @@ public class VeerFermionOp extends TeleOpMode implements TextToSpeech.OnInitList
 
     public void stop(){
         super.stop();
-        cam.destroy();
     }
 
     @Override

@@ -42,7 +42,10 @@ public abstract class AutoOpMode extends LinearOpMode {
 
         try {
             initDashboard();
-            runOp();
+
+            if (!isStopRequested()) {
+                runOp();
+            }//if
         } finally {
             stopOpMode();
             TaskHandler.removeAllTasks();

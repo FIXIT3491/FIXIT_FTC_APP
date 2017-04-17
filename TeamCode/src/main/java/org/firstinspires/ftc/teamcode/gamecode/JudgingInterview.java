@@ -20,7 +20,7 @@ public class JudgingInterview extends AutoOpMode implements TextToSpeech.OnInitL
     public void runOp() throws InterruptedException {
         TextToSpeech text = new TextToSpeech(RC.c(), this);
         text.setSpeechRate(0.9f);
-        Fermion fermion = new Fermion(false);
+        Fermion fermion = new Fermion(true);
         fermion.stop();
         fermion.startShooterControl();
 
@@ -70,13 +70,14 @@ public class JudgingInterview extends AutoOpMode implements TextToSpeech.OnInitL
         fermion.lifter.stop();
 
         text.speak("I also have had some problems with balls getting in front me so I use my whiskers to clear balls from in front of the beacons", TextToSpeech.QUEUE_ADD, null);
+
+        while(opModeIsActive() && text.isSpeaking()) {
+            idle();
+        }//while
+
         fermion.clearBall();
         sleep(500);
         fermion.resetBallClearing();
-
-
-
-
 
     }
 
