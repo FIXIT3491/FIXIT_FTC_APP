@@ -51,6 +51,8 @@ public abstract class LinearTeleOpMode extends LinearOpMode {
 
             initialize();
 
+            try{
+
             RC.t.addData("OpMode", "Initialization Complete");
 
             waitForStart();
@@ -64,6 +66,12 @@ public abstract class LinearTeleOpMode extends LinearOpMode {
                 loopOpMode();
                 telemetry.update();
             }
+            } finally {
+
+                TaskHandler.removeAllTasks();
+                stopOpMode();
+            }
+
         }
 
 
@@ -77,6 +85,8 @@ public abstract class LinearTeleOpMode extends LinearOpMode {
          */
 
         public abstract void loopOpMode();
+
+        public abstract void stopOpMode();
 
 
         /**

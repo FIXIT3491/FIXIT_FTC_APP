@@ -53,9 +53,9 @@ public class ArmControl extends TeleOpMode {
             lily.door.goToPos("closed");
         }
 
-        RC.t.addData("basejoint", "" + lily.elbow.getCurrentPosition());
-        RC.t.addData("turntable", "" + lily.turnTable.getCurrentPosition());
-        RC.t.addData("wrist", "" + lily.wrist.currentPos);
+        RC.t.addData("basejoint", "" + lily.elbow.getBaseCurrentPosition());
+        RC.t.addData("turntable", "" + lily.turnTable.getBaseCurrentPosition());
+        RC.t.addData("wrist", "" + lily.wrist.getPosition());
 
     }
 }

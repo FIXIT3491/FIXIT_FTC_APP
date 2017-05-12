@@ -6,8 +6,8 @@ package org.firstinspires.ftc.teamcode.newhardware;
 public class LinearServo extends FXTServo {
 
     private double position = 1;
-    public double min = 0;
-    public double max = 1;
+    private double min = 0;
+    private double max = 1;
     private double length = 2.54;
 
     public LinearServo(String address) {
@@ -32,10 +32,20 @@ public class LinearServo extends FXTServo {
         setPosition(position);
     }//out
 
-    public void goToPosition(double mm) {
+
+    @Override
+    public void setPosition(double mm) {
         if (mm < length && mm >= 0) {
-            setPosition(mm / length);
-        }
+            super.setPosition(mm / length);
+        }//if
+    }//goToPosition
+
+    public double getMin() {
+        return min;
+    }//getMin
+
+    public double getMax() {
+        return max;
     }
 
     public void setRange(double min, double max) {
@@ -45,5 +55,9 @@ public class LinearServo extends FXTServo {
 
     public void setLength(double length) {
         this.length = length;
+    }
+
+    public double getLength() {
+        return length;
     }
 }

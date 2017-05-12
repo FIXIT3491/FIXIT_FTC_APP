@@ -87,6 +87,6 @@ public class BasketRedWait extends TeleOpMode {
         }
 
         lily.checkAllSystems();
-        dataLogData("" + lily.motorL.getCurrentPosition());
+        dataLogData("" + lily.motorL.getBaseCurrentPosition());
     }
 }

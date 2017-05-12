@@ -252,6 +252,6 @@ public abstract class FXTSensor implements FXTDevice {
     public void check() {
         getValues();
         getValue();
-    }//check
+    }//checkTimer
 
 }//FixedSensor

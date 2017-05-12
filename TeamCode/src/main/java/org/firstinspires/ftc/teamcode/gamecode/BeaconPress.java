@@ -3,21 +3,20 @@ package org.firstinspires.ftc.teamcode.gamecode;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.vuforia.Image;
 import com.vuforia.PIXEL_FORMAT;
 import com.vuforia.Vuforia;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
-import org.firstinspires.ftc.teamcode.robots.*;
+import org.firstinspires.ftc.teamcode.robots.Fermion;
 import org.firstinspires.ftc.teamcode.util.VortexUtils;
+
 
 /**
  * Created by Windows on 2016-11-06.

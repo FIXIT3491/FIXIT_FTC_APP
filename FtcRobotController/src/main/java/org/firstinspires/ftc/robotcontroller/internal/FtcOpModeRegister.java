@@ -43,11 +43,13 @@ import com.qualcomm.robotcore.eventloop.opmode.OpModeMeta;
 import com.qualcomm.robotcore.eventloop.opmode.OpModeRegister;
 import com.qualcomm.robotcore.eventloop.opmode.AnnotatedOpModeRegistrar;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.InstantRunDexHelper;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.ConceptNullOp;
 import org.firstinspires.ftc.robotcore.internal.AppUtil;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
@@ -101,13 +103,12 @@ public class FtcOpModeRegister implements OpModeRegister {
 
         try {
             List<String> classNames = Collections.list(FtcControllerUtils.activity().dxFile.entries());
+            classNames.addAll(InstantRunDexHelper.getAllClasses(AppUtil.getInstance().getActivity()));
 
             for (String clazz : classNames) {
 
                 if (clazz.contains(pkgName)) {
                     Class opMode = Class.forName(clazz);
-
-                    Log.i("CLAZZ", clazz);
 
                     if (!opMode.getSimpleName().equals("") && !opMode.isAnnotationPresent(Disabled.class) && !opMode.isAnnotationPresent(Autonomous.class) && !opMode.isAnnotationPresent(TeleOp.class)) {
                         OpModeMeta meta;

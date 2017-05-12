@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.gamecode;
 
+import android.util.Log;
+
 import com.qualcomm.hardware.adafruit.AdafruitBNO055IMU;
 import com.qualcomm.hardware.adafruit.BNO055IMU;
 import com.qualcomm.hardware.adafruit.JustLoggingAccelerationIntegrator;
@@ -20,19 +22,18 @@ import org.firstinspires.ftc.teamcode.robots.Fermion;
 /**
  * Created by Owner on 8/31/2015.
  */
-public class AdafruitCheck extends LinearTeleOpMode {
+@Autonomous
+public class AdafruitCheck extends AutoOpMode{
 
-    Fermion f;
-
-    @Override
-    public void initialize() {
-        f = new Fermion(true);
-    }
 
     @Override
-    public void loopOpMode() {
+    public void runOp() throws InterruptedException {
+        Fermion f = new Fermion(true);
+
+        waitForStart();
+
+        f.imuTurnL(90, 0.5);
+
         sleep(500);
-        f.imuTurnR(45, 0.3);
-        telemetry.addData("k", cycles);
     }
 }

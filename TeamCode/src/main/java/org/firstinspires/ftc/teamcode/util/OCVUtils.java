@@ -4,7 +4,10 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
+import android.widget.ImageView;
 
+import org.firstinspires.ftc.robotcontroller.internal.FtcControllerUtils;
+import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.RC;
 
 import org.opencv.android.Utils;
@@ -20,6 +23,7 @@ import java.io.InputStream;
 public final class OCVUtils {
 
     final static String LOGTAG = "FTC OpenCV";
+    static ImageView displayImage;
 
     public static Mat bitmapToMat (Bitmap bit, int cvType) {
         Mat newMat = new Mat(bit.getHeight(), bit.getWidth(), cvType);
@@ -85,6 +89,35 @@ public final class OCVUtils {
 
         process.put(0, 0, temp);
 
+    }
+
+    public static void displayImage(final Mat mat) {
+        if (displayImage == null) {
+            displayImage = new ImageView(RC.c());
+            FtcControllerUtils.addView(displayImage, R.id.cameraMonitorViewId);
+        }//if
+
+        Log.i("OCVUtils", mat.toString());
+
+        RC.a().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                displayImage.setImageBitmap(matToBitmap(mat));
+            }
+        });
+    }
+
+    public static void displayImage(Bitmap bit) {
+        if (displayImage == null) {
+            displayImage = new ImageView(RC.c());
+            FtcControllerUtils.addView(displayImage, R.id.cameraMonitorViewId);
+        }//if
+
+        displayImage.setImageBitmap(bit);
+    }
+
+    public static void hideImage() {
+        FtcControllerUtils.emptyView(R.id.cameraMonitorViewId);
     }
 
 }

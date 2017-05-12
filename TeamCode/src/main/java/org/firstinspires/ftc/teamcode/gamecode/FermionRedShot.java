@@ -1,10 +1,8 @@
 package org.firstinspires.ftc.teamcode.gamecode;
 
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.vuforia.Image;
 import com.vuforia.PIXEL_FORMAT;
 import com.vuforia.Vuforia;
 
@@ -17,7 +15,6 @@ import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
 import org.firstinspires.ftc.teamcode.robots.Robot;
-import org.firstinspires.ftc.teamcode.util.MathUtils;
 import org.firstinspires.ftc.teamcode.robots.Fermion;
 import org.firstinspires.ftc.teamcode.util.VortexUtils;
 
@@ -45,43 +42,32 @@ public class FermionRedShot extends AutoOpMode {
         VuforiaTrackableDefaultListener gears = (VuforiaTrackableDefaultListener) beacons.get(3).getListener();
         VuforiaTrackableDefaultListener tools = (VuforiaTrackableDefaultListener) beacons.get(1).getListener();
 
+        double voltage = muon.getBatteryVoltage();
         RC.t.addData("OpMode", "initialized");
+
         muon.startShooterControl();
-        muon.prime();
         waitForStart();
         beacons.activate();
         muon.addVeerCheckRunnable();
         muon.resetTargetAngle();
 
         muon.right(1);
-        sleep(1100);
+        if(voltage > 13.5){
+            sleep(900);
+        } else {
+            sleep(1100);
+        }
         muon.stop();
         muon.shoot();
-
-        if(RC.globalDouble("NumBalls") == 2){
-            muon.waitForState(Fermion.LOADED);
-            muon.door.goToPos("open");
-            muon.collector.setPower(-1);
-            muon.shoot();
-            sleep(1000);
-            muon.door.goToPos("close");
-            muon.setCollectorState(Robot.STOP);
-        }
-
-        muon.waitForState(Fermion.FIRE);
-
-
+        muon.waitForShooterState(Fermion.FIRE);
 
         muon.imuTurnR(25, 0.5);
 
         muon.forward(0.2);
-        sleep(1000);
-        muon.forward(0.09);
 
         while (gears.getPose() == null && opModeIsActive()) {
             idle();
         }//while
-
 
         VectorF trans = gears.getPose().getTranslation();
 
@@ -105,6 +91,12 @@ public class FermionRedShot extends AutoOpMode {
             telemetry.addData("Beacon", "could not not be found");
         }
 
+        if (config == VortexUtils.BEACON_BLUE_RED) {
+            RC.t.speakString("Pressing Right");
+        } else {
+            RC.t.speakString("Pressing Left");
+        }//else
+
         Log.i(TAG, "runOp: before");
         muon.forward(1);
         sleep(600);
@@ -112,16 +104,16 @@ public class FermionRedShot extends AutoOpMode {
 
         muon.absoluteIMUTurn(-90, 0.5);
 
-        while (opModeIsActive() && muon.ultra.getDistance() < 100){
+        while (opModeIsActive() && muon.getUltrasonicDistance(0) < 50){
             muon.backward(0.2);
         }
-        while(opModeIsActive() && muon.ultra.getDistance() > 457){
+        while(opModeIsActive() && muon.getUltrasonicDistance(0) > 457){
             muon.forward(0.2);
         }
 
         muon.stop();
 
-        muon.right(0.2);
+        muon.right(0.3);
 
         int sensor = (config == VortexUtils.BEACON_RED_BLUE)? Robot.LEFT : Robot.RIGHT;
         while (opModeIsActive() && muon.getLight(sensor) < 0.2){
@@ -130,27 +122,37 @@ public class FermionRedShot extends AutoOpMode {
         muon.stop();
         sleep(100);
         muon.forward(0.5);
-        sleep(700);
+        sleep(800);
         muon.stop();
         muon.backward(0.5);
         sleep(300);
 
+        muon.stop();
+
+        if (VortexUtils.isBlueOrRed(getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565)) == VortexUtils.OBJECT_BLUE) {
+            sleep(5000);
+            muon.forward(0.5);
+            sleep(400);
+            muon.stop();
+            muon.backward(0.5);
+            sleep(300);
+        }
 
 
         //------------------------------Beacon 2--------------
 
         muon.right(1);
-        sleep(1500);
+        sleep(1200);
 
-        while (opModeIsActive() && muon.ultra.getDistance() < 100){
+        while (opModeIsActive() && muon.getUltrasonicDistance(0) < 100){
             muon.backward(0.2);
         }
-        while(opModeIsActive() && muon.ultra.getDistance() > 457){
+        while(opModeIsActive() && muon.getUltrasonicDistance(0) > 457){
             muon.forward(0.2);
         }
         muon.stop();
 
-        muon.right(0.2);
+        muon.right(0.3);
 
         sensor = Robot.LEFT;
         while (opModeIsActive() && muon.getLight(sensor) < 0.2){
@@ -159,26 +161,19 @@ public class FermionRedShot extends AutoOpMode {
         muon.stop();
         sleep(100);
 
-        muon.absoluteIMUTurn(-90, 0.5);
+        muon.absoluteIMUTurn(-90, 0.6);
 
         muon.stop();
         RC.t.addData("Hi", "ya");
 
-        long timeBack = 0;
-        clearTimer();
-        while (tools.getPose() == null && opModeIsActive()) {
-            if(getMilliSeconds() > 500){
-                Log.i(TAG, "runOp: " + "can't see");
-                muon.backward(0.3);
-                sleep(300);
-                timeBack += 300;
-                muon.stop();
-                clearTimer();
-            }
-            idle();
+        while (opModeIsActive() && muon.getUltrasonicDistance(0) < 500) {
+            muon.backward(1);
         }//while
+        muon.stop();
 
-
+        while (tools.getPose() == null && opModeIsActive()){
+            idle();
+        }
 
         config = VortexUtils.NOT_VISIBLE;
         try{
@@ -191,14 +186,13 @@ public class FermionRedShot extends AutoOpMode {
             telemetry.addData("Beacon", "could not not be found");
         }
 
-        while(opModeIsActive() && muon.ultra.getDistance() > 300){
+        while(opModeIsActive() && muon.getUltrasonicDistance(0) > 300){
             muon.forward(0.2);
         }
 
-
         if(config == VortexUtils.BEACON_BLUE_RED){
             muon.stop();
-            muon.left(0.2);
+            muon.left(0.3);
 
             sensor = Robot.RIGHT;
             while (opModeIsActive() && muon.getLight(sensor) < 0.2){
@@ -206,7 +200,17 @@ public class FermionRedShot extends AutoOpMode {
             }
             muon.stop();
             sleep(100);
-        }
+        } else {
+            muon.stop();
+            muon.left(0.3);
+
+            sensor = Robot.LEFT;
+            while (opModeIsActive() && muon.getLight(sensor) < 0.2){
+                Log.i("light", "" + muon.getLight(sensor));
+            }
+            muon.stop();
+            sleep(100);
+        }//else
 
         muon.forward(0.3);
         sleep(1000);
@@ -215,6 +219,12 @@ public class FermionRedShot extends AutoOpMode {
         sleep(300);
         muon.stop();
 
+        if(RC.globalBool("Cap-ball")){
+            muon.imuTurnR(45, 0.7);
+            muon.backward(1);
+            sleep(2000);
+            muon.stop();
+        }
     }//runOp
 
 }

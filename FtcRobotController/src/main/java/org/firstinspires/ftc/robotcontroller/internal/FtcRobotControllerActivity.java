@@ -47,7 +47,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -99,17 +98,12 @@ import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -160,6 +154,7 @@ public class FtcRobotControllerActivity extends Activity {
   protected Button initOpMode;
   protected Button runOpMode;
   protected Button stopOpMode;
+  protected TextView audTelStatus;
 
   protected class RobotRestarter implements Restarter {
 
@@ -308,6 +303,19 @@ public class FtcRobotControllerActivity extends Activity {
     } catch (IOException e) {
       e.printStackTrace();
     }//catch
+
+    if (!OpenCVLoader.initDebug()) {
+      RobotLog.d("OpenCV", "Internal OpenCV library not found. Using OpenCV Manager for initialization");
+      OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_0_0, this, mOpenCVCallBack);
+    } else {
+      RobotLog.d("OpenCV", "OpenCV library found inside package. Using it!");
+      mOpenCVCallBack.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+    }//else
+
+    initOpMode = (Button) findViewById(R.id.initOpMode);
+    runOpMode = (Button) findViewById(R.id.runOpMode);
+    stopOpMode = (Button) findViewById(R.id.stopOpMode);
+
   }
 
   public void initOpMode(View v) {
@@ -345,7 +353,7 @@ public class FtcRobotControllerActivity extends Activity {
     updateUIAndRequestRobotSetup();
 
     cfgFileMgr.getActiveConfigAndUpdateUI();
-    cfgFileMgr.changeBackground(R.color.opaque_dark_fixit_green, R.id.idActiveConfigHeader);
+    cfgFileMgr.changeBackground(0xFF539E2E, R.id.idActiveConfigHeader);
 
     entireScreenLayout.setOnTouchListener(new View.OnTouchListener() {
       @Override
@@ -519,9 +527,9 @@ public class FtcRobotControllerActivity extends Activity {
       final RelativeLayout driverStation = (RelativeLayout) findViewById(R.id.driverstation);
 
       if (!driverStationEnabled) {
-
-        controllerService.shutdownRobot();
-        FtcControllerUtils.setUpRobotWithoutWifi();
+        FtcControllerUtils.reinitializeControllerService(false);
+        requestRobotRestart();
+        FtcControllerUtils.confirmOpModeRegistration();
 
         final Spinner spinner = (Spinner) findViewById(R.id.opModeList);
 
@@ -531,19 +539,21 @@ public class FtcRobotControllerActivity extends Activity {
           @Override
           public void run() {
             driverStation.setVisibility(View.VISIBLE);
-            cfgFileMgr.changeBackground(R.color.opaque_dark_fixit_green, R.id.idActiveConfigHeader);
+            cfgFileMgr.changeBackground(0xFF539E2E, R.id.idActiveConfigHeader);
           }//run
         });
 
         driverStationEnabled = true;
       } else {
+        FtcControllerUtils.reinitializeControllerService(true);
+
         requestRobotRestart();
 
         runOnUiThread(new Runnable() {
           @Override
           public void run() {
             driverStation.setVisibility(View.INVISIBLE);
-            cfgFileMgr.changeBackground(R.color.opaque_dark_fixit_green, R.id.idActiveConfigHeader);
+            cfgFileMgr.changeBackground(0xFF539E2E, R.id.idActiveConfigHeader);
           }//run
         });
 
@@ -600,8 +610,8 @@ public class FtcRobotControllerActivity extends Activity {
 
     HardwareFactory factory;
     RobotConfigFile file = cfgFileMgr.getActiveConfigAndUpdateUI();
-    cfgFileMgr.changeBackground(R.color.opaque_dark_fixit_green, R.id.idActiveConfigHeader);
-    
+    cfgFileMgr.changeBackground(0xFF539E2E, R.id.idActiveConfigHeader);
+
     HardwareFactory hardwareFactory = new HardwareFactory(context);
     try {
       hardwareFactory.setXmlPullParser(file.getXml());
@@ -649,13 +659,17 @@ public class FtcRobotControllerActivity extends Activity {
     }
   }
 
+
   public static void initializeGlobals() {
     HashMap<String, Object> values = new HashMap<>();
+    String globalsPath = AppUtil.getInstance().getApplication().getExternalFilesDir(null).getAbsolutePath() + "/globals.txt";
+
+    GlobalValuesActivity.GLOBALS_FILE_PATH = globalsPath;
 
     try {
+        new File(globalsPath).createNewFile();
 
-        BufferedReader globalsRead = new BufferedReader(new FileReader(
-                AppUtil.getInstance().getApplication().getExternalFilesDir(null).getAbsolutePath() + "/globals.txt"));
+        BufferedReader globalsRead = new BufferedReader(new FileReader(globalsPath));
 
         String toAdd = globalsRead.readLine();
         while (toAdd != null) {
@@ -671,7 +685,7 @@ public class FtcRobotControllerActivity extends Activity {
                 val = data[2];
             }//else
 
-            values.put(key, val);
+            GlobalValuesActivity.add(key, val);
 
             toAdd = globalsRead.readLine();
         }//while
@@ -680,21 +694,27 @@ public class FtcRobotControllerActivity extends Activity {
         e.printStackTrace();
     }//catch
 
-    GlobalValuesActivity.add("RedAlliance", true);
-    GlobalValuesActivity.add("TeleBeginAngle", 0);
-    GlobalValuesActivity.add("EncoderDistance", 500);
-    GlobalValuesActivity.add("VeerProportional", 0.7 / 90);
-    GlobalValuesActivity.add("VeerDerivative", (0.5 / 90) / 10);
-    GlobalValuesActivity.add("VeerIntegral", (0.1 / 90) / 1000);
+    int numEntries = GlobalValuesActivity.globals.size();
+
+    GlobalValuesActivity.tentativelyAdd("RedAlliance", true);
+    GlobalValuesActivity.tentativelyAdd("TeleBeginAngle", 0);
+    GlobalValuesActivity.tentativelyAdd("EncoderDistance", 500);
+    GlobalValuesActivity.tentativelyAdd("VeerProportional", 0.03);
+    GlobalValuesActivity.tentativelyAdd("VeerDerivative", (5 / 9) * 1E-6);
+    GlobalValuesActivity.tentativelyAdd("VeerIntegral", 3.1E-5);
+
+    GlobalValuesActivity.tentativelyAdd("WallProportional", 0.2);
+    GlobalValuesActivity.tentativelyAdd("WallDerivative", 0.2);
+    GlobalValuesActivity.tentativelyAdd("WallIntegral", 0);
+
     GlobalValuesActivity.addDashboard("WaitTime", 10000);
     GlobalValuesActivity.addDashboard("NumBalls", 1);
     GlobalValuesActivity.addDashboard("Cap-ball", true);
     GlobalValuesActivity.addDashboard("Ramp",false);
 
-    for (Map.Entry<String, Object> entry : values.entrySet()) {
-        Log.i(entry.getKey(), entry.getValue().toString());
-        GlobalValuesActivity.add(entry.getKey(), entry.getValue());
-    }//for
+    if (GlobalValuesActivity.globals.size() > numEntries) {
+      GlobalValuesActivity.writeValuesToFile();
+    }//if
 
   }
 

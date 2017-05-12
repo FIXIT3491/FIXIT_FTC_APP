@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.robots.Robot;
  * Created by Windows on 2017-01-15.
  */
 @Autonomous
-public class FermionShotBlue extends AutoOpMode {
+public class Fermion2ShotCapBlue extends AutoOpMode {
 
         @Override
         public void runOp() throws InterruptedException {
@@ -19,7 +19,6 @@ public class FermionShotBlue extends AutoOpMode {
 
             muon.startShooterControl();
             muon.addVeerCheckRunnable();
-            muon.prime();
             waitForStart();
             muon.resetTargetAngle();
 
@@ -33,7 +32,7 @@ public class FermionShotBlue extends AutoOpMode {
                 muon.shoot();
 
                 if(RC.globalDouble("NumBalls") == 2){
-                    muon.waitForState(Fermion.LOADED);
+                    muon.waitForShooterState(Fermion.LOADED);
                     muon.door.goToPos("open");
                     muon.collector.setPower(-1);
                     muon.shoot();
@@ -42,7 +41,7 @@ public class FermionShotBlue extends AutoOpMode {
                     muon.setCollectorState(Robot.STOP);
                 }//if
 
-                muon.waitForState(Fermion.FIRE);
+                muon.waitForShooterState(Fermion.FIRE);
             }
 
             if(RC.globalBool("Ramp")){

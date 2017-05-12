@@ -88,7 +88,7 @@ public class CopyCatExecutor {
             }
         };
 
-        TaskHandler.addTask("CopyCatExec: " + fileName, execute);
+        TaskHandler.addTask("CopyCatExecutor." + fileName.toUpperCase(), execute);
     }//execute
 
 }

@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.gamecode;
 
-import android.util.Log;
-
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.RC;
@@ -27,15 +25,15 @@ public class EncoderDatalog extends TeleOpMode {
     @Override
     public void loopOpMode() {
         if (stage == 0) {
-            test.setTarget(500, 0.4);
+            test.setTargetAndPower(500, 0.4);
             stage++;
-        } else if (stage == 1 && test.isFin()) {
-            test.setTarget(-500, 0.4);
+        } else if (stage == 1 && test.isTimeFin()) {
+            test.setTargetAndPower(-500, 0.4);
 
         }
 
 //        test.checkTarget();
-//        Log.i("Data", "" + test.getCurrentPosition() + ", " + test.target + ", " + test.getPower() + "\n");
-//        RC.t.dataLogData(test.getCurrentPosition() + ", " + test.target + ", " + test.getPower() + "\n");
+//        Log.i("Data", "" + test.getBaseCurrentPosition() + ", " + test.target + ", " + test.getPower() + "\n");
+//        RC.t.dataLogData(test.getBaseCurrentPosition() + ", " + test.target + ", " + test.getPower() + "\n");
     }
 }

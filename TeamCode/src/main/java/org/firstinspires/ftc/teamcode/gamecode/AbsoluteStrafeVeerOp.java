@@ -51,7 +51,7 @@ public class AbsoluteStrafeVeerOp extends TeleOpMode {
         }//if
         
         Log.i("thetaPlanned", theta + "");
-        Log.i("PlannedSpeeds", top.leftFore.plannedSpeed + ", " + top.leftBack.plannedSpeed + ", " + top.rightBack.plannedSpeed + ", " + top.rightFore.plannedSpeed);
+        Log.i("PlannedSpeeds", top.leftFore.getPlannedSpeed() + ", " + top.leftBack.getPlannedSpeed() + ", " + top.rightBack.getPlannedSpeed() + ", " + top.rightFore.getPlannedSpeed());
         Log.i("Speeds", top.leftBack.getPower() + ", " + top.leftFore.getPower() + ", " + top.rightBack.getPower() + ", " + top.rightFore.getPower());
     }//loopOpMode
 }//AbsoluteStrafeOp

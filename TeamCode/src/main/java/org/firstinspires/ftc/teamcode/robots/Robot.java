@@ -97,7 +97,7 @@ public class Robot {
                             m.setReverse(true);
                         }//if
 
-//                        if (xpp.getAttributeValue(null, "target").equals("check")) {
+//                        if (xpp.getAttributeValue(null, "target").equals("checkTimer")) {
 //                            m.toggleChecking(true);
 //                        } else if (xpp.getAttributeValue(null, "target").equals("fix")) {
 //                            m.toggleTargetFixing(true);
@@ -168,12 +168,12 @@ public class Robot {
     }//wait
 
     public boolean allReady() {
-        return motorL.isFin() && motorR.isFin();
+        return motorL.isTimeFin() && motorR.isTimeFin();
     }//allReady
 
     public void checkAllSystems() {
-        motorL.check();
-        motorR.check();
+        motorL.updateTimer();
+        motorR.updateTimer();
     }//checkAllSystems
 
 
@@ -260,8 +260,8 @@ public class Robot {
 
         mm *= 1120 / (wheelDiameter * 25.4 * Math.PI); //convert mm to tiks
 
-        motorL.setTarget(mm, speed);
-        motorR.setTarget(mm, speed);
+        motorL.setTargetAndPower(mm, speed);
+        motorR.setTargetAndPower(mm, speed);
 
     }//forwardDistance
 
@@ -278,8 +278,8 @@ public class Robot {
 
         mm *= 1120 / (wheelDiameter * 25.4 * Math.PI); //convert mm to tiks
 
-        motorL.setTarget(-mm, speed); //target checking corrects motor direction
-        motorR.setTarget(-mm, speed);
+        motorL.setTargetAndPower(-mm, speed); //target checking corrects motor direction
+        motorR.setTargetAndPower(-mm, speed);
 
     }//backwardDistance
 
@@ -321,15 +321,15 @@ public class Robot {
 
     public void encTurnL(int tik, double speed) {
 
-        motorL.setTarget(-tik, -speed);
-        motorR.setTarget(tik, speed);
+        motorL.setTargetAndPower(-tik, -speed);
+        motorR.setTargetAndPower(tik, speed);
 
     }//encTurnL
 
     public void encTurnR(int tik, double speed) {
 
-        motorL.setTarget(tik, speed);
-        motorR.setTarget(-tik, -speed);
+        motorL.setTargetAndPower(tik, speed);
+        motorR.setTargetAndPower(-tik, -speed);
 
     }//encTurnR
 

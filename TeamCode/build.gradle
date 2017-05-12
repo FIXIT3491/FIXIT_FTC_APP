@@ -17,3 +17,8 @@ dependencies {
     compile project(':openCV')
     compile project(':FtcRobotController')
 }
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion '23.0.1'
+}

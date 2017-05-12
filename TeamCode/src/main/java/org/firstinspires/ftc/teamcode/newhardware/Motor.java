@@ -3,26 +3,33 @@ package org.firstinspires.ftc.teamcode.newhardware;
 
 import org.firstinspires.ftc.teamcode.RC;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorImpl;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 /**
  * Created by FIXIT on 15-08-18.
  * This class take the basic functionality of DcMotor but adds some methods to it
  */
-public class Motor implements FXTDevice {
+public class Motor implements FXTDevice, Timeable {
 
     private DcMotor m;
 
-    public int beginningPosition = 0;
     private long targetTime = -1;
+    private double plannedSpeed = 0;
 
-    public double minSpeed = 0.09;
-    public int accuracy = 20;
-    public double plannedSpeed = 0;
+    private int numTiksPerRev = 1120;
+    private MotorType motorType = MotorType.AM40;
 
-    /**
-     * Constructors
-     */
+    private int beginningPosition = 0;
+    private double minSpeed = 0.09;
+    private int positioningAccuracy = 20;
+
+    public enum MotorType {
+        AM20,
+        AM40,
+        AM60,
+        Tetrix,
+    }//Type
 
     /**
      * Initializes a new Motor based on a pre-existing DcMotor
@@ -39,9 +46,44 @@ public class Motor implements FXTDevice {
         this(RC.h.dcMotor.get(address));
     }//Motor
 
-    /*
-     * Methods
-     */
+    public DcMotor getM() {
+        synchronized (m) {
+            return m;
+        }//synchronized
+    }//getM
+
+    /***************
+    MOTOR PROPERTIES
+     ***************/
+
+    public int getNumTiksPerRev() {
+        return numTiksPerRev;
+    }//getNumTiksPerRev
+
+    public void setMotorType(MotorType motor){
+        switch (motor){
+            case AM20: numTiksPerRev = 560;
+                break;
+            case AM40: numTiksPerRev = 1120;
+                break;
+            case AM60: numTiksPerRev = 1680;
+                break;
+            case Tetrix: numTiksPerRev = 1440;
+                break;
+        }//switch
+
+        this.motorType = motor;
+    }//setMotorType
+
+    public MotorType getMotorType() {
+        return motorType;
+    }//getMotorType
+
+    public void setMode(DcMotor.RunMode mode) {
+        synchronized (m) {
+            m.setMode(mode);
+        }//synchronized
+    }//setMode
 
     /**
      * Changes whether a motor spins forward or reverse based on a positive input value.
@@ -57,15 +99,50 @@ public class Motor implements FXTDevice {
         }//synchronized
     }//setReverse
 
-    /**
-     * Stops the motor
-     */
-    public void stop() {
-        setPower(0);
-    }//stop
 
-    //PRECISION CONTROL
 
+    /*****************************
+    ENCODER TARGET & TIMER METHODS
+     *****************************/
+
+    public void setAbsoluteTarget(int target){
+        setTarget(getBaseCurrentPosition() + target - getAbsolutePosition());
+    }//setAbsoluteTarget
+
+    public void setTarget(int tik) {
+        synchronized (m) {
+            m.setTargetPosition(tik);
+        }//synchronized
+    }//setTargetAndPower
+
+    public void setRelativeTarget(int tik) {
+        setTarget(tik + getBaseCurrentPosition());
+    }//setTargetAndPower
+
+    public void addToTarget(int tik) {
+        setTarget(getTarget() + tik);
+    }
+
+    public int getTarget(){
+        synchronized (m) {
+            return m.getTargetPosition();
+        }//synchronized
+    }//getTargetPosition
+
+    public void setPositioningAccuracy (int tikAcc) {
+        this.positioningAccuracy = tikAcc;
+    }//setPositioningAccuracy
+
+    public int getPositioningAccuracy() {
+        return positioningAccuracy;
+    }//getPositioningAccuracy
+
+    public void setTimer(int millis, double speed) {
+        setPower(speed);
+        targetTime = System.currentTimeMillis() + millis;
+    }//setTimer
+
+    @Deprecated
     public void toggleChecking(boolean check) {
         if (check) {
             setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -74,17 +151,16 @@ public class Motor implements FXTDevice {
         }//else
     }//toggleChecking
 
-    public void setTimer(int millis, double speed) {
-        setPower(speed);
-        targetTime = System.currentTimeMillis() + millis;
-    }//setTimer
-
-    public void setTarget(int target, double speed) {
+    public void setTargetAndPower(int target, double speed) {
         setTarget(target);
         setPower(speed);
-    }//setTarget
+    }//setTargetAndPower
 
-    //SET MOTOR POWER
+
+    /*********************
+    ENCODER & TIMER STATUS
+     *********************/
+
     public boolean isBusy() {
         synchronized (m) {
             return m.isBusy();
@@ -92,44 +168,26 @@ public class Motor implements FXTDevice {
     }//isBusy
 
     public boolean isFin() {
-        return Math.abs(getCurrentPosition() - getM().getTargetPosition()) < accuracy;
+        return Math.abs(getBaseCurrentPosition() - getM().getTargetPosition()) < positioningAccuracy;
     }//finished
 
-    public DcMotor getM() {
-        synchronized (m) {
-            return m;
-        }//synchronized
-    }//getM
+    public boolean isTimeFin() {
+        return targetTime == -1;
+    }//isTimeFin
 
-    public void setTarget(int tik) {
-        toggleChecking(true);
+    public void updateTimer() {
+        if (!getM().getMode().equals(DcMotor.RunMode.RUN_TO_POSITION)) {
+            if (System.currentTimeMillis() > targetTime && targetTime != -1) {
+                stop();
+                targetTime = -1;
+            }//if
+        }//if
+    }//run
 
-        synchronized (m) {
-            m.setTargetPosition(tik + m.getCurrentPosition());
-        }//synchronized
-    }//setTarget
 
-    public void setAbsoluteTarget(int tik) {
-        setTarget(tik - getCurrentPosition());
-    }//setAbsTarget
-
-    public int getCurrentPosition() {
-        synchronized (m) {
-            return m.getCurrentPosition();
-        }//synchronized
-    }//getCurrentPosition
-
-    public double getPower() {
-        synchronized (m) {
-            return m.getPower();
-        }//synchronized
-    }//getPower
-
-    public void setMode(DcMotor.RunMode mode) {
-        synchronized (m) {
-            m.setMode(mode);
-        }//synchronized
-    }//setMode
+    /**********
+    MOTOR POWER
+     **********/
 
     public void setPower(double power) {
 
@@ -144,55 +202,120 @@ public class Motor implements FXTDevice {
         synchronized (m) {
             m.setPower(power);
         }//synchronized
-    }//setPowerSuper
+    }//setPower
 
-    //LOGGING
+    public double getPower() {
+        synchronized (m) {
+            return m.getPower();
+        }//synchronized
+    }//getPower
 
-    public String returnCurrentState() {
-        return "Current Pos: " + getCurrentPosition() +
-                ", Power: " + getPower() +
-                ", Target: " + getM().getTargetPosition();
-    }//returnCurrentState
+    public void stop() {
+        setPower(0);
+    }//stop
 
-    public void runToPosition(int tiks, double speed){
+    public void usePlannedSpeed() {
+        setPower(plannedSpeed);
+    }//usePlannedSpeed
 
-        m.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        m.setTargetPosition(m.getCurrentPosition() + tiks);
+    /*********************
+    MOTOR SPEED PROPERTIES
+     *********************/
+
+    public void setPlannedSpeed(double plannedSpeed) {
+        this.plannedSpeed = plannedSpeed;
+    }//setPlannedSpeed
+
+    public double getPlannedSpeed() {
+        return this.plannedSpeed;
+    }//setPlannedSpeed
+
+    public void setMinimumSpeed(double minimumSpeed) {
+        this.minSpeed = minimumSpeed;
+    }//setMinimumSpeed
+
+    public double getMinimumSpeed() {
+        return minSpeed;
+    }//getMinimumSpeed
+
+
+    /********************************
+    POSITION ACCESSORS & MANIPULATORS
+     ********************************/
+
+    /**
+     * @return the position within the current revolution of this motor (relative to beginningPosition)
+     */
+    public int getAbsolutePosition(){
+        return (getPosition() - beginningPosition) % numTiksPerRev;
+    }//getAbsolutePosition
+
+    /**
+     * @return the encoder tiks that the motor has moved since its encoder was reset using default FTC libraries
+     */
+    public int getBaseCurrentPosition() {
+        synchronized (m) {
+            return m.getCurrentPosition();
+        }//synchronized
+    }//getBaseCurrentPosition
+
+    /**
+     * @return the encoder tiks that the motor has moved since its encoder was rest using our library
+     */
+    public int getPosition() {
+        return getBaseCurrentPosition() - getBeginningPosition();
+    }//getPosition
+
+    /**
+     * @return the encoder tiks at which the motor began
+     */
+    public int getBeginningPosition() {
+        return beginningPosition;
+    }//getBeginningPosition
+
+    /**
+     * @param beginningPosition the encoder tik position at which the motor began
+     */
+    public void setBeginningPosition(int beginningPosition) {
+        this.beginningPosition = beginningPosition;
+    }//setBeginningPosition
+
+    public void resetEncoder(){
+        setBeginningPosition(getBaseCurrentPosition());
+    }//resetEncoder
+
+
+
+    /**********************
+    AUTOMATED MOTOR MOTIONS
+     **********************/
+
+    public void beginRunToPosition(int tiks, double speed){
+
+        setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        setRelativeTarget(tiks);
         setPower(speed);
-    }
+    }//beginRunToPosition
 
-    public void completeRunToPosition(int tiks, double speed) {
-        runToPosition(tiks, speed);
+    public void runToPosition(int tiks, double speed) {
+        beginRunToPosition(tiks, speed);
 
-        while (isFin()) {
+        while (isTimeFin()) {
             RC.l.idle();
         }//while
 
         stop();
     }//completeRunToPosition
 
-    //INHERITED METHODS
-
-    public void check() {
-
-        if (!getM().getMode().equals(DcMotor.RunMode.RUN_TO_POSITION)) {
-            if (System.currentTimeMillis() > targetTime && targetTime != -1) {
-                stop();
-                targetTime = -1;
-            }//if
-        }//if
-
-    }//run
-
-
-
-    public void setPlannedSpeed(double plannedSpeed) {
-        this.plannedSpeed = plannedSpeed;
-    }//setPlannedSpeed
-
-    public void usePlannedSpeed() {
-        setPower(plannedSpeed);
-    }//usePlannedSpeed
+    /******
+    LOGGING
+     ******/
+    public String returnCurrentState() {
+        return "Current Pos: " + getBaseCurrentPosition() +
+                ", Power: " + getPower() +
+                ", Target: " + getM().getTargetPosition();
+    }//returnCurrentState
 
 }//Motor

@@ -1,20 +1,10 @@
 package org.firstinspires.ftc.teamcode.gamecode;
 
-import android.support.annotation.Nullable;
-import android.util.Log;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.vuforia.Image;
-import com.vuforia.PIXEL_FORMAT;
-import com.vuforia.Vuforia;
 
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
-import org.firstinspires.ftc.teamcode.R;
-import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
+import org.firstinspires.ftc.teamcode.roboticslibrary.FXTCamera;
+import org.firstinspires.ftc.teamcode.robots.Fermion;
 import org.firstinspires.ftc.teamcode.util.VortexUtils;
 
 /**
@@ -23,56 +13,31 @@ import org.firstinspires.ftc.teamcode.util.VortexUtils;
 @Autonomous
 public class BeaconAnalysisTest extends AutoOpMode {
 
+    /*
+    RANGE: 285 to 500 mm away from beacon
+    TARGET: 370mm
+     */
+    FXTCamera cam;
+
     @Override
     public void runOp() throws InterruptedException {
-        VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
-        params.vuforiaLicenseKey = RC.VUFORIA_LICENSE_KEY;
-        params.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
 
-        VuforiaLocalizer locale = ClassFactory.createVuforiaLocalizer(params);
-        Vuforia.setFrameFormat(PIXEL_FORMAT.RGB565, true);
-        locale.setFrameQueueCapacity(1);
+        Fermion f = new Fermion(true);
+        cam = new FXTCamera(FXTCamera.FACING_BACKWARD, true);
 
-        VuforiaTrackables beacons = locale.loadTrackablesFromAsset("FTC_2016-17");
-        VuforiaTrackableDefaultListener gears = (VuforiaTrackableDefaultListener) beacons.get(3).getListener();
 
         waitForStart();
-        beacons.activate();
 
-        while (!gears.isVisible()) {
-            delay(1);
-        }//while
+        while (opModeIsActive()){
+            VortexUtils.getBeaconConfig(cam.getImage());
 
-        while (opModeIsActive()) {
-            int beaconConfig = VortexUtils.NOT_VISIBLE;
-            while (beaconConfig == VortexUtils.NOT_VISIBLE) {
-                beaconConfig = VortexUtils.getBeaconConfig(getImageFromFrame(locale.getFrameQueue().take(), PIXEL_FORMAT.RGB565), gears, locale.getCameraCalibration());
-            }//while
+        }
 
-            if (beaconConfig == VortexUtils.BEACON_RED_BLUE) {
-                Log.i("RED", "BLUE");
-            } else if (beaconConfig != VortexUtils.NOT_VISIBLE) {
-                Log.i("BLUE", "RED");
-            } else {
-                Log.i("BEAC", "== -1");
-            }//else
-
-            delay(500);
-        }//while
     }//runOp
 
 
-    @Nullable
-    public static Image getImageFromFrame(VuforiaLocalizer.CloseableFrame frame, int format) {
-
-        long numImgs = frame.getNumImages();
-        for (int i = 0; i < numImgs; i++) {
-            if (frame.getImage(i).getFormat() == format) {
-                return frame.getImage(i);
-            }//if
-        }//for
-
-        return null;
+    public void stopOpMode() {
+        if (cam != null)
+            cam.destroy();
     }
-
 }
