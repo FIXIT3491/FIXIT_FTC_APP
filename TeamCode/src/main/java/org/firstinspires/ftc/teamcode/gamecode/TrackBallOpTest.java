@@ -65,4 +65,9 @@ public class TrackBallOpTest extends LinearTeleOpMode {
 //            proton.absoluteIMUTurn(0, 0.6);
         }//if
     }
+
+    @Override
+    public void stopOpMode() {
+        
+    }
 }

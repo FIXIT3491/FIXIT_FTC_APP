@@ -56,4 +56,9 @@ public class FermionOp extends LinearTeleOpMode {
         telemetry.addData("BL", charm.leftBack.returnCurrentState());
         telemetry.addData("BR", charm.rightBack.returnCurrentState());
     }
+
+    @Override
+    public void stopOpMode() {
+
+    }
 }//FermionOp

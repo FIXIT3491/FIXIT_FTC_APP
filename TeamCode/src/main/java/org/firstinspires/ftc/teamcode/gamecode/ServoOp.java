@@ -1,15 +1,10 @@
 package org.firstinspires.ftc.teamcode.gamecode;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.RC;
-import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.FXTLightSensor;
 import org.firstinspires.ftc.teamcode.newhardware.FXTServo;
-import org.firstinspires.ftc.teamcode.newhardware.LinearServo;
 import org.firstinspires.ftc.teamcode.opmodesupport.LinearTeleOpMode;
-import org.firstinspires.ftc.teamcode.opmodesupport.TeleOpMode;
 
 /**
  * Created by User on 8/25/2015.
@@ -83,5 +78,10 @@ public class ServoOp extends LinearTeleOpMode {
         RC.t.addData("Manual", manualMode );
 
         
+    }
+
+    @Override
+    public void stopOpMode() {
+
     }
 }
