@@ -4,7 +4,7 @@ import android.support.annotation.IntDef;
 import android.util.Log;
 
 import com.qualcomm.hardware.adafruit.AdafruitBNO055IMU;
-import com.qualcomm.hardware.adafruit.BNO055IMU;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;

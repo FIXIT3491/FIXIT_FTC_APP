@@ -115,7 +115,7 @@ public class FtcControllerUtils {
 
     public static boolean startDriverServiceInteraction() {
 
-        speakExec = ThreadPool.newSingleThreadExecutor();
+        speakExec = ThreadPool.newSingleThreadExecutor("AudibleTelemetry");
 
         speakExec.execute(new Runnable() {
             @Override
