@@ -211,8 +211,7 @@ public class GlobalValuesActivity extends Activity {
 
             for (Map.Entry<String, Object> entry : globals.entrySet()) {
                 if (entry.getValue() instanceof Double) {
-
-                    globalsWrite.write(("d,;" + entry.getKey() + ",;" + entry.getValue() + "\n").getBytes());
+                    globalsWrite.write(("d,;" + entry.getKey() + ",;" + (Double) entry.getValue() + "\n").getBytes());
                 } else if (entry.getValue() instanceof String) {
                     globalsWrite.write(("s,;" + entry.getKey() + ",;" + entry.getValue() + "\n").getBytes());
                 } else {
@@ -227,18 +226,49 @@ public class GlobalValuesActivity extends Activity {
 
     }//writeValuesToFile
 
-    public static void add(String key, Object val){
+    public static void add(String key, double val){
+        globals.put(key, val);
+    }//add
+    public static void add(String key, boolean val){
+        globals.put(key, val);
+    }//add
+    public static void add(String key, String val){
         globals.put(key, val);
     }//add
 
     //if key already exists, then we don't replace it
-    public static void tentativelyAdd(String key, Object val) {
+    public static void tentativelyAdd(String key, double val) {
         if (!globals.containsKey(key)) {
             globals.put(key, val);
         }//if
     }//recessivelyAdd
 
-    public static void addDashboard(String key, Object val) {
+    public static void tentativelyAdd(String key, boolean val) {
+        if (!globals.containsKey(key)) {
+            globals.put(key, val);
+        }//if
+    }//recessivelyAdd
+
+    public static void tentativelyAdd(String key, String val) {
+        if (!globals.containsKey(key)) {
+            globals.put(key, val);
+        }//if
+    }//recessivelyAdd
+
+
+    public static void addDashboard(String key, String val) {
+        tentativelyAdd(key, val);
+        autoKeys.add(key);
+    }//addDashboard
+
+
+    public static void addDashboard(String key, double val) {
+        tentativelyAdd(key, val);
+        autoKeys.add(key);
+    }//addDashboard
+
+
+    public static void addDashboard(String key, boolean val) {
         tentativelyAdd(key, val);
         autoKeys.add(key);
     }//addDashboard

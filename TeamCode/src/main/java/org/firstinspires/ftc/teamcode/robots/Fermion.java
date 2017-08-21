@@ -4,7 +4,7 @@ import android.support.annotation.IntDef;
 import android.util.Log;
 
 import com.qualcomm.hardware.adafruit.AdafruitBNO055IMU;
-import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
@@ -213,14 +213,14 @@ public class Fermion {
         ADAFRUIT IMU
         Note: init process takes some time
          */
-        if (auto) {
-            BNO055IMU.Parameters params = new BNO055IMU.Parameters();
-            params.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-            params.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-
-            imu = (AdafruitBNO055IMU) RC.h.get(BNO055IMU.class, "adafruit");
-            imu.initialize(params);
-        }//if
+//        if (auto) {
+//            BNO055IMU.Parameters params = new BNO055IMU.Parameters();
+//            params.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+//            params.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+//
+//            imu = (AdafruitBNO055IMU) RC.h.get(BNO055IMU.class, "adafruit");
+//            imu.initialize(params);
+//        }//if
 
         /*
         LIGHT SENSORS
@@ -958,6 +958,9 @@ public class Fermion {
 
     public void clearBall(){
         whisker1.goToPos("out");
+        if(RC.o instanceof LinearOpMode){
+            RC.l.sleep(300);
+        }
         whisker2.goToPos("out");
     }
 

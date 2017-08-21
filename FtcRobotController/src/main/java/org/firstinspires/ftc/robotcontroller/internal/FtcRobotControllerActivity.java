@@ -582,7 +582,7 @@ public class FtcRobotControllerActivity extends Activity {
     }
     else if (id == R.id.action_driver) {
 
-      final RelativeLayout driverStation = (RelativeLayout) findViewById(R.id.driverstation);
+      final RelativeLayout driverStation = (RelativeLayout) findViewById(R.id.super_station);
 
       if (!driverStationEnabled) {
         FtcControllerUtils.reinitializeControllerService(false);
@@ -740,13 +740,15 @@ public class FtcRobotControllerActivity extends Activity {
             Object val = null;
             if (data[0].equals("d")) {
                 val = Double.parseDouble(data[2]);
+                GlobalValuesActivity.add(key, (Double) val);
             } else if (data[0].equals("b")) {
                 val = Boolean.parseBoolean(data[2]);
+              GlobalValuesActivity.add(key, (Boolean) val);
             } else {
                 val = data[2];
+              GlobalValuesActivity.add(key, (String) val);
             }//else
 
-            GlobalValuesActivity.add(key, val);
 
             toAdd = globalsRead.readLine();
         }//while
@@ -758,11 +760,12 @@ public class FtcRobotControllerActivity extends Activity {
     int numEntries = GlobalValuesActivity.globals.size();
 
     GlobalValuesActivity.tentativelyAdd("RedAlliance", true);
-    GlobalValuesActivity.tentativelyAdd("TeleBeginAngle", 0);
+    GlobalValuesActivity.tentativelyAdd("TeleBeginAngle", 0.);
     GlobalValuesActivity.tentativelyAdd("EncoderDistance", 500);
     GlobalValuesActivity.tentativelyAdd("VeerProportional", 0.03);
     GlobalValuesActivity.tentativelyAdd("VeerDerivative", (5 / 9) * 1E-6);
     GlobalValuesActivity.tentativelyAdd("VeerIntegral", 3.1E-5);
+    GlobalValuesActivity.tentativelyAdd("WaitTime", 15000);
 
     GlobalValuesActivity.tentativelyAdd("WallProportional", 0.2);
     GlobalValuesActivity.tentativelyAdd("WallDerivative", 0.2);

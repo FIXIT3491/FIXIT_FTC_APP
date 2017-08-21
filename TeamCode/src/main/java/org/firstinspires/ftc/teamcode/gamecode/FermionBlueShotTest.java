@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import org.firstinspires.ftc.robotcontroller.internal.GlobalValuesActivity;
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
 import org.firstinspires.ftc.teamcode.roboticslibrary.FXTCamera;
@@ -52,7 +53,7 @@ public class FermionBlueShotTest extends AutoOpMode {
 
         muon.absoluteIMUTurn(90, 0.6);
 
-        muon.startWallFollowing(0, -90, 0.5, 400);
+        muon.startWallFollowing(0, -90, 0.7, 400);
 
         int sensor = Robot.LEFT;
 
@@ -84,7 +85,7 @@ public class FermionBlueShotTest extends AutoOpMode {
 
         if(config == VortexUtils.BEACON_RED_BLUE){
             muon.stop();
-            muon.left(0.4);
+            muon.left(0.7);
 
             sensor = Robot.RIGHT;
             if (muon.getLight(sensor) < Fermion.LIGHT_THRESHOLD) {
@@ -100,7 +101,7 @@ public class FermionBlueShotTest extends AutoOpMode {
 
             if (muon.getLight(Robot.LEFT) < Fermion.LIGHT_THRESHOLD) {
 
-                muon.right(0.4);
+                muon.right(0.7);
 
                 sensor = Robot.LEFT;
                 while (opModeIsActive() && muon.getLight(sensor) < muon.LIGHT_THRESHOLD) {
@@ -134,7 +135,7 @@ public class FermionBlueShotTest extends AutoOpMode {
             } else if (config == VortexUtils.BEACON_RED_BLUE ) {
                 if (muon.getLight(Robot.RIGHT) < Fermion.LIGHT_THRESHOLD && lastConfig != config) {
                     muon.stop();
-                    muon.left(0.4);
+                    muon.left(0.7);
 
                     sensor = Robot.RIGHT;
                     while (opModeIsActive() && muon.getLight(sensor) < muon.LIGHT_THRESHOLD) {
@@ -146,7 +147,7 @@ public class FermionBlueShotTest extends AutoOpMode {
             } else {
                 if (muon.getLight(Robot.LEFT) < Fermion.LIGHT_THRESHOLD) {
                     muon.stop();
-                    muon.right(0.4);
+                    muon.right(0.7);
 
                     sensor = Robot.LEFT;
                     while (opModeIsActive() && muon.getLight(sensor) < muon.LIGHT_THRESHOLD) {
@@ -171,7 +172,7 @@ public class FermionBlueShotTest extends AutoOpMode {
         //------------------------------Beacon 2--------------
         muon.startWallFollowing(0, -90, 1, 400);
         sleep(1000);
-        muon.setTargetSpeed(0.5);
+        muon.setTargetSpeed(0.7);
 
         sensor = Robot.LEFT;
         while (opModeIsActive() && muon.getLight(sensor) < Fermion.LIGHT_THRESHOLD){
@@ -202,7 +203,7 @@ public class FermionBlueShotTest extends AutoOpMode {
 
         if(config == VortexUtils.BEACON_RED_BLUE){
             muon.stop();
-            muon.left(0.4);
+            muon.left(0.7);
 
             sensor = Robot.RIGHT;
             while (opModeIsActive() && muon.getLight(sensor) < muon.LIGHT_THRESHOLD){
@@ -232,7 +233,7 @@ public class FermionBlueShotTest extends AutoOpMode {
             } else if (config == VortexUtils.BEACON_RED_BLUE ) {
                 if (muon.getLight(Robot.RIGHT) < Fermion.LIGHT_THRESHOLD && lastConfig != config) {
                     muon.stop();
-                    muon.left(0.4);
+                    muon.left(0.7);
 
                     sensor = Robot.RIGHT;
                     while (opModeIsActive() && muon.getLight(sensor) < muon.LIGHT_THRESHOLD) {
@@ -244,7 +245,7 @@ public class FermionBlueShotTest extends AutoOpMode {
             } else {
                 if (muon.getLight(Robot.LEFT) < Fermion.LIGHT_THRESHOLD) {
                     muon.stop();
-                    muon.right(0.4);
+                    muon.right(0.7);
 
                     sensor = Robot.LEFT;
                     while (opModeIsActive() && muon.getLight(sensor) < muon.LIGHT_THRESHOLD) {
@@ -273,6 +274,8 @@ public class FermionBlueShotTest extends AutoOpMode {
             sleep(1800);
             muon.stop();
         }
+
+
         cam.destroy();
     }//runOp
 

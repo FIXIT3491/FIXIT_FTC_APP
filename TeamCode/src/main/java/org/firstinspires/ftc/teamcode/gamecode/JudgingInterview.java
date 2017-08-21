@@ -83,7 +83,7 @@ public class JudgingInterview extends LinearTeleOpMode implements TextToSpeech.O
         }
         
         if(joy1.buttonY()){
-            text.speak("Hello my name is Fermion", TextToSpeech.QUEUE_FLUSH, null);
+            text.speak("Hello, my name is Fermion", TextToSpeech.QUEUE_FLUSH, null);
         }
 
         if (fermion.seesBall()) {
