@@ -1,19 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.app.Application;
 import android.content.Context;
-import android.view.View;
-
-import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
-import org.firstinspires.ftc.robotcontroller.internal.GlobalValuesActivity;
-import org.firstinspires.ftc.robotcore.internal.AppUtil;
-import org.firstinspires.ftc.teamcode.roboticslibrary.FXTTelemetry;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import java.util.HashMap;
+import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
+import org.firstinspires.ftc.robotcontroller.internal.GlobalValuesActivity;
+import org.firstinspires.ftc.robotcore.internal.AppUtil;
+import org.firstinspires.ftc.teamcode.roboticslibrary.FXTTelemetry;
 
 /**
  * Created by FIXIT on 15-08-21.
@@ -47,15 +43,27 @@ public class RC {
     }//setOpMode
 
     public static boolean globalBool(String key) {
-        return ((Boolean)GlobalValuesActivity.globals.get(key));
+        if (GlobalValuesActivity.globals.containsKey(key)) {
+            return ((Boolean) GlobalValuesActivity.globals.get(key));
+        }//if
+
+        return false;
     }//globalBool
 
     public static String globalString(String key) {
-        return (String) GlobalValuesActivity.globals.get(key);
+        if (GlobalValuesActivity.globals.containsKey(key)) {
+            return (String) GlobalValuesActivity.globals.get(key);
+        }//if
+
+        return "";
     }//globalString
 
     public static double globalDouble(String key) {
-        return ((Double) GlobalValuesActivity.globals.get(key));
+        if (GlobalValuesActivity.globals.containsKey(key)) {
+            return ((Double) GlobalValuesActivity.globals.get(key));
+        }//if
+
+        return -1;
     }//globalDouble
 
     public static Object global(String key){

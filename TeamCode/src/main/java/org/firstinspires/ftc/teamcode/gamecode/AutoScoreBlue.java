@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.gamecode;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.TrackBall;
 import org.firstinspires.ftc.teamcode.opmodesupport.AutoOpMode;
 import org.firstinspires.ftc.teamcode.roboticslibrary.FXTCamera;
@@ -36,11 +37,14 @@ public class AutoScoreBlue extends AutoOpMode {
 
         f.mouse.addAbsoluteCoordinateRunnable(f.imu);
 
+        sleep((int) RC.globalDouble("WaitTime"));
+        RC.t.addData("Hello", "Hello");
+
         f.absoluteTrack(new TrackBall.Point(0, 100), 0.3, false);
 
-        f.absoluteTrack(new TrackBall.Point(57*25.4, 36*25.4), 0.6, true);
+        f.absoluteTrack(new TrackBall.Point(60*25.4, 34*25.4), 0.6, true);
         Log.i("AbsoluteInfo", f.mouse.getAbsoluteCoord() + "");
-        f.absoluteIMUTurn(-155, 0.7);
+        f.absoluteIMUTurn(-145, 0.7);
         Log.i("AngleEnd", f.getIMUAngle()[0] + "");
 
         f.shoot();
@@ -128,19 +132,20 @@ public class AutoScoreBlue extends AutoOpMode {
         f.backward(0.3);
         f.setCollectorState(Robot.IN);
 
-        while (opModeIsActive() && !f.seesBall()) {
+        clearTimer();
+        while (opModeIsActive() && !f.seesBall() && getMilliSeconds() < 4000) {
             idle();
         }//while
 
         f.stop();
         f.setCollectorState(Robot.STOP);
         f.collector.setPower(1);
-        sleep(400);
-        f.loadShooter();
+        f.door.goToPos("open");
 
         f.absoluteTrack(new TrackBall.Point(36*25.4, 24*25.4), 0.6, true);
+        f.setCollectorState(Robot.STOP);
         Log.i("AbsoluteInfo", f.mouse.getAbsoluteCoord() + "");
-        f.absoluteIMUTurn(-60, 0.7);
+        f.absoluteIMUTurn(-90, 0.7);
         Log.i("AngleEnd", f.getIMUAngle()[0] + "");
 
         f.shoot();

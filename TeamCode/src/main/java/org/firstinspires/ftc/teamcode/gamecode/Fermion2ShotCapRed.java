@@ -17,9 +17,9 @@ public class Fermion2ShotCapRed extends AutoOpMode {
     public void runOp() throws InterruptedException {
         final Fermion muon = new Fermion(true);
 
+        waitForStart();
         muon.startShooterControl();
         muon.addVeerCheckRunnable();
-        waitForStart();
         muon.resetTargetAngle();
 
         sleep((long)RC.globalDouble("WaitTime"));
@@ -41,7 +41,7 @@ public class Fermion2ShotCapRed extends AutoOpMode {
                 muon.setCollectorState(Robot.STOP);
             }//if
 
-            muon.waitForShooterState(Fermion.FIRE);
+            muon.waitForShooterState(Fermion.LOADING);
         }
 
         if(RC.globalBool("Ramp")){
@@ -62,5 +62,7 @@ public class Fermion2ShotCapRed extends AutoOpMode {
             muon.stop();
         }
         muon.stop();
+
+
     }//runOp
 }

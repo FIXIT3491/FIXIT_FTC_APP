@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.opmodesupport.TeleOpMode;
-import org.firstinspires.ftc.teamcode.roboticslibrary.FXTCamera;
 import org.firstinspires.ftc.teamcode.robots.Fermion;
 import org.firstinspires.ftc.teamcode.robots.Robot;
 
@@ -39,6 +38,8 @@ public class VeerFermionOp extends TeleOpMode implements TextToSpeech.OnInitList
     public void start(){
         tau.capRelease.goToPos("start");
         tau.mouse.addAbsoluteCoordinateRunnable(tau.imu);
+
+
     }
 
     @Override
@@ -59,7 +60,7 @@ public class VeerFermionOp extends TeleOpMode implements TextToSpeech.OnInitList
         STRAFING & VEERING
          */
         double theta = Math.atan2(-driveDirection * joy1.x1(), driveDirection * joy1.y1());
-        double speed = ((joy1.rightBumper())? 0.3 : 1.0) * Math.hypot(joy1.y1(), joy1.x1());
+        double speed = ((joy1.rightBumper())? 0.6 : 1.0) * Math.hypot(joy1.y1(), joy1.x1());
 
         tau.strafe(Math.toDegrees(theta), speed, false);
         tau.veer(joy1.x2() / 2.0, false, false);
