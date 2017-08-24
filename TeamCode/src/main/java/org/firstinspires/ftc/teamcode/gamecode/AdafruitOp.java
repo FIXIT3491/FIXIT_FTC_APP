@@ -40,7 +40,7 @@ public class AdafruitOp extends TeleOpMode {
             clearTimer();
             stage++;
         } else if (getMilliSeconds() > 1000 && stage == 1) {
-            robot.halt();
+            robot.stop();
             clearTimer();
             stage++;
         } else if (getMilliSeconds() > 1000 && stage == 2) {
@@ -48,7 +48,7 @@ public class AdafruitOp extends TeleOpMode {
             clearTimer();
             stage++;
         } else if (getMilliSeconds() > 1000 && stage == 3) {
-            robot.halt();
+            robot.stop();
         }//elseif
 
         if (robot.motorL.getPower() == 0 && robot.motorR.getPower() == 0) {

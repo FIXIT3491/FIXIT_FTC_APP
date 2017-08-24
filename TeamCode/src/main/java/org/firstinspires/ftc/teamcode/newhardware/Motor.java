@@ -1,10 +1,10 @@
 package org.firstinspires.ftc.teamcode.newhardware;
 
 
-import org.firstinspires.ftc.teamcode.RC;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorImpl;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
+import org.firstinspires.ftc.teamcode.RC;
 
 /**
  * Created by FIXIT on 15-08-18.
@@ -98,6 +98,17 @@ public class Motor implements FXTDevice, Timeable {
             }//else
         }//synchronized
     }//setReverse
+
+    /**
+     * Check if the motor is reversed
+     * @return true if the motor is reversed false otherwise
+     */
+    public boolean isReversed(){
+        synchronized (m) {
+            DcMotorSimple.Direction dir = m.getDirection();
+            return dir == DcMotorSimple.Direction.REVERSE;
+        }//synchronized
+    }//isReversed
 
 
 

@@ -156,7 +156,7 @@ public class Larry extends Robot {
         motorL.setPower(0.3);
         motorR.setPower(0.1);
         wait(time);
-        halt();
+        stop();
     }
 
     //gyro doesn't always work, so we're not using it
@@ -177,7 +177,7 @@ public class Larry extends Robot {
 
         }
 
-        halt();
+        stop();
     }
 
     public void gyroTurnR (double deg, double speed) {
@@ -196,7 +196,7 @@ public class Larry extends Robot {
 
         }
 
-        halt();
+        stop();
 
     }
 

@@ -34,13 +34,12 @@ public class Awesomness extends AutoOpMode {
 
         while (sensor.red() < 100 && opModeIsActive()) {
             ceaser.forward(0.15);
-
         }
         ceaser.backward(0.5);
         sleep(500);
         imuTurnL(ceaser, imu, 90, 0.5);
         sleep(1000);
-        ceaser.halt();
+        ceaser.stop();
 
 
     }
@@ -68,7 +67,7 @@ public class Awesomness extends AutoOpMode {
             }//if
         }//while
 
-        r.halt();
+        r.stop();
     }//imuTurnL
 
     public double[] getIMUAngle(BNO055IMU imu) {
