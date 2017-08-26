@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.robots.Fermion;
  * Created by Windows on 2016-12-30.
  */
 
-public class FXTAnalogUltrasonicSensor extends FXTSensor {
+public class FXTAnalogUltrasonicSensor {
     AnalogInput ultra;
     DigitalChannel range;
 
@@ -22,17 +22,11 @@ public class FXTAnalogUltrasonicSensor extends FXTSensor {
         this.range.setState(true);
     }
 
-
     public FXTAnalogUltrasonicSensor(String name){
         ultra = RC.h.analogInput.get(name);
     }
 
     public double getDistance(){
         return ultra.getVoltage() * 3072 / ultra.getMaxVoltage();
-    }
-
-    @Override
-    public double returnValue() {
-        return getDistance();
     }
 }

@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.hardware.I2cDevice;
 /**
  * Created by FIXIT on 15-11-01.
  */
-public class I2cSensor extends FXTSensor implements I2cController.I2cPortReadyCallback {
+public class I2cSensor implements I2cController.I2cPortReadyCallback {
 
     public I2cDevice device;
     public I2cAddr i2cReadAddr;

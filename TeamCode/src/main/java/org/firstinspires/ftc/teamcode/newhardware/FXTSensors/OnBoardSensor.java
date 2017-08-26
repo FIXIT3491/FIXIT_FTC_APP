@@ -1,11 +1,14 @@
 package org.firstinspires.ftc.teamcode.newhardware.FXTSensors;
 
+import android.hardware.Sensor;
+
 /**
  * Created by FIXIT on 15-09-10.
  */
-public class OnBoardSensor extends FXTSensor {
+public class OnBoardSensor {
 
     private OnBoardSensorManager osm;
+    private int sensorType;
 
     /**
      * Creates a new MySensor and registers the listener to be the sensor manager
@@ -13,7 +16,7 @@ public class OnBoardSensor extends FXTSensor {
      * @param sensorManager the sensor manager that updates the storedValues
      */
     public OnBoardSensor (int sensorType, OnBoardSensorManager sensorManager) {
-        super.sensorType = sensorType;
+        this.sensorType = sensorType;
         sensorManager.addSensor(sensorType);
         this.osm = sensorManager;
     }//MySensor
@@ -25,10 +28,9 @@ public class OnBoardSensor extends FXTSensor {
      * @param sensorManager the sensor manager that updates the storedValues
      */
     public OnBoardSensor (int sensorType, String name, OnBoardSensorManager sensorManager) {
-        super.sensorType = sensorType;
+        this.sensorType = sensorType;
         sensorManager.addSensor(sensorType);
         this.osm = sensorManager;
-        sensorName = name;
     }//MySensor
 
     /**
@@ -37,15 +39,15 @@ public class OnBoardSensor extends FXTSensor {
      */
     public String getTypeString() {
         switch (sensorType){
-            case ACCEL: return "Accelerometer";
-            case MAG: return "Magnetometer";
-            case ORIENT: return "Orientation";
-            case GRAV: return "Gravity";
-            case LIGHT: return "Light";
-            case TEMP: return "Temperature";
-            case PROX: return "Proximity";
-            case LINEAR_ACC: return "Linear Acceleration";
-            case ROTATION_VECTOR: return "Rotation Vector";
+            case Sensor.TYPE_ACCELEROMETER: return "Accelerometer";
+            case Sensor.TYPE_MAGNETIC_FIELD: return "Magnetometer";
+            case Sensor.TYPE_ORIENTATION: return "Orientation";
+            case Sensor.TYPE_GRAVITY: return "Gravity";
+            case Sensor.TYPE_LIGHT: return "Light";
+            case Sensor.TYPE_TEMPERATURE: return "Temperature";
+            case Sensor.TYPE_PROXIMITY: return "Proximity";
+            case Sensor.TYPE_LINEAR_ACCELERATION: return "Linear Acceleration";
+            case Sensor.TYPE_ROTATION_VECTOR: return "Rotation Vector";
             default: return "Gyroscope";
         }//switch
     }//getName
@@ -62,8 +64,8 @@ public class OnBoardSensor extends FXTSensor {
      * Get the current storedValues of the sensor
      * @return the current storedValues
      */
-    public double[] returnValues() {
-        return osm.getValues(super.sensorType);
+    public double[] getValues() {
+        return osm.getValues(this.sensorType);
     }//getValues
 
 }

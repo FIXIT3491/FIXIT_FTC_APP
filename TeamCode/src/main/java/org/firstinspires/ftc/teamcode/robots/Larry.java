@@ -1,13 +1,12 @@
 package org.firstinspires.ftc.teamcode.robots;
 
+import android.hardware.Sensor;
+
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.newhardware.FXTCRServo;
-import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.FXTLightSensor;
-import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.FXTSensor;
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.OnBoardSensorManager;
 import org.firstinspires.ftc.teamcode.newhardware.Motor;
 import org.firstinspires.ftc.teamcode.newhardware.FXTServo;
-import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.FXTIrSeeker;
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.OnBoardSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -32,8 +31,6 @@ public class Larry extends Robot {
     private OnBoardSensorManager fxt;
 
     public OnBoardSensor gyro;
-    public FXTIrSeeker irseek;
-    public FXTLightSensor light;
 
     public Larry() {
 
@@ -75,9 +72,7 @@ public class Larry extends Robot {
 
     private void initializeSensors() {
 
-        gyro = new OnBoardSensor(FXTSensor.GYRO, fxt);
-        light = new FXTLightSensor("light");
-        irseek = new FXTIrSeeker("irseek");
+        gyro = new OnBoardSensor(Sensor.TYPE_GYROSCOPE, fxt);
 
     }
 
