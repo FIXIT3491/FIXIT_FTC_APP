@@ -97,6 +97,7 @@ public class FtcOpModeRegister implements OpModeRegister {
          * Any manual OpMode class registrations should go here.
          */
         registerOpModes(manager, "org.firstinspires.ftc.teamcode.gamecode");
+        registerOpModes(manager, "org.firstinspires.ftc.teamcode.examples");
     }
 
     public void registerOpModes(OpModeManager manager, String pkgName) {

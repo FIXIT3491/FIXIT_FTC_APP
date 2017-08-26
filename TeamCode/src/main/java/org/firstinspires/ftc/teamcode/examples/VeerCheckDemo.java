@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.velocityvortexopmodes;
+package org.firstinspires.ftc.teamcode.examples;
 
 import android.util.Log;
 
@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.robots.Fermion;
  * Created by Windows on 2017-03-04.
  */
 @Autonomous
-public class VeerCheck4 extends AutoOpMode{
+public class VeerCheckDemo extends AutoOpMode{
 
 
     @Override
@@ -24,7 +24,9 @@ public class VeerCheck4 extends AutoOpMode{
 
         f.resetTargetAngle();
         f.addVeerCheckRunnable();
-        waitForStart();
-        sleep(10000);
+
+        while (opModeIsActive()) {
+            idle();
+        }//while
     }
 }
