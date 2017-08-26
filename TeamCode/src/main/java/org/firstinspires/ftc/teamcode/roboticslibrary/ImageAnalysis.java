@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Created by Nirzvi on 2015-06-11.
  */
-public class ImageAnalysis {
+public class    ImageAnalysis {
 
     public double blobAccuracy = 3;
 

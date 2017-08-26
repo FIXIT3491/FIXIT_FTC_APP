@@ -272,7 +272,7 @@ public class Motor implements FXTDevice, Timeable {
     }//getBaseCurrentPosition
 
     /**
-     * @return the encoder tiks that the motor has moved since its encoder was rest using our library
+     * @return the encoder tiks that the motor has moved since its encoder was reset using our library
      */
     public int getPosition() {
         return getBaseCurrentPosition() - getBeginningPosition();
