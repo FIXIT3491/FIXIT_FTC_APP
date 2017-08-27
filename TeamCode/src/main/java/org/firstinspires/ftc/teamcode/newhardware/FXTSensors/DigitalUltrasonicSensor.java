@@ -48,7 +48,7 @@ public class DigitalUltrasonicSensor extends TOFSensor {
     }//pulse
 
     public double returnValue() {
-        return ((super.returnValue()) * 340.29 / 1000000000) * 1000;
+        return ((super.getTimeOfFlight()) * 340.29 / 1000000000) * 1000;
     }
 
 }//DigitalUltrasonicSensor

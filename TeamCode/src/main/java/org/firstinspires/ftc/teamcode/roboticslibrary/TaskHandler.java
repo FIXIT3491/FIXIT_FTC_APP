@@ -11,7 +11,7 @@ import java.util.concurrent.Future;
 /**
  * Created by FIXIT on 16-10-02.
  */
-public final class TaskHandler {
+public abstract class TaskHandler {
 
     private static String TAG = "TaskHandler";
 

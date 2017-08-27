@@ -4,7 +4,6 @@ import android.util.Log;
 
 import org.firstinspires.ftc.robotcontroller.internal.FtcControllerUtils;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.FXTSensor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,7 +18,6 @@ public class FXTTelemetry {
 
     public Telemetry telemetry;
     public HashMap<String, DataWriter> out = new HashMap<>();
-    private List<FXTSensor> sensors = new ArrayList<FXTSensor>();
     private HashMap<Long, Long> speakTimes = new HashMap<>();
 
     public void setTelemetry (Telemetry telem) {
@@ -183,39 +181,6 @@ public class FXTTelemetry {
         if (out != null)
             out.get(fileName).write(data);
     }
-
-
-    //DataLogging sensors
-
-    public void dataLogSensor (String fileName, FXTSensor sensor) {
-        if (out != null)
-            out.get(fileName).write(sensor.getName() + ": " + sensor); //FXTSensor.toString() is overridden
-    }
-
-    public void addSensorToDataLog (FXTSensor sensor) {
-        if (sensors.contains(sensor)) {
-            Log.e("DataLog", "Sensor is already being datalogged!");
-        } else {
-            sensors.add(sensor);
-        }
-    }
-
-    public void removeSensorFromDataLog(FXTSensor sensor) {
-        if (!sensors.contains(sensor)) {
-            Log.e("DataLog", "Sensor isn't being datalogged!");
-        } else {
-            sensors.remove(sensor);
-        }
-    }
-
-    public void dataLogSensorList(String fileName) {
-
-        if (out != null && !sensors.isEmpty()) {
-            for (int i = 0; i < sensors.size(); i++) {
-                out.get(fileName).write(sensors.get(i).getName() + ": " + sensors.get(i));
-            }//for
-        }//if
-    }//dataLogSensorList
 
     public void beginDataLogging(final String fileName) {
         TaskHandler.addLoopedTask("FXTTelemetry.DATALOGGING_" + fileName.toUpperCase(), new Runnable() {

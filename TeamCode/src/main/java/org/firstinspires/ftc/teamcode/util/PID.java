@@ -60,15 +60,15 @@ public class PID {
 
         public boolean containsP() {
             return this.equals(PID) || this.equals(PI) || this.equals(PD) || this.equals(P);
-        }
+        }//containsP
 
         public boolean containsI() {
             return this.equals(PID) || this.equals(PI) || this.equals(ID) || this.equals(I);
-        }
+        }//containsI
 
         public boolean containsD() {
             return this.equals(PID) || this.equals(ID) || this.equals(PD) || this.equals(D);
-        }
+        }//containsD
     }//Type
 
     //method to call every time a new error is calculated
@@ -85,6 +85,6 @@ public class PID {
         }//if
 
         return val;
-    }
+    }//update
 
-}
+}//PID

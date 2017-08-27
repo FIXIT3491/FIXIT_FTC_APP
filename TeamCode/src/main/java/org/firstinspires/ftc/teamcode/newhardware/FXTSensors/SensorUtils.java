@@ -57,7 +57,7 @@ public class SensorUtils {
         return orientMatrix;
     }
 
-    public static float[] getAllAngles (FXTSensor accelSensor, FXTSensor magSensor) {
+    public static float[] getAllAngles (OnBoardSensor accelSensor, OnBoardSensor magSensor) {
         float[] rotMatrix = new float[9];
         float[] incline = new float[9];
         float[] orientMatrix = new float[3];

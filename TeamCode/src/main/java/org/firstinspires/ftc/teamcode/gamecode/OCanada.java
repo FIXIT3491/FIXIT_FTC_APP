@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.gamecode;
 
 import android.media.MediaPlayer;
-import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -36,11 +35,11 @@ public class OCanada extends TeleOpMode {
     @Override
     public void loopOpMode() {
 
-//        if (joy2.buttonRight() && !mediaPlayer.isPlaying()) {
-//        } else if (joy2.buttonLeft()) {
-//            if(mediaPlayer.isPlaying()) mediaPlayer.pause();
-//            mediaPlayer.reset();
-//        }
+        if (joy2.buttonRight() && !mediaPlayer.isPlaying()) {
+        } else if (joy2.buttonLeft()) {
+            if(mediaPlayer.isPlaying()) mediaPlayer.pause();
+            mediaPlayer.reset();
+        }
 
     }
 }

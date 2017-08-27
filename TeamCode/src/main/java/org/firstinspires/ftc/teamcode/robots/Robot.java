@@ -1,19 +1,16 @@
 package org.firstinspires.ftc.teamcode.robots;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.RC;
-import org.firstinspires.ftc.teamcode.newhardware.FXTCRServo;
-import org.firstinspires.ftc.teamcode.newhardware.FXTDevice;
-import org.firstinspires.ftc.teamcode.newhardware.FXTServo;
-import org.firstinspires.ftc.teamcode.newhardware.LinearServo;
 import org.firstinspires.ftc.teamcode.newhardware.Motor;
-
-import org.xmlpull.v1.XmlPullParser;
-
-import java.util.HashMap;
+import org.firstinspires.ftc.teamcode.util.MathUtils;
 
 /**
  * Created by FIXIT on 15-08-18.
- * Default template for all raw.robots. Include basic motion methods.
+ * Default template for all raw robots. Include basic motion methods.
  */
 public class Robot {
     /**
@@ -39,10 +36,26 @@ public class Robot {
      * This is the right drive system motor
      */
     public Motor motorR;
+
     /**
      * The diameter of the wheel in inches. Default is 4 inches
      */
     public int wheelDiameter = 4;
+
+    /**
+     * The minimum power to supply the wheels when turning
+     */
+    private double minTurningSpeed = 0.1;
+
+    /**
+     * The built in Adafruit IMU
+     */
+    BNO055IMU imu;
+
+    /**
+     * The turning tolerance in degrees
+     */
+    private int degreeTolerance = 3;
 
     /**
      * Creates a default robot with a drive system in which one motor must be reversed
@@ -50,10 +63,7 @@ public class Robot {
      * driveR and driveL
      */
     public Robot() {
-        motorL = new Motor("driveL");
-        motorR = new Motor("driveR");
-        this.motorR.setReverse(true);
-
+        this("driveL", "driveR");
     }//Robot
 
     /**
@@ -67,6 +77,16 @@ public class Robot {
         this.motorR = driveR;
         this.motorR.setReverse(true);
 
+        if(RC.h.getAll(BNO055IMU.class).size() > 0){
+            imu = RC.h.get(BNO055IMU.class, "imu");
+
+            BNO055IMU.Parameters params = new BNO055IMU.Parameters();
+            params.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+            params.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+
+            imu.initialize(params);
+        }
+
     }//Robot
 
     /**
@@ -78,93 +98,15 @@ public class Robot {
         this(new Motor(driveL), new Motor(driveR));
     }//Robot
 
-    public static HashMap<String, FXTDevice> parseRobotXML (int fileId) {
-
-        String lastAddedDevice = "";
-        XmlPullParser xpp = RC.c().getResources().getXml(fileId);
-        HashMap<String, FXTDevice> devices = new HashMap<String, FXTDevice>();
-
-        try {
-            while (xpp.next() != XmlPullParser.END_DOCUMENT) {
-                if (xpp.getEventType() == XmlPullParser.START_TAG) {
-                    String tagName = xpp.getName();
-                    String name = xpp.getAttributeValue(null, "name");
-
-                    if (tagName.equals("Motor")) {
-                        Motor m = new Motor(name);
-
-                        if (xpp.getAttributeValue(null, "reversed") != null) {
-                            m.setReverse(true);
-                        }//if
-
-//                        if (xpp.getAttributeValue(null, "target").equals("checkTimer")) {
-//                            m.toggleChecking(true);
-//                        } else if (xpp.getAttributeValue(null, "target").equals("fix")) {
-//                            m.toggleTargetFixing(true);
-//                        }//elseif
-
-                        devices.put(name, m);
-                        lastAddedDevice = name;
-
-                    } else if (tagName.contains("Servo")) {
-
-                        FXTServo s;
-                        FXTCRServo cs;
-
-                        if (tagName.equals("ContServo")) {
-                            cs = new FXTCRServo(name);
-
-                            double zero = Double.parseDouble(xpp.getAttributeValue(null, "zero"));
-
-                            devices.put(name, cs);
-                        } else if (tagName.equals("LinearServo")) {
-                            s = new LinearServo(name);
-                            devices.put(name, s);
-                        } else {
-                            s = new FXTServo(name);
-                            devices.put(name, s);
-                        }//else
-
-                        lastAddedDevice = name;
-
-                    } else if (tagName.contains("Pos")) {
-
-                        ((FXTServo) devices.get(lastAddedDevice)).addPos(name, Double.parseDouble(xpp.getAttributeValue(null, "val")));
-
-                    }//elseif
-                } else if (xpp.getEventType() == XmlPullParser.END_TAG) {
-
-                    if (xpp.getName().contains("Servo")) {
-                        String defaultPos = xpp.getAttributeValue(null, "val");
-
-                        try {
-                            ((FXTServo) devices.get(lastAddedDevice)).setPosition(Double.parseDouble(defaultPos));
-                        } catch (Exception e) {
-                            ((FXTServo) devices.get(lastAddedDevice)).goToPos(defaultPos);
-                        }//catch
-                    }//if
-                }//elseif
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }//catch
-
-        return devices;
-    }//parseRobotXML
-
     /**
      * Effectively pauses the thread without risk of exception
      *
      * @param time The duration the robot waits in milliseconds
      */
     public static void wait(int time) {
-
-        try {
-            Thread.sleep(time);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if(RC.o instanceof LinearOpMode){
+            RC.l.sleep(time);
         }
-
     }//wait
 
     public boolean allReady() {
@@ -200,10 +142,6 @@ public class Robot {
      * @param speed The speed at which the motors turn value between 0.0 and 1.0
      */
     public void forward(double speed) {
-
-        motorL.toggleChecking(false);
-        motorR.toggleChecking(false);
-
         motorL.setPower(speed);
         motorR.setPower(speed);
 
@@ -218,7 +156,7 @@ public class Robot {
         motorL.setPower(speed);
         motorR.setPower(speed);
         wait(time);
-        halt();
+        stop();
     }//forward
 
     /**
@@ -226,10 +164,6 @@ public class Robot {
      * @param speed The speed at which the motors turn value between 0.0 and 1.0
      */
     public void backward(double speed) {
-
-        motorL.toggleChecking(false);
-        motorR.toggleChecking(false);
-
         motorL.setPower(-speed);
         motorR.setPower(-speed);
 
@@ -241,10 +175,9 @@ public class Robot {
      * @param time The duration the motors are on
      */
     public void backward(double speed, int time) {
-        motorL.setPower(-speed);
-        motorR.setPower(-speed);
+        backward(speed);
         wait(time);
-        halt();
+        stop();
     }//backward
 
     /**
@@ -254,14 +187,20 @@ public class Robot {
      *              If speed > 1 speed will be modified to match the parameters of the Motor
      */
     public void forwardDistance(int mm, double speed) {
-
-        motorL.toggleChecking(true);
-        motorR.toggleChecking(true);
-
         mm *= 1120 / (wheelDiameter * 25.4 * Math.PI); //convert mm to tiks
 
         motorL.setTargetAndPower(mm, speed);
         motorR.setTargetAndPower(mm, speed);
+
+        while(RC.l.opModeIsActive() && !motorR.isFin() && !motorL.isFin()){
+            if(motorL.isFin()){
+                motorL.stop();
+            }//if
+            if(motorR.isFin()){
+                motorR.stop();
+            }//if
+        }//while
+        stop();
 
     }//forwardDistance
 
@@ -272,14 +211,20 @@ public class Robot {
      *              If speed > 1 speed will be modified to match the parameters of the Motor
      */
     public void backwardDistance(int mm, double speed) {
-
-        motorL.toggleChecking(true);
-        motorR.toggleChecking(true);
-
         mm *= 1120 / (wheelDiameter * 25.4 * Math.PI); //convert mm to tiks
 
-        motorL.setTargetAndPower(-mm, speed); //target checking corrects motor direction
-        motorR.setTargetAndPower(-mm, speed);
+        motorL.setTargetAndPower(-mm, -speed); //target checking corrects motor direction
+        motorR.setTargetAndPower(-mm, -speed);
+
+        while(RC.l.opModeIsActive() && !motorR.isFin() && !motorL.isFin()){
+            if(motorL.isFin()){
+                motorL.stop();
+            }//if
+            if(motorR.isFin()){
+                motorR.stop();
+            }//if
+        }//while
+        stop();
 
     }//backwardDistance
 
@@ -288,10 +233,8 @@ public class Robot {
      * @param speed The speed at which the motors turn value between 0.0 and 1.0
      */
      public void turnR (double speed) {
-
          motorL.setPower(speed);
          motorR.setPower(-speed);
-
     }//turnR
 
     /**
@@ -299,31 +242,120 @@ public class Robot {
      * @param speed The speed at which the motors turn value between 0.0 and 1.0
      */
     public void turnL (double speed) {
-
         motorL.setPower(-speed);
         motorR.setPower(speed);
-
     }//turnL
 
+    /**
+     * Turns the robot right and stops it after the given period of time
+     * @param speed The speed to drive
+     * @param time The time it is on for
+     */
     public void turnR(double speed, int time){
-        motorL.setPower(speed);
-        motorR.setPower(-speed);
+        turnR(speed);
         wait(time);
-        halt();
+        stop();
     }
 
+    /**
+     * Turns the robot left and stops it after the given period of time
+     * @param speed The speed to drive
+     * @param time The time it is on for
+     */
     public void turnL(double speed, int time) {
-        motorL.setPower(-speed);
-        motorR.setPower(speed);
+        turnL(speed);
         wait(time);
-        halt();
+        stop();
     }//turnL
+
+    /**
+     * Turn right using the IMU for a given degrees. There is a built in ramping functionality.
+     * @param degrees The degrees to turn
+     * @param speed The speed at which to turn
+     */
+    public void imuTurnR(double degrees, double speed) {
+
+        if(degrees < degreeTolerance) return;
+        turnR(speed);
+
+        double beginAngle = MathUtils.cvtAngleToNewDomain(getIMUAngle()[0]);
+        double targetAngle = MathUtils.cvtAngleToNewDomain(beginAngle + degrees);
+
+        while (RC.l.opModeIsActive()) {
+
+            double currentAngle = MathUtils.cvtAngleToNewDomain(getIMUAngle()[0]);
+            double angleToTurn = MathUtils.cvtAngleJumpToNewDomain(targetAngle - currentAngle);
+
+            turnR(angleToTurn / 180 * (speed - minTurningSpeed) + minTurningSpeed);
+
+            if (angleToTurn < degreeTolerance) {
+                break;
+            }//if
+        }//while
+
+
+        stop();
+    }//imuTurnR
+
+    /**
+     * Turn left using the IMU for a given degrees. There is a built in ramping functionality.
+     * @param degrees The degrees to turn
+     * @param speed The speed at which to turn
+     */
+    public void imuTurnL(double degrees, double speed) {
+
+        if(degrees < degreeTolerance) return;
+        turnL(speed);
+
+        double beginAngle = MathUtils.cvtAngleToNewDomain(getIMUAngle()[0]);
+        double targetAngle = MathUtils.cvtAngleToNewDomain(beginAngle - degrees);
+
+        while (RC.l.opModeIsActive()) {
+
+            double currentAngle = MathUtils.cvtAngleToNewDomain(getIMUAngle()[0]);
+            double angleToTurn = MathUtils.cvtAngleJumpToNewDomain(currentAngle - targetAngle);
+
+            turnL(Math.signum(angleToTurn) * (Math.abs(angleToTurn) / 180 * (speed - minTurningSpeed) + minTurningSpeed));
+
+            if (Math.abs(angleToTurn) < degreeTolerance) {
+                break;
+            }//if
+        }//while
+
+        stop();
+    }//imuTurnL
+
+    /**
+     * Turn to a given heading based on the robot's initial heading. Initial is 0 degrees
+     * @param degrees The desired absolute heading
+     * @param speed The speed at which to turn
+     */
+    public void absoluteIMUTurn(double degrees, double speed) {
+        double currentAngle = MathUtils.cvtAngleToNewDomain(getIMUAngle()[0]);
+
+        double toTurn = MathUtils.cvtAngleToNewDomain(degrees - currentAngle);
+
+        if (toTurn < 0) {
+            imuTurnL(-toTurn, speed);
+        } else {
+            imuTurnR(toTurn, speed);
+        }//else
+    }//absoluteIMUTurn
 
     public void encTurnL(int tik, double speed) {
 
         motorL.setTargetAndPower(-tik, -speed);
         motorR.setTargetAndPower(tik, speed);
 
+        while(RC.l.opModeIsActive() && !motorR.isFin() && !motorL.isFin()){
+            if(motorL.isFin()){
+                motorL.stop();
+            }//if
+            if(motorR.isFin()){
+                motorR.stop();
+            }//if
+        }//while
+        stop();
     }//encTurnL
 
     public void encTurnR(int tik, double speed) {
@@ -331,25 +363,76 @@ public class Robot {
         motorL.setTargetAndPower(tik, speed);
         motorR.setTargetAndPower(-tik, -speed);
 
+        while(RC.l.opModeIsActive() && !motorR.isFin() && !motorL.isFin()){
+            if(motorL.isFin()){
+                motorL.stop();
+            }//if
+            if(motorR.isFin()){
+                motorR.stop();
+            }//if
+        }//while
+        stop();
     }//encTurnR
 
     /**
      * Stops the robot
      */
-    public void halt() {
+    public void stop() {
         motorL.stop();
         motorR.stop();
-    }//halt
+    }//stop
 
     /**
      * Stops the robot then waits for a specified time
      * @param time The duration the robot waits
      */
-    public void halt(int time) {
+    public void stop(int time) {
         motorL.stop();
         motorR.stop();
         wait(time);
-    }//halt
+    }//stop
+
+    /**Robot helper methods**/
+
+    /**
+     * Flips the direction of both motors
+     */
+    public void reverseDriveSystem(){
+        motorL.setReverse(!motorL.isReversed());
+        motorR.setReverse(!motorR.isReversed());
+    }//reverseDriveSystem
+
+    /**
+     * The minimum speed the robot while it's turning.
+     * @param minSpeed The minimum speed
+     */
+    public void setMinTurningSpeed(double minSpeed){
+        if(minSpeed <= 0){
+            minSpeed = 0.05;
+        }
+        minTurningSpeed = minSpeed;
+    }//setMinTurningSpeed
+
+    /**
+     * Sets how accurate the turn must be. Too low may never stop
+     * @param degTol The new degree tolerance
+     */
+    public void setDegreeTolerance(int degTol){
+        if (degTol < 1){
+            degTol = 1;
+        }
+        degreeTolerance = degTol;
+    }//setDegreeTolerance
+
+    /**
+     * Gets the angles from the imu
+     * @return the angles in the order x, y, z from the sensor as an array
+     */
+    public double[] getIMUAngle() {
+        Orientation orient = imu.getAngularOrientation();
+
+        return new double[] {-orient.firstAngle, -orient.secondAngle, -orient.thirdAngle};
+    }//getIMUAngle
 
 
 }//Robot

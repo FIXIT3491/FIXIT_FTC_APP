@@ -6,13 +6,13 @@ import android.util.Log;
 import com.qualcomm.hardware.adafruit.AdafruitBNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.teamcode.RC;
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.FXTAnalogUltrasonicSensor;
-import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.FXTOpticalDistanceSensor;
 import org.firstinspires.ftc.teamcode.newhardware.FXTSensors.TrackBall;
 import org.firstinspires.ftc.teamcode.newhardware.FXTServo;
 import org.firstinspires.ftc.teamcode.newhardware.Lights;
@@ -47,9 +47,9 @@ public class Fermion {
     private FXTAnalogUltrasonicSensor ultra;
     private FXTAnalogUltrasonicSensor ultraSide;
 
-    private FXTOpticalDistanceSensor leftBeacon;
-    private FXTOpticalDistanceSensor rightBeacon;
-    private FXTOpticalDistanceSensor ball;
+    private OpticalDistanceSensor leftBeacon;
+    private OpticalDistanceSensor rightBeacon;
+    private OpticalDistanceSensor ball;
 
     /*
     State Definitions
@@ -226,14 +226,14 @@ public class Fermion {
         LIGHT SENSORS
         to line up with beacons
          */
-        leftBeacon = new FXTOpticalDistanceSensor("leftBeacon");
-        rightBeacon = new FXTOpticalDistanceSensor("rightBeacon");
+        leftBeacon = RC.h.opticalDistanceSensor.get("leftBeacon");
+        rightBeacon = RC.h.opticalDistanceSensor.get("rightBeacon");
 
         /*
         LIGHT SENSOR
         to detect collected balls
          */
-        ball = new FXTOpticalDistanceSensor("ball");
+        ball = RC.h.opticalDistanceSensor.get("ball");
 
         /*
         ULTRASONIC SENSORS
@@ -868,18 +868,18 @@ public class Fermion {
      */
     public double getLight(@LightSensors int config){
         if(config == Robot.LEFT){
-            return leftBeacon.getValue();
+            return leftBeacon.getLightDetected();
         } else {
-            return rightBeacon.getValue();
+            return rightBeacon.getLightDetected();
         }//else
     }//getLight
 
     public double getCollectorLightSensor() {
-        return ball.getValue();
+        return ball.getLightDetected();
     }//getCollectorLightSensor
 
     public boolean seesBall(){
-        return ball.getValue() > 0.05;
+        return ball.getLightDetected() > 0.05;
     }//seesBall
 
     public double getBatteryVoltage(){

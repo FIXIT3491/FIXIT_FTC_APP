@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannelController;
 /**
  * Created by Windows on 2016-03-26.
  */
-public class TOFSensor extends FXTSensor {
+public class TOFSensor {
 
     public DigitalChannel channel;
     boolean currentlyTiming = false;
@@ -36,7 +36,7 @@ public class TOFSensor extends FXTSensor {
         }//if
     }//run
 
-    public double returnValue() {
+    public double getTimeOfFlight() {
         return latestTime;
     }//returnValue
 
