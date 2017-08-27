@@ -17,7 +17,7 @@ public class Motor implements FXTDevice, Timeable {
     private long targetTime = -1;
     private double plannedSpeed = 0;
 
-    private int numTiksPerRev = 1120;
+    protected int numTiksPerRev = 1120;
     private MotorType motorType = MotorType.AM40;
 
     private int beginningPosition = 0;

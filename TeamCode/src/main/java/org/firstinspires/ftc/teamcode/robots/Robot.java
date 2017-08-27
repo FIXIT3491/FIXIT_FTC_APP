@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.robots;
 
+import android.util.Log;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -281,10 +283,14 @@ public class Robot {
         double beginAngle = MathUtils.cvtAngleToNewDomain(getIMUAngle()[0]);
         double targetAngle = MathUtils.cvtAngleToNewDomain(beginAngle + degrees);
 
+
         while (RC.l.opModeIsActive()) {
 
             double currentAngle = MathUtils.cvtAngleToNewDomain(getIMUAngle()[0]);
             double angleToTurn = MathUtils.cvtAngleJumpToNewDomain(targetAngle - currentAngle);
+
+            Log.i("Angle", currentAngle + "");
+            Log.i("AnSpeeds", motorL.getPower() + ", " + motorR.getPower());
 
             turnR(angleToTurn / 180 * (speed - minTurningSpeed) + minTurningSpeed);
 
