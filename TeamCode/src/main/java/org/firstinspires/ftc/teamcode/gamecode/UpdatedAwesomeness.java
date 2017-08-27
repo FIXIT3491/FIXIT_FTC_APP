@@ -21,12 +21,22 @@ public class UpdatedAwesomeness extends AutoOpMode {
 
         waitForStart();
 
-        while (sensor.red() < 100 && opModeIsActive()) {
+        while (sensor.red() < 100 && sensor.blue() < 100 && opModeIsActive()) {
             ceaser.forward(0.15);
+
         }
 
-        ceaser.backward(0.5, 500);
-        ceaser.imuTurnL(90, 0.5);
-        ceaser.stop();
+        if (sensor.red() > 100){
+            ceaser.backward(0.5, 500);
+            ceaser.imuTurnL(90, 0.5);
+            ceaser.stop();
+        }
+        if (sensor.blue() > 100) {
+
+            ceaser.backward(0.5, 500);
+            ceaser.imuTurnR(90, 0.5);
+            ceaser.stop();
+        }
+
     }
 }
