@@ -1,4 +1,12 @@
-# ftc_app
+# FIX IT FTC APP
+FIX IT FTC APP has [migrated to V2.](https://github.com/FIXIT3491/FIXIT_FTC_APP_V2)
+
+All future updates will be made in the aforementioned Repo.
+
+The "README" below will no longer be up to date, kept for historic purposes only.
+**************************************************************************************
+
+# Welcome
 FTC Android Studio project to create FTC Robot Controller app.
 
 This is the FTC SDK that can be used to create an FTC Robot Controller app, with custom op modes.
